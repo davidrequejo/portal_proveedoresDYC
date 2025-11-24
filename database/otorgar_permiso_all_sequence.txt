@@ -1,0 +1,13 @@
+DO $$
+DECLARE
+    seq RECORD;
+BEGIN
+    FOR seq IN
+        SELECT sequence_schema, sequence_name
+        FROM information_schema.sequences
+        WHERE sequence_schema = 'public'
+    LOOP
+        EXECUTE format('GRANT USAGE, SELECT ON SEQUENCE %I.%I TO optimiza_erp_urbalima',
+                        seq.sequence_schema, seq.sequence_name);
+    END LOOP;
+END $$;
