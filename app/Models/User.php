@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\DB;
 use App\Models\Permiso;
 
 class User extends Authenticatable
@@ -21,12 +22,18 @@ class User extends Authenticatable
     use Notifiable;
     use TwoFactorAuthenticatable;
 
+    protected $table = 'users';
+
+    protected $primaryKey = 'id';
+
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
+        'idpersona',
         'name',
         'email',
         'password',
@@ -68,10 +75,40 @@ class User extends Authenticatable
 
     public function permisos()
     {
-        return $this->belongsToMany(Permiso::class, 'usuario_permiso', 'idusuario', 'idpermiso')
+        return $this->belongsToMany(Permiso::class, 'usuario_permiso', 'users_id', 'idpermiso')
                     ->withPivot('idusuario_permiso')
                     ->withTimestamps();
     }
+
+    public static function personas_sin_usuario()
+    {
+
+      $personas = DB::table('persona as p')
+      ->join('tipo_persona as tp', 'p.idtipo_persona', '=', 'tp.idtipo_persona')
+      ->leftJoin('users as u', 'p.idpersona', '=', 'u.idpersona')
+      ->select( 'p.idpersona', 'p.nombre_razonsocial', 'p.numero_documento', 'tp.descripcion as Rolpersona' )
+      ->where('p.estado', 1) ->whereNull('u.idpersona') ->get();
+
+      return $personas;
+
+    }
+
+
+
+        // helper genérico: ¿tiene un permiso?
+    public function hasGrupo(string $grupo): bool
+    {
+        if (! $this->relationLoaded('permisos')) {
+            $this->load('permisos');
+        }
+
+        return $this->permisos->contains('grupo', $grupo);
+    }
+    
+    public function getGrupoUtilitariosAttribute(): bool         { return $this->hasGrupo('Utilitarios'); }        // grupo_utilitarios
+    public function getGrupoconfiguracionAttribute(): bool        { return $this->hasGrupo('configuracion'); }     // grupo_configuracion
+
+
 
     // helper genérico: ¿tiene un permiso?
     public function hasPermiso(string $escenario): bool
@@ -82,12 +119,17 @@ class User extends Authenticatable
         return $this->permisos->contains('escenario', $escenario);
     }
 
+
     // atajos (para llamarlos como Auth::user()->perm_presupuesto)
-    public function getPermPresupuestoAttribute(): bool     { return $this->hasPermiso('presupuesto'); }        // perm_presupuesto
-    public function getPermProyectoAttribute(): bool        { return $this->hasPermiso('proyecto'); }           // perm_proyecto
-    public function getPermRecursoAttribute(): bool         { return $this->hasPermiso('recurso'); }            // perm_recurso
-    public function getPermConfiguracionAttribute(): bool   { return $this->hasPermiso('configuracion'); }      // perm_configuracion
-    public function getPermUtilitarioAttribute(): bool      { return $this->hasPermiso('utilitario'); }         // perm_utilitario
-    public function getPermImportarHoraAttribute(): bool    { return $this->hasPermiso('importar_hora'); }      // perm_importar_hora
+    public function getPermPresupuestoAttribute(): bool         { return $this->hasPermiso('presupuesto'); }        // perm_presupuesto
+    public function getPermProyectoAttribute(): bool            { return $this->hasPermiso('proyecto'); }           // perm_proyecto
+    public function getPermRecursoAttribute(): bool             { return $this->hasPermiso('recurso'); }            // perm_recurso
+    public function getPermConfiguracionAttribute(): bool       { return $this->hasPermiso('configuracion'); }      // perm_configuracion
+    public function getPermUtilitarioAttribute(): bool          { return $this->hasPermiso('utilitario'); }         // perm_utilitario
     public function getPermCombinarTxtAttribute(): bool         { return $this->hasPermiso('combinar_txt'); }       // perm_combinar_txt
+    public function getPermUsuarioAttribute(): bool             { return $this->hasPermiso('usuarios'); }           // perm_usuario
+    public function getPermTipoSocioNogocioAttribute(): bool    { return $this->hasPermiso('tipo_socio_negocio'); }  // perm_tipo_socio_negocio
+    public function getPermTipoEstandarAttribute(): bool        { return $this->hasPermiso('tipo_estandar'); }      // perm_tipo_estandar
+    public function getPermProveedorAttribute(): bool           { return $this->hasPermiso('proveedor'); }           // perm_proveedor
+    public function getPermPersonaAttribute(): bool             { return $this->hasPermiso('persona'); }           // perm_persona
 }

@@ -32,7 +32,11 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+        "app/Helpers/ApiResponse.php",
+        "app/Helpers/ApiconsultaReniecSunat.php"
+    ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -75,6 +79,7 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true,
-    "files": [ "app/Helpers/ApiResponse.php"]
+    "prefer-stable": true
+
+
 }

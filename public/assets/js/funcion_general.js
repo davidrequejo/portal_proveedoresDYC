@@ -1,3 +1,6 @@
+// Configuración del token CSRF
+$.ajaxSetup({headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')    }});
+
 /*  ══════════════════════════════════════════ - F E C H A S - ══════════════════════════════════════════ */
 
 function sumar_mes(m = 1, fecha) { var date = new Date(fecha);   return new Date( date.setMonth(date.getMonth() + m ) ).toISOString().slice(0, 10); }
@@ -1214,15 +1217,15 @@ function buscar_sunat_reniec(input='') {
 
   let tipo_doc = $(`#tipo_documento${input}`).val();
 
-  let dni_ruc = $(`#num_documento${input}`).val(); 
+  let dni_ruc = $(`#numero_documento${input}`).val(); 
    
-  if (tipo_doc == "DNI") {
+  if (tipo_doc == "1") { //dni
 
     if (dni_ruc.length == "8") {
 
-      $.post("../ajax/ajax_general.php?op=reniec", { dni: dni_ruc }, function (data, status) {
+      $.post("/consulta/reniec", { dni: dni_ruc }, function (data, status) {
 
-        data = JSON.parse(data);  console.log(data);
+        //data = JSON.parse(data);  console.log(data);
 
         if (data == null) {
 
@@ -1230,7 +1233,7 @@ function buscar_sunat_reniec(input='') {
   
           $(`#charge${input}`).hide();
 
-          $(`#nombre${input}`).val(''); $(`#titular_cuenta${input}`).val('');
+          $(`#nombre_razonsocial${input}`).val(''); $(`#titular_cuenta${input}`).val('');
   
           toastr.error("Verifique su conexion a internet o el sistema de BUSQUEDA esta en mantenimiento.");
           
@@ -1249,7 +1252,7 @@ function buscar_sunat_reniec(input='') {
 
             $(`#charge${input}`).hide();
 
-            $(`#nombre${input}`).val(data.nombres + " " + data.apellidoPaterno + " " + data.apellidoMaterno);
+            $(`#nombre_razonsocial${input}`).val(data.nombres + " " + data.apellidoPaterno + " " + data.apellidoMaterno);
             $(`#titular_cuenta${input}`).val(data.nombres + " " + data.apellidoPaterno + " " + data.apellidoMaterno);
 
             toastr.success("Persona encontrada!!!!");
@@ -1265,17 +1268,18 @@ function buscar_sunat_reniec(input='') {
 
       $(`#charge${input}`).hide();
 
-      $(`#nombre${input}`).val(''); $(`#titular_cuenta${input}`).val('');
+      $(`#nombre_razonsocial${input}`).val(''); $(`#titular_cuenta${input}`).val('');
 
       toastr.info("Asegurese de que el DNI tenga 8 dígitos!!!");
     }
   } else {
-    if (tipo_doc == "RUC") {
+    if (tipo_doc == "6") { //ruc
 
       if (dni_ruc.length == "11") {
-        $.post("../ajax/ajax_general.php?op=sunat", { ruc: dni_ruc }, function (data, status) {
+        $.post("/consulta/sunat", { ruc: dni_ruc }, function (data, status) {
 
-          data = JSON.parse(data);    console.log(data);
+
+          //data = JSON.parse(data);    console.log(data);
 
           if (data == null) {
             $(`#search${input}`).show();
@@ -1292,7 +1296,7 @@ function buscar_sunat_reniec(input='') {
 
               $(`#charge${input}`).hide();
 
-              $(`#nombre${input}`).val(''); $(`#titular_cuenta${input}`).val('');  $(`#empresa${input}`).val('');  $(`#razon_social${input}`).val(''); $(`#direccion${input}`).val('');
+              $(`#nombre_razonsocial${input}`).val(''); $(`#titular_cuenta${input}`).val('');  $(`#empresa${input}`).val('');  $(`#razon_social${input}`).val(''); $(`#direccion${input}`).val('');
 
               toastr.error("Datos no encontrados en la SUNAT!!!");
               
@@ -1304,7 +1308,7 @@ function buscar_sunat_reniec(input='') {
 
                 $(`#charge${input}`).hide();
 
-                data.razonSocial == null ? $(`#nombre${input}`).val(data.nombreComercial) : $(`#nombre${input}`).val(data.razonSocial);
+                data.razonSocial == null ? $(`#nombre_razonsocial${input}`).val(data.nombreComercial) : $(`#nombre_razonsocial${input}`).val(data.razonSocial);
                 data.razonSocial == null ? $(`#empresa${input}`).val(data.nombreComercial) : $(`#empresa${input}`).val(data.razonSocial);
                 data.razonSocial == null ? $(`#razon_social${input}`).val(data.nombreComercial) : $(`#razon_social${input}`).val(data.razonSocial);
 
@@ -1327,7 +1331,7 @@ function buscar_sunat_reniec(input='') {
 
                 $(`#charge${input}`).hide();
 
-                data.razonSocial == null ? $(`#nombre${input}`).val(data.nombreComercial) : $(`#nombre${input}`).val(data.razonSocial);
+                data.razonSocial == null ? $(`#nombre_razonsocial${input}`).val(data.nombreComercial) : $(`#nombre_razonsocial${input}`).val(data.razonSocial);
                 data.razonSocial == null ? $(`#empresa${input}`).val(data.empresaComercial) : $(`#empresa${input}`).val(data.razonSocial);
 
                 data.razonSocial == null ? $(`#titular_cuenta${input}`).val(data.nombreComercial) : $(`#titular_cuenta${input}`).val(data.razonSocial);
@@ -1350,7 +1354,7 @@ function buscar_sunat_reniec(input='') {
 
         $(`#charge${input}`).hide();
 
-        $(`#nombre${input}`).val(''); $(`#titular_cuenta${input}`).val('');  $(`#empresa${input}`).val('');  $(`#razon_social${input}`).val(''); $(`#direccion${input}`).val('');
+        $(`#nombre_razonsocial${input}`).val(''); $(`#titular_cuenta${input}`).val('');  $(`#empresa${input}`).val('');  $(`#razon_social${input}`).val(''); $(`#direccion${input}`).val('');
 
         toastr.info("Asegurese de que el RUC tenga 11 dígitos!!!");
       }

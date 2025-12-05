@@ -1,28 +1,128 @@
 
-$("#guardar_registro_proyecto").on("click", function (e) { $("#submit-form-proyecto").submit(); });   
+$("#guardar_registro_usuario").on("click", function (e) { $("#submit-form-usuario").submit(); });   
 
-// lista_select2("../ajax/ajax_general.php?op=select2EmpresaACargo", '#empresa_acargo', null);
+// Cargar select2 de socios de negocio
+ lista_select2('/select2/socionegocio', '#idpersona');
 
-$('#idempresa').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
-$('#idsocio_negocio').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
+ $("#idpersona").select2({ theme: "bootstrap4", placeholder: "Seleccionar Socio Negocio", allowClear: true, });
+
+$('#tipo_persona').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
+$('#tipo_documento').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
 
 
 function show_hide_escenario(flag) {
   if (flag == 1) {            // Tabla principal
-    $('#div-tabla-principal-proyecto').show();
-    $("#div-ver-detalle-proyecto").hide();
-    $(".btn-agregar-proyecto").show();
+    $('#div-tabla-principal-usuario').show();
+    $(".btn-agregar-usuario").show();
     $(".btn-cancelar").hide();
     
   } else if (flag == 2) {     // Detalle proyecto
-    $('#div-tabla-principal-proyecto').hide();
-    $("#div-ver-detalle-proyecto").show();
-    $(".btn-agregar-proyecto").hide();
+    $('#div-tabla-principal-usuario').hide();
+    $(".btn-agregar-usuario").hide();
     $(".btn-cancelar").show();
+    
   } else if (flag == 3) {     //
   } else if (flag == 4) {
     
   }
+}
+
+$(document).ready(function() {
+    // Cuando el valor del select cambia
+    $('#idpersona').change(function() {
+        // Obtener el valor del atributo 'data-provincia' del option seleccionado
+        var rol = $(this).find('option:selected').data('rol');
+        $('#tipoPersona').val(rol);
+        
+    });
+
+    permisos_usuario();
+    
+});
+
+
+// Cargar permisos de usuario
+function permisos_usuario(){
+  
+  $.getJSON("/usuario/permisos_crear", state, function(res){
+
+    console.log(res.data);
+
+    // Limpiar contenedor
+    $('#permisos_usuario').html('');
+
+    // Crear contenedor general de 2 columnas
+    let html = `
+        <div class="row">
+            <div class="col-md-6" id="col1"></div>
+            <div class="col-md-6" id="col2"></div>
+        </div>
+    `;
+
+    $('#permisos_usuario').append(html);
+
+    // Obtener grupos
+    const grupos = Object.keys(res.data);
+
+    // Dividir grupos a la mitad
+    const mitad = Math.ceil(grupos.length / 2);
+
+    const gruposCol1 = grupos.slice(0, mitad);
+    const gruposCol2 = grupos.slice(mitad);
+
+    // ---- COLUMNA 1 ----
+    gruposCol1.forEach(grupo => {
+
+        $('#col1').append(`
+            <h6 class="fw-bold text-primary text-uppercase mt-3">${grupo}</h6>
+            <div id="grupo_${grupo}"></div>
+        `);
+
+        res.data[grupo].forEach(p => {
+            $(`#grupo_${grupo}`).append(`
+                <div class="form-check mb-1">
+                    <input 
+                        class="form-check-input" 
+                        type="checkbox" 
+                        name="permisos[]" 
+                        id="permiso_${p.idpermiso}"
+                        value="${p.idpermiso}">
+                    <label class="form-check-label" for="permiso_${p.idpermiso}">
+                        ${p.escenario}
+                    </label>
+                </div>
+            `);
+        });
+
+    });
+
+    // ---- COLUMNA 2 ----
+    gruposCol2.forEach(grupo => {
+
+        $('#col2').append(`
+            <h6 class="fw-bold text-primary text-uppercase mt-3">${grupo}</h6>
+            <div id="grupo_${grupo}"></div>
+        `);
+
+        res.data[grupo].forEach(p => {
+            $(`#grupo_${grupo}`).append(`
+                <div class="form-check mb-1">
+                    <input 
+                        class="form-check-input" 
+                        type="checkbox" 
+                        name="permisos[]" 
+                        id="permiso_${p.idpermiso}"
+                        value="${p.idpermiso}">
+                    <label class="form-check-label" for="permiso_${p.idpermiso}">
+                        ${p.escenario}
+                    </label>
+                </div>
+            `);
+        });
+
+    });
+
+  }).fail(function (xhr) { ver_errores(xhr); });
 }
 
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -38,9 +138,12 @@ const state = {
 };
 
 // Cargar datos
-function tabla_principal_cargar(){
+function tabla_principal_usuario(){
   
-  $.getJSON("/proyectos/tabla_principal", state, function(res){
+  $.getJSON("/usuario/tabla_principal", state, function(res){
+
+    console.log(res.data);
+    
     renderFilas(res.data);
     renderPaginacion(res.current_page, res.last_page);
     marcarOrden(state.sort, state.dir);
@@ -49,29 +152,29 @@ function tabla_principal_cargar(){
 
 // Render filas de la tabla
 function renderFilas(rows){
-  const $tb = $("#tabla-proyectos tbody").empty();
+  const $tb = $("#tabla-proveedores tbody").empty();
   if (!rows || rows.length === 0){
     $tb.append('<tr><td colspan="15" class="text-center text-muted">Sin resultados</td></tr>');
     return;
   }
   rows.forEach(r => {
+    estado = r.estado_trash == '1'?' <span class="text-center badge badge-success">Activado</span>':'Deshabilitado';
     $tb.append(`
-      <tr class="fila-proyecto" data-id="${r.idproyecto}">          
+      <tr class="fila-proyecto" data-id="${r.id}">          
         <td class="py-1"> 
           <div class="btn-group btn-group-sm">
-            <button class="btn btn-warning text-nowrap bnt-editar-proyecto" onclick="ver_editar_proyecto(${r.idproyecto})" data-toggle="tooltip" data-original-title="Editar"><i class="ti ti-edit"></i></button>
-            <button class="btn btn-info text-nowrap bn-ver-proyecto" onclick="ver_detalle_proyecto(${r.idproyecto})" data-toggle="tooltip" data-original-title="Ver"><i class="ti ti-eye-cog"></i></button>
+            <button class="btn btn-warning text-nowrap bnt-editar-proyecto" onclick="ver_editar_proyecto(${r.id})" data-toggle="tooltip" data-original-title="Editar"><i class="ti ti-edit"></i></button>
+            <button class="btn btn-info text-nowrap bn-ver-proyecto" onclick="ver_detalle_proyecto(${r.id})" data-toggle="tooltip" data-original-title="Ver"><i class="ti ti-eye-cog"></i></button>
           </div>
         </td>
-        <td class="py-1 text-nowrap" >${r.codigo ?? ''}</td>
-        <td class="py-1 text-nowrap" >${r.descripcion ?? ''}</td>
-        <td class="py-1" >${r.cliente ?? ''}</td>
-        <td class="py-1" >${r.empresa ?? ''}</td>
-        <td class="py-1 text-nowrap" >${r.fecha_inicio_dmy ?? ''}</td>
-        <td class="py-1 text-nowrap" >${r.fecha_fin_dmy ?? ''}</td>
-        <td class="py-1 text-right">${ formato_miles( (r.total_presupuesto ?? 0) )}</td>
-        <td class="py-1 text-nowrap">${ r.direccion }</td>
-        <td class="py-1 text-nowrap">${ r.ubicacion }</td>
+        <td class="py-1 text-center" >${r.id ?? ''}</td>
+        <td class="py-1 text-nowrap" >${r.usuario ?? ''}</td>
+        <td class="py-1" >${r.nombre_razonsocial ?? ''}</td>
+        <td class="py-1" >${r.abreviatura ?? ''}</td>
+        <td class="py-1 text-nowrap" >${r.numero_documento ?? ''}</td>
+        <td class="py-1 text-nowrap" >${r.tipo_entidad_sunat ?? ''}</td>
+        <td class="py-1 text-nowrap">${r.tipo_persona ?? ''}</td>
+        <td class="py-1 text-nowrap">${ estado }</td>
         
       </tr>
     `);
@@ -99,44 +202,44 @@ function renderPaginacion(actual, total){
 
 // Marcar orden visualmente
 function marcarOrden(col, dir){
-  $("#tabla-proyectos thead th.sortable").each(function(){ const $th = $(this);  const c = $th.data('sort');  $th.removeClass('asc desc'); if (c === col) $th.addClass(dir);  });
+  $("#tabla-proveedores thead th.sortable").each(function(){ const $th = $(this);  const c = $th.data('sort');  $th.removeClass('asc desc'); if (c === col) $th.addClass(dir);  });
 }
 
 // Eventos: click en paginación
 $("#paginacion").on("click", "a.page-link", function(e){  
-  $("#tabla-proyectos tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Buscando...</td></tr>');
-  e.preventDefault();   const page = parseInt($(this).data("page"), 10); if (!isNaN(page)){ state.page = Math.max(1, page); tabla_principal_cargar(); } 
+  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Buscando...</td></tr>');
+  e.preventDefault();   const page = parseInt($(this).data("page"), 10); if (!isNaN(page)){ state.page = Math.max(1, page); tabla_principal_usuario(); } 
 });
 
 // Eventos: ordenar al hacer clic en header
-$("#tabla-proyectos thead").on("click", "th.sortable", function(){
-  $("#tabla-proyectos tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Ordenando...</td></tr>');
+$("#tabla-proveedores thead").on("click", "th.sortable", function(){
+  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Ordenando...</td></tr>');
   const col = $(this).data("sort"); if (state.sort === col) { state.dir = (state.dir === 'asc') ? 'desc' : 'asc'; } else { state.sort = col;  state.dir  = 'asc'; } state.page = 1;    
-  tabla_principal_cargar();
+  tabla_principal_usuario();
 });
 
 // Búsqueda con debounce
 let t = null;
 $("#buscar").on("input", function(){
-  $("#tabla-proyectos tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Buscando...</td></tr>');
-  const val = $(this).val(); clearTimeout(t); t = setTimeout(function(){ state.q = val; state.page = 1; tabla_principal_cargar(); }, 300);
+  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Buscando...</td></tr>');
+  const val = $(this).val(); clearTimeout(t); t = setTimeout(function(){ state.q = val; state.page = 1; tabla_principal_usuario(); }, 300);
 });
 
 // Cambiar tamaño de página
 $("#perPage").on("change", function(){
-  $("#tabla-proyectos tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');
+  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');
   state.per_page = parseInt($(this).val(), 10) || 20;  state.page = 1;
-  tabla_principal_cargar();
+  tabla_principal_usuario();
 });
 
 // Carga inicial
-tabla_principal_cargar();
+tabla_principal_usuario();
 
 $(".recargar-tabla-proyecto").on("click", function(){
   toastr_info('<i class="ti ti-checks"></i> Actualizando...', 'Los datos se estan actualizado', 500);
-  $("#tabla-proyectos tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');    
+  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');    
 
-  tabla_principal_cargar();
+  tabla_principal_usuario();
 });
 
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -167,7 +270,7 @@ function ver_editar_proyecto(idproyecto) {
   $("#cargando-1-formulario").hide();
   $("#cargando-2-formulario").show();
   limpiar_form_proyecto();
-  $('#modal-agregar-proyecto').modal('show');
+  $('#modal-agregar-usuario').modal('show');
   $.getJSON(`/proyectos/${idproyecto}/ver-editar`, function (e) {
     if (e.status == true) {
       $("#idproyecto").val(e.data.idproyecto);
@@ -187,19 +290,20 @@ function ver_editar_proyecto(idproyecto) {
 
 }
 
-function guardar_y_editar_proyecto(e) {
+function guardar_y_editar_proveedor(e) {
   // e.preventDefault(); //No se activará la acción predeterminada del evento
-  var formData = new FormData($("#form-agregar-proyecto")[0]);
+  var formData = new FormData($("#form-agregar-usuario")[0]);
 
-  var id = $("#idproyecto").val();
+  var id = $("#id").val();
   var url_editar_crear = '';
   if (id == '') {
-    url_editar_crear =  `/proyectos/crear_proyecto` ;    
+    url_editar_crear =  `/persona/crear_usuario` ;    
   } else {
     url_editar_crear = `/proyectos/editar_proyecto/${id}`;
     formData.append('_method', 'PUT'); // spoof para Laravel
   }
   
+
   $.ajax({
     url: url_editar_crear,
     type: "POST",
@@ -209,15 +313,15 @@ function guardar_y_editar_proyecto(e) {
     success: function (e) {
       try {        
         if (e.status == true) {          
-          tabla_principal_cargar();
+          tabla_principal_usuario();
           limpiar_form_proyecto();
           Swal.fire("Correcto!", "Proyecto guardado correctamente", "success");          
-          $("#modal-agregar-proyecto").modal("hide");           
+          $("#modal-agregar-usuario").modal("hide");           
         }else{
           ver_errores(e);				 
         }
       } catch (err) { console.log('Error: ', err.message); toastr.error('<h5 class="font-size-16px">Error temporal!!</h5> puede intentalo mas tarde, o comuniquese con <i><a href="tel:+51921305769" >921-305-769</a></i> ─ <i><a href="tel:+51921487276" >921-487-276</a></i>'); } 
-      $("#guardar_registro_proyecto").html('Guardar Cambios').removeClass('disabled');
+      $("#guardar_registro_usuario").html('Guardar Cambios').removeClass('disabled');
     },
     xhr: function () {
       var xhr = new window.XMLHttpRequest();
@@ -230,7 +334,7 @@ function guardar_y_editar_proyecto(e) {
       return xhr;
     },
     beforeSend: function () {
-      $("#guardar_registro_proyecto").html('<i class="fas fa-spinner fa-pulse fa-lg"></i>').addClass('disabled');
+      $("#guardar_registro_usuario").html('<i class="fas fa-spinner fa-pulse fa-lg"></i>').addClass('disabled');
       $("#barra_progress_proyecto").css({ width: "0%",  });
       $("#barra_progress_proyecto").text("0%");
     },
@@ -241,8 +345,6 @@ function guardar_y_editar_proyecto(e) {
     error: function (jqXhr) { ver_errores(jqXhr); },
   });
 }
-
-
 
 function empezar_proyecto(idproyecto, nombre_proyecto ) {
   crud_simple_alerta(
@@ -380,27 +482,29 @@ $(function () {
 
   // validamos el formulario  
 
-  $('#fecha_pago_obrero').on('change', function() { $(this).trigger('blur'); });
-  $('#fecha_valorizacion').on('change', function() { $(this).trigger('blur'); });
-  $('#empresa_acargo').on('change', function() { $(this).trigger('blur'); });
+  $('#tipo_entidad_sunat').on('change', function() { $(this).trigger('blur'); });
+  $('#tipo_documento').on('change', function() { $(this).trigger('blur'); });
 
-  $("#form-agregar-proyecto").validate({
+  $("#form-agregar-usuario").validate({
     //ignore: '.select2-input, .select2-focusser',
     rules: {
-      codigo:           { required: true, minlength: 5, maxlength: 8, },
-      descripcion:      { required: true, minlength: 4, maxlength: 300 },
-      direccion:        { required: true, minlength: 4, maxlength: 300 },
-      ubicacion:        { required: true, minlength: 4, maxlength: 300 },
-      fecha_inicio:     { required: true, },
-      fecha_fin:        { required: true, },      
+
+      tipo_entidad_sunat:    { required: true, },
+      tipo_documento:  { required: true, },
+      numero_documento:   { required: true, },
+      direccion:       { required: true, },
+      nombre_razonsocial: { required: true, },
+      celular:        { required: true, },
+      email:           { required: true, },      
     },
     messages: {
-      codigo:           { required: "Campo requerido.", minlength: "MÍNIMO {0} caracteres.", maxlength: "MÁXIMO {0} caracteres.", },
-      descripcion:      { required: "Campo requerido.", minlength: "MÍNIMO {0} caracteres.", maxlength: "MÁXIMO {0} caracteres.", },
-      direccion:        { required: "Campo requerido.", minlength: "MÍNIMO {0} caracteres.", maxlength: "MÁXIMO {0} caracteres.", },
-      ubicacion:        { required: "Campo requerido.", },
-      fecha_inicio:     { required: "Campo requerido.", },
-      fecha_fin:        { required: "Campo requerido.", },
+      tipo_entidad_sunat:    { required: "Campo requerido.", },
+      tipo_documento:  { required: "Campo requerido.", },
+      numero_documento:   { required: "Campo requerido.", },
+      direccion:       { required: "Campo requerido.", },
+      nombre_razonsocial: { required: "Campo requerido.", },
+      celular:        { required: "Campo requerido.", },
+      email:           { required: "Campo requerido.", },
     },
     
     errorElement: "span",
@@ -420,12 +524,11 @@ $(function () {
 
     submitHandler: function (e) {
       $(".modal-body").animate({ scrollTop: $(document).height() }, 600); // Scrollea hasta abajo de la página
-      guardar_y_editar_proyecto(e);       
+      guardar_y_editar_proveedor(e);       
     },
   });
 
-  $('#fecha_pago_obrero').rules('add', { required: true, messages: {  required: "Campo requerido" } });
-  $('#fecha_valorizacion').rules('add', { required: true, messages: {  required: "Campo requerido" } });
-  $('#empresa_acargo').rules('add', { required: true, messages: {  required: "Campo requerido" } });
+  $('#tipo_entidad_sunat').rules('add', { required: true, messages: {  required: "Campo requerido" } });
+  $('#tipo_documento').rules('add', { required: true, messages: {  required: "Campo requerido" } });
 
 });

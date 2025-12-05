@@ -10,6 +10,12 @@ use App\Http\Controllers\PresupuestoDetalleController;
 use App\Http\Controllers\PresupuestoGrupoController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\RecursoController;
+use App\Http\Controllers\ProveedorController;
+use App\Http\Controllers\PersonaController;
+Use App\Http\Controllers\ApiReniecSunatController;
+use App\Http\Controllers\UbigeoDistritoController;
+use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\Tipo_estandarController;
 
 
 Route::get('/', function () {  return redirect()->route('login'); });
@@ -30,7 +36,51 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::get('/proyectos/tabla_principal', [ProyectoController::class, 'tabla_principal'])->name('proyectos.datatable'); // AJAX
     Route::get('/proyectos/{idproyecto}/ver-editar', [ProyectoController::class, 'ver_editar_proyecto'])->whereNumber('idproyecto')->name('proyectos.ver_editar');
     Route::resource('proyectos', ProyectoController::class);
-   
+
+        // ::::::::::::::::: PERSONAS SOCIO NEGOCIO ::::::::::::::::::::::::::::::
+    Route::post('/persona/crear_persona', [PersonaController::class, 'crear_persona'])->name('persona.crear_persona');                     // crear
+    Route::get('/persona/tabla_principal', [PersonaController::class, 'Listar_personas'])->name('persona.Listar_personas'); // AJAX
+    Route::get('/select2/Rolpersona', [PersonaController::class, 'selec2Rolpersona']);
+    Route::get('/persona/{idpersona}/ver-editar', [PersonaController::class, 'mostrar_editar_persona'])->whereNumber('idpersona')->name('persona.mostrar_editar_persona'); //mostar para editar
+    Route::put('/persona/editar_persona/{idpersona}', [PersonaController::class, 'editar_persona'])->whereNumber('idpersona')->name('persona.editar_persona'); // editar
+    Route::put('/persona/eliminar_persona/{idpersona}', [PersonaController::class, 'eliminar_persona'])->whereNumber('idpersona')->name('persona.eliminar_persona'); // eliminar
+    Route::resource('persona', PersonaController::class);
+
+
+    //:::::::::::::::::::::::::. TIPO ESTANDAR ::::::::::::::::::::::::::::::
+    Route::post('/tipoestandar/crear_tipoestandar', [Tipo_estandarController::class, 'crear_tipoestandar'])->name('tipoestandar.crear_tipoestandar');                     // crear
+    Route::get('/tipoestandar/tabla_principal', [Tipo_estandarController::class, 'Listar_tipoestandar'])->name('tipoestandar.Listar_tipoestandar'); // AJAX
+    Route::get('/tipoestandar/{idtipoestandarproveedor}/ver-editar', [Tipo_estandarController::class, 'mostrar_tipoestandar'])->whereNumber('idtipoestandarproveedor')->name('tipoestandar.mostrar_tipoestandar'); //mostar para editar
+    Route::put('/tipoestandar/editar_tipoestandar/{idtipoestandarproveedor}', [Tipo_estandarController::class, 'editar_tipoestandar'])->whereNumber('idtipoestandarproveedor')->name('tipoestandar.editar_tipoestandar'); // editar
+    Route::put('/tipoestandar/eliminar_tipoestandar/{idtipoestandarproveedor}', [Tipo_estandarController::class, 'eliminar_tipoestandar'])->whereNumber('idtipoestandarproveedor')->name('tipoestandar.eliminar_tipoestandar'); // eliminar
+    Route::resource('tipo_estandar', Tipo_estandarController::class);
+
+    
+    // :::::::::::::::::::::::::::::: P R O V E E D O R E S ::::::::::::::::::::::::::::::
+    Route::post('/proveedor/crear_proveedor', [ProveedorController::class, 'crear_proveedor'])->name('proveedor.crear_proveedor');                     // crear
+    //Route::put('/proyectos/editar_proyecto/{idproyecto}', [ProyectoController::class, 'editar_proyecto'])->whereNumber('idproyecto')->name('proyectos.editar_proyecto'); // editar
+    //Route::get('/proyectos/detalle-html/{idproyecto}', [ProyectoController::class, 'detalleHtml'])->name('proyectos.detalleHtml');
+
+    Route::get('/proveedor/tabla_principal', [ProveedorController::class, 'Listar_Proveedores'])->name('proveedor.Listar_Proveedores'); // AJAX
+    //Route::get('/proyectos/{idproyecto}/ver-editar', [ProyectoController::class, 'ver_editar_proyecto'])->whereNumber('idproyecto')->name('proyectos.ver_editar');
+    Route::resource('proveedor', ProveedorController::class);
+
+    // :::::::::::::::::::::::::::::: API SUNAT RENIEC ::::::::::::::::::::::::::::::
+    Route::post('/consulta/reniec', [ApiReniecSunatController::class, 'buscarReniec']);
+    Route::post('/consulta/sunat', [ApiReniecSunatController::class, 'buscarSunat']);
+    // :::::::::::::::: S E L E C T 2   U B I G E O  D I S T R I T O  :::::::::::::::::::::
+    Route::get('/select2/obtener', [UbigeoDistritoController::class, 'obtenerDistritos']);
+    //:::::::::::::::::.:.::::::::::::::::::: usuarios  ::::::::::::::::::::::::::::::
+    Route::post('/persona/crear_usuario', [UsuarioController::class, 'crear_usuario'])->name('persona.crear_usuario');  
+    Route::get('/usuario/tabla_principal', [UsuarioController::class, 'Listar_usuarios'])->name('usuario.Listar_usuarios'); // AJAX
+    Route::get('/usuario/permisos_crear', [UsuarioController::class, 'MostrarPermisos_crear'])->name('usuario.MostrarPermisos_crear');   // ← NUEVO
+    Route::get('/select2/socionegocio', [UsuarioController::class, 'select2pers_sin_user']); //  ← select2 personas sin usuario
+    
+    Route::resource('usuario', UsuarioController::class);
+
+    
+
+
 
     // :::::::::::::::::::::::::::::: P R E S U P U E S T O S ::::::::::::::::::::::::::::::
     Route::post('/presupuestos/crear_cabecera',                         [PresupuestoController::class, 'crear_cabecera_presupuesto'])->name('presupuestos.crear.cabecera');

@@ -36,7 +36,7 @@
           <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
 
           
-          @if (auth()->user()->perm_presupuesto)
+         <!-- @if (auth()->user()->perm_presupuesto)
           <li class="nav-item">
             <a href="{{ route('presupuestos.index') }}" class="nav-link {{ request()->routeIs('presupuestos.*') ? 'active' : '' }}">
               <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -52,84 +52,86 @@
               <p> Proyectos <span class="right badge badge-danger">New</span>  </p>
             </a>
           </li>
-          @endif
+          @endif-->
 
-          @if (auth()->user()->perm_recurso)
+
+
+          <!-- @if (auth()->user()->perm_recurso)
           <li class="nav-item">
             <a href="{{ route('recursos.index') }}" class="nav-link {{ request()->routeIs('recursos.*') ? 'active' : '' }}">
               <i class="nav-icon ti ti-keyframes"></i>
               <p> Recursos <span class="right badge badge-danger">New</span>  </p>
             </a>
           </li>
+          @endif*/-->
+
+
+          @if (auth()->user()->perm_proveedor)
+          <li class="nav-item">
+            <a href="{{ route('proveedor.index') }}" class="nav-link {{ request()->routeIs('proveedor.*') ? 'active' : '' }}">
+              <i class="nav-icon ti ti-user-cog"></i>
+              <p> Proveedores <span class="right badge badge-danger">New</span>  </p>
+            </a>
+          </li>
           @endif
+
 
           
 
-          @if (auth()->user()->perm_configuracion)
+          
           <li class="nav-header">DATOS DE CONFIGURACIÓN</li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon ti ti-settings"></i> <p>Configuracion<i class="fas fa-angle-left right"></i></p>
-            </a>
+            @if (auth()->user()->grupo_utilitarios)
+              <a href="#" class="nav-link">
+                <i class="nav-icon ti ti-settings"></i> <p>Configuracion<i class="fas fa-angle-left right"></i></p>
+              </a>
+            @endif
             <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="pages/tables/simple.html" class="nav-link"><i class="ti ti-calendar nav-icon"></i><p>Periodos</p></a>
-              </li>
-              <li class="nav-item">
-                <a href="pages/tables/data.html" class="nav-link"><i class="ti ti-user-cog nav-icon"></i><p>Tipo socio Negocio</p></a>
-              </li>              
+              @if (auth()->user()->perm_tipo_socio_negocio)
+                <li class="nav-item">
+                  <a href="pages/tables/data.html" class="nav-link"><i class="ti ti-user-cog nav-icon"></i><p>Tipo socio Negocio</p></a>
+                </li>  
+              @endif
+              @if (auth()->user()->perm_tipo_estandar)
+                <li class="nav-item">
+                  <a href="{{ route('tipo_estandar.index') }}" class="nav-link {{ request()->routeIs('tipo_estandar.*') ? 'active' : '' }}">
+                    <i class="ti ti-user-shield nav-icon"></i>
+                    <p>Tipo Estandar</p>
+                  </a>
+                </li>  
+              @endif          
             </ul>
           </li>
-          @endif
+          
 
-          @if (auth()->user()->perm_utilitario)
-          <li class="nav-item">
-            <a href="#" class="nav-link activeE"> <i class="nav-icon fas fa-columns"></i> <p> Utilitarios <i class="right fas fa-angle-left"></i> </p> </a>
+          
+          <li class="nav-item">           
+            @if (auth()->user()->grupo_utilitarios)
+             <a href="#" class="nav-link activeE"> <i class="nav-icon fas fa-columns"></i> <p> Utilitarios <i class="right fas fa-angle-left"></i> </p> </a>
+            @endif
             <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="./index.html" class="nav-link activeE">
-                  <i class="ti ti-users nav-icon"></i>
-                  <p>Socio Negocio</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="./index2.html" class="nav-link">
-                  <i class="ti ti-user-shield nav-icon"></i>
-                  <p>Usuarios del sistema</p>
-                </a>
-              </li>              
+               @if (auth()->user()->perm_persona)
+                <li class="nav-item">
+                  <a href="{{ route('persona.index') }}" class="nav-link {{ request()->routeIs('persona.*') ? 'active' : '' }}">
+                    <i class="ti ti-users nav-icon"></i>
+                    <p>Socio Negocio</p>
+                  </a>
+                </li>
+               @endif
+              @if (auth()->user()->perm_usuario)
+                <li class="nav-item">
+                  <a href="{{ route('usuario.index') }}" class="nav-link {{ request()->routeIs('usuario.*') ? 'active' : '' }}">
+                    <i class="ti ti-user-shield nav-icon"></i>
+                    <p>Usuarios del sistema</p>
+                  </a>
+                </li>  
+              @endif           
             </ul>
           </li>    
-          @endif
           
-          <li class="nav-header">EXTRAS</li>
+          
+         <!-- <li class="nav-header">EXTRAS</li>-->
 
-          @if (auth()->user()->perm_importar_hora)
-          <li class="nav-item">
-            <a href="{{ route('importar-horas.index') }}" class="nav-link {{ request()->routeIs('importar-horas.*') ? 'active' : '' }}">
-              <i class="nav-icon ti ti-file-excel"></i>
-              <p> Importar Horas <span class="right badge badge-danger">New</span>  </p>
-            </a>
-          </li>
-          @endif
-
-          @if (auth()->user()->perm_combinar_txt)
-          <li class="nav-item">
-            <a href="{{ route('combinar-txt.index') }}" class="nav-link {{ request()->routeIs('combinar-txt.*') ? 'active' : '' }}">
-              <i class="nav-icon ti ti-file-excel"></i>
-              <p> Combinar TXT <span class="right badge badge-danger">New</span>  </p>
-            </a>
-          </li>
-          @endif
-
-          @if (auth()->user()->perm_combinar_txt)
-          <li class="nav-item">
-            <a href="{{ route('combinar-planilla-afp.index') }}" class="nav-link {{ request()->routeIs('combinar-planilla-afp.*') ? 'active' : '' }}">
-              <i class="nav-icon ti ti-file-excel"></i>
-              <p> Combinar Planilla APF   </p>
-            </a>
-          </li>
-          @endif
           
         </ul>
       </nav>
