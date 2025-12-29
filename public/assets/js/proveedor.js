@@ -5,25 +5,29 @@ $("#guardar_registro_proveedor").on("click", function (e) { $("#submit-form-prov
 
 
 
- lista_select2('select2/obtener', '#distrito');
+ lista_select2('select2/obtener', '#distrito'); 
+ lista_select2('/select2/tipoestandar', '#idtipoestandarproveedor');
 
  $("#distrito").select2({ theme: "bootstrap4", placeholder: "Seleccionar Distrito", allowClear: true, });
+ $("#idtipoestandarproveedor").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
 
 $('#tipo_persona').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
 $('#tipo_documento').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
 $('#idsocio_negocio').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
+$('#estado_documentos_update').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
 
+$("#estado_documentos_update").val("").trigger('change');
 
 function show_hide_escenario(flag) {
   if (flag == 1) {            // Tabla principal
     $('#div-tabla-principal-proyecto').show();
-    $("#div-ver-detalle-proyecto").hide();
+    $("#div-ver-detalle-documentos").hide();
     $(".btn-agregar-proyecto").show();
     $(".btn-cancelar").hide();
     
   } else if (flag == 2) {     // Detalle proyecto
     $('#div-tabla-principal-proyecto').hide();
-    $("#div-ver-detalle-proyecto").show();
+    $("#div-ver-detalle-documentos").show();
     $(".btn-agregar-proyecto").hide();
     $(".btn-cancelar").show();
   } else if (flag == 3) {     //
@@ -122,10 +126,11 @@ function renderFilas(rows){
         <td class="py-1"> 
           <div class="btn-group btn-group-sm">
             <button class="btn btn-warning text-nowrap bnt-editar-proyecto" onclick="ver_editar_proyecto(${r.idpersona})" data-toggle="tooltip" data-original-title="Editar"><i class="ti ti-edit"></i></button>
-            <button class="btn btn-info text-nowrap bn-ver-proyecto" onclick="ver_detalle_proyecto(${r.idpersona})" data-toggle="tooltip" data-original-title="Ver"><i class="ti ti-eye-cog"></i></button>
+            <button class="btn btn-info text-nowrap bn-ver-proyecto" onclick="ver_estados_docs_proveedor(${r.idpersona}, ${r.idtipoestandarproveedor}, '${r.nombre_razonsocial ?? ''}')" data-toggle="tooltip" data-original-title="Ver Documentos"><i class="fas fa-folder"></i></button>
+            <button class="btn btn-danger text-nowrap bn-ver-proyecto" onclick="eliminar_proveedor(${r.idpersona})" data-toggle="tooltip" data-original-title="Eliminar"><i class="fas fa-trash"></i></button>
           </div>
         </td>
-        <td class="py-1 text-center" >${r.idpersona ?? ''}</td>
+        <td class="py-1 text-center" > ${String(r.idpersona).padStart(3, '0')} </td>
         <td class="py-1 text-nowrap" >${r.nombre_razonsocial ?? ''}</td>
         <td class="py-1" >${r.tipo_entidad_sunat ?? ''}</td>
         <td class="py-1" >${r.abreviatura ?? ''}</td>
@@ -133,8 +138,17 @@ function renderFilas(rows){
         <td class="py-1 text-nowrap" >${r.celular ?? ''}</td>
         <td class="py-1 text-nowrap">${r.email ?? ''}</td>
         <td class="py-1 text-nowrap">${ r.direccion }</td>
-        <td class="py-1 text-nowrap">${ r.estado }</td>
-        
+        <td class="py-1 text-nowrap">${ r.tipo_estandar } (${r.nroDocumentos})</td>
+        <td class="py-1 text-nowrap">
+        <div class="progress-group">
+                      <span class="progress-text">Cant. Docs</span>
+                      <span class="float-right"><b>6</b>/10</span>
+                      <div class="progress progress-sm">
+                        <div class="progress-bar bg-success" style="width: 60%"></div>
+                      </div>
+                    </div>
+        </td>
+
       </tr>
     `);
     $('[data-toggle="tooltip"]').tooltip(); 
@@ -208,7 +222,7 @@ $(".recargar-tabla-proyecto").on("click", function(){
 function limpiar_form_proyecto(){
   
   //Mostramos los Materiales
-  $("#idproyecto").val("");
+  $("#idpersona").val("");
   $("#codigo").val("");
   $("#descripcion").val("");
   $("#direccion").val("");
@@ -225,14 +239,14 @@ function limpiar_form_proyecto(){
   $(".error.invalid-feedback").remove();
 }
 
-function ver_editar_proyecto(idproyecto) {
+function ver_editar_proyecto(idpersona) {
   $("#cargando-1-formulario").hide();
   $("#cargando-2-formulario").show();
   limpiar_form_proyecto();
   $('#modal-agregar-proyecto').modal('show');
-  $.getJSON(`/proyectos/${idproyecto}/ver-editar`, function (e) {
+  $.getJSON(`/proyectos/${idpersona}/ver-editar`, function (e) {
     if (e.status == true) {
-      $("#idproyecto").val(e.data.idproyecto);
+      $("#idpersona").val(e.data.idpersona);
       $("#codigo").val(e.data.codigo);
       $("#descripcion").val(e.data.descripcion);
       $("#direccion").val(e.data.direccion);
@@ -305,10 +319,10 @@ function guardar_y_editar_proveedor(e) {
   });
 }
 
-function empezar_proyecto(idproyecto, nombre_proyecto ) {
+function empezar_proyecto(idpersona, nombre_proyecto ) {
   crud_simple_alerta(
     '../ajax/proyecto.php?op=empezar_proyecto', 
-    idproyecto, 
+    idpersona, 
     '¿Está Seguro de  Empezar  el proyecto ?', 
     `<b class="text-success">${nombre_proyecto}</b> <br> Tendras acceso a agregar o editar: provedores, trabajadores!`, 
     'Si, Empezar!',
@@ -319,23 +333,65 @@ function empezar_proyecto(idproyecto, nombre_proyecto ) {
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 // ═══════                                       S E C C I O N   DETALLE PROYECTO                                                        ═══════
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-function ver_detalle_proyecto(idproyecto) {
+
+function ver_estados_docs_proveedor(idpersona, id, nombre_razonsocial) {
   show_hide_escenario(2);
-  $(".span-proyecto-charge").addClass('skeleton');
-  $.getJSON(`/proyectos/detalle-html/${idproyecto}`, function (e) {
+  //$("#titulo-detalle-proyecto").html(`Documentos del Proveedor: <b class="text-info">${nombre_razonsocial}</b>`);
+   $(".tbl_lista_documentos").html('<tr><td colspan="10" class="text-center text-muted">Ninguno</td></tr>');
+
+   var cont =1;
+
+  $.getJSON(`/proveedor/ver_listar_tipos_estandar_docs`,{  idtipoestandar: id , idpersona: idpersona}, function (e) {
     if (e.status == true) {
-     $("#div-ver-detalle-proyecto").html(e.data);
+      $(".tbl_lista_documentos").empty('');
+      e.data.forEach(r => {
+        let estado_trash = r.estado_trash == 1 ? 'checked' : '';
+        let estado_delete = r.estado_delete == 1 ? 'checked' : '';
+      
+        $(".tbl_lista_documentos").append(`
+          <tr>
+            <td class="py-1"> ${String(cont++).padStart(3, '0')} </td>
+            <td class="py-1 text-nowrap" ><img src="/assets/images/default/pdf_icon.png" alt="Product 1" class="img-circle img-size-32 mr-2"> ${r.detalle ?? ''}</td>
+            <td class="py-1 text-nowrap" ><span class="badge bg-success">Verificado</span> </td>
+            <td class="py-1 text-nowrap" ><a  class="text-muted" onclick="ver_documento_proveedor('11_MORANDO_EN_LA_TIERRA.pdf','${r.detalle ?? ''}')"><i class="fas fa-search"></i></a></td>
+            <td class="py-1 text-center" ><a class="btn btn-info btn-sm" onclick="actualizar_estado_documento(${r.iddetalletipoestandarproveedor},'${r.detalle ?? ''}')"><i class="fas fa-pencil-alt"></i> Editar</a> </td>
+          </tr>
+        `);
+        $('[data-toggle="tooltip"]').tooltip(); 
+      });
+    // $("#div-ver-detalle-documentos").html(e.data);
     } else {
       alert("No se encontró el proyecto");
     }
-    $(".span-proyecto-charge").removeClass('skeleton');
   }).fail(function (xhr) { ver_errores(xhr);  });
 }
-// ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-// ═══════                                       S E C C I O N   C L I C K   D E R E C H O   T A B L A                                              ═══════
-// ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
-let idproyecto_select = null;
+function ver_documento_proveedor(ruta_documento, nombre_documento) {
+
+  $(".nombre_doc_edit").text(`${nombre_documento}`);
+
+  $(".nombre_documento_pdf").html(`Nombre : <b class="text-info">${nombre_documento}</b>`);
+
+  $('.mostrar_documento_pdf').html(``); 
+
+  $('.mostrar_documento_pdf').html(`  <object data="/assets/images/${ruta_documento}" type="application/pdf" width="100%" height="100%">
+                            <p class="p-3 m-0">
+                              Tu navegador no soporta visor PDF.
+                              <a href="/assets/images/${ruta_documento}" target="_blank">Abrir PDF</a>
+                            </p>
+                          </object>`);
+
+}
+
+function actualizar_estado_documento(id, nombre_documento) { 
+  $(".nombre_doc_edit").text(`${nombre_documento}`);
+  $("#modal-actualizar-estado").modal("show");
+  
+ }
+// ══════════════════════════════════════════════════════════════════════════════════
+// ══ S E C C I O N   C L I C K   D E R E C H O   T A B L A                                              ══
+
+let idpersona_select = null;
 let idpresupuesto_select = null;
 
 // Ocultar menú al hacer clic en otro lugar
@@ -351,7 +407,7 @@ $(document).on("contextmenu", ".fila-proyecto", function (e) {
   
   $(".fila-proyecto").removeClass("selected");// Remover selección previa  
   $(this).addClass("selected");// Marcar esta fila como seleccionada
-  idproyecto_select = $(this).data("id");
+  idpersona_select = $(this).data("id");
 
   $("#menu-contextual-proyecto").css({ top: e.pageY + "px", left: e.pageX + "px", }).show();
 });
@@ -359,35 +415,35 @@ $(document).on("contextmenu", ".fila-proyecto", function (e) {
 // Opciones del menú contextual
 $("#opcion-p-editar").on("click", function (e) {
   e.preventDefault();
-  if (idproyecto_select) {
-    ver_editar_proyecto(idproyecto_select);
+  if (idpersona_select) {
+    ver_editar_proyecto(idpersona_select);
   }
 });
 
 $("#opcion-p-ver-detalle").on("click", function (e) {
   e.preventDefault();
-  if (idproyecto_select) {
-    ver_detalle_proyecto(idproyecto_select);
+  if (idpersona_select) {
+    ver_detalle_proyecto(idpersona_select);
   }
 });
 
 $("#opcion-p-eliminar").on("click", function (e) {
   e.preventDefault();
-  if (idproyecto_select) {
+  if (idpersona_select) {
     toastr_info('En desarrollo!!', 'Sea paciente, esta opcion esta disponible pronto.');
   }
 });
 
 $("#opcion-p-enviar-terminado").on("click", function (e) {
   e.preventDefault();
-  if (idproyecto_select) {
+  if (idpersona_select) {
     toastr_info('En desarrollo!!', 'Sea paciente, esta opcion esta disponible pronto.');
   }
 });
 
 $("#opcion-p-enviar-papelera").on("click", function (e) {
   e.preventDefault();
-  if (idproyecto_select) {
+  if (idpersona_select) {
     toastr_info('En desarrollo!!', 'Sea paciente, esta opcion esta disponible pronto.');
   }
 });

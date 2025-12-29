@@ -37,6 +37,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'estado_trash',
     ];
 
     /**
@@ -80,16 +81,29 @@ class User extends Authenticatable
                     ->withTimestamps();
     }
 
-    public static function personas_sin_usuario()
+    public static function personas_sin_usuario($id = null)
     {
 
-      $personas = DB::table('persona as p')
-      ->join('tipo_persona as tp', 'p.idtipo_persona', '=', 'tp.idtipo_persona')
-      ->leftJoin('users as u', 'p.idpersona', '=', 'u.idpersona')
-      ->select( 'p.idpersona', 'p.nombre_razonsocial', 'p.numero_documento', 'tp.descripcion as Rolpersona' )
-      ->where('p.estado', 1) ->whereNull('u.idpersona') ->get();
+			$query = DB::table('persona as p')
+					->join('tipo_persona as tp', 'p.idtipo_persona', '=', 'tp.idtipo_persona')
+					->leftJoin('users as u', 'p.idpersona', '=', 'u.idpersona')
+					->select(
+							'p.idpersona',
+							'p.nombre_razonsocial',
+							'p.numero_documento',
+							'tp.descripcion as Rolpersona'
+					)
+					->where('p.estado', 1);
 
-      return $personas;
+			// 👉 Si llega un id, traer solo esa persona (tenga o no usuario)
+			if ($id) {
+					$query->where('p.idpersona', $id);
+			} else {
+					// 👉 Si no llega id, solo personas SIN usuario
+					$query->whereNull('u.idpersona');
+			}
+
+			return $query->get();
 
     }
 
@@ -106,7 +120,8 @@ class User extends Authenticatable
     }
     
     public function getGrupoUtilitariosAttribute(): bool         { return $this->hasGrupo('Utilitarios'); }        // grupo_utilitarios
-    public function getGrupoconfiguracionAttribute(): bool        { return $this->hasGrupo('configuracion'); }     // grupo_configuracion
+    public function getGrupoconfiguracionAttribute(): bool        { return $this->hasGrupo('Configuración'); }     // grupo_configuracion
+    public function getGrupoconProveedorAttribute(): bool        { return $this->hasGrupo('Proveedor'); }        // grupo_Proveedor
 
 
 
@@ -121,12 +136,12 @@ class User extends Authenticatable
 
 
     // atajos (para llamarlos como Auth::user()->perm_presupuesto)
-    public function getPermPresupuestoAttribute(): bool         { return $this->hasPermiso('presupuesto'); }        // perm_presupuesto
+    /*public function getPermPresupuestoAttribute(): bool         { return $this->hasPermiso('presupuesto'); }        // perm_presupuesto
     public function getPermProyectoAttribute(): bool            { return $this->hasPermiso('proyecto'); }           // perm_proyecto
     public function getPermRecursoAttribute(): bool             { return $this->hasPermiso('recurso'); }            // perm_recurso
     public function getPermConfiguracionAttribute(): bool       { return $this->hasPermiso('configuracion'); }      // perm_configuracion
     public function getPermUtilitarioAttribute(): bool          { return $this->hasPermiso('utilitario'); }         // perm_utilitario
-    public function getPermCombinarTxtAttribute(): bool         { return $this->hasPermiso('combinar_txt'); }       // perm_combinar_txt
+    public function getPermCombinarTxtAttribute(): bool         { return $this->hasPermiso('combinar_txt'); }  */     // perm_combinar_txt
     public function getPermUsuarioAttribute(): bool             { return $this->hasPermiso('usuarios'); }           // perm_usuario
     public function getPermTipoSocioNogocioAttribute(): bool    { return $this->hasPermiso('tipo_socio_negocio'); }  // perm_tipo_socio_negocio
     public function getPermTipoEstandarAttribute(): bool        { return $this->hasPermiso('tipo_estandar'); }      // perm_tipo_estandar

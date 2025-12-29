@@ -66,6 +66,110 @@ class UsuarioController extends Controller{
     }
   }
 
+  public function mostrar_usuario_editar($id)
+  {
+      try {
+
+          // 1) Usuario
+          $user = User::findOrFail($id);
+
+          // 2) Permisos asignados del usuario (solo ids)
+          $permisos_usuario = DB::table('usuario_permiso')
+          ->where('users_id', $user->id)
+          ->pluck('idpermiso')
+          ->map(fn($x) => (int)$x)
+          ->values();
+
+          return ApiResponse::success([
+          'user' => [
+              'id'        => $user->id,
+              'idpersona' => $user->idpersona,
+              'tipoPersona' => $user->name,   // tú lo guardas en name
+              'email'     => $user->email,
+          ],
+          'permisos_usuario' => $permisos_usuario
+          ], 'Datos para editar usuario');
+
+      } catch (\Throwable $e) {
+          return ApiResponse::error($e);
+      }
+  }
+
+  public function editar_usuario(Request $r)
+  {
+      try {
+
+          // 1️⃣ Validación
+          $data = $r->validate([
+              'id'          => 'required|integer|exists:users,id',
+              'idpersona'   => 'required|integer',
+              'tipoPersona' => 'required|string',
+              'email'       => 'required|string|unique:users,email,' . $r->id,
+              'password'    => 'nullable|string|min:8',
+              'permisos'    => 'nullable|array',
+              'permisos.*'  => 'integer'
+          ]);
+
+          // 2️⃣ Buscar usuario
+          $user = User::findOrFail($r->id);
+
+          // 3️⃣ Actualizar datos básicos
+          $user->update([
+              'idpersona' => $r->idpersona,
+              'name'      => $r->tipoPersona,
+              'email'     => $r->email,
+          ]);
+
+          // 4️⃣ Actualizar contraseña SOLO si se envía
+          if (!empty($r->password)) {
+              $user->update([
+                  'password' => bcrypt($r->password)
+              ]);
+          }
+
+          // 5️⃣ SINCRONIZAR permisos (CLAVE 🔥)
+          DB::table('usuario_permiso')
+              ->where('users_id', $user->id)
+              ->delete();
+
+          if ($r->permisos && count($r->permisos) > 0) {
+              foreach ($r->permisos as $permiso) {
+                  DB::table('usuario_permiso')->insert([
+                      'users_id' => $user->id,
+                      'idpermiso' => $permiso
+                  ]);
+              }
+          }
+
+          return ApiResponse::success([
+              'id' => $user->id
+          ], 'Usuario actualizado correctamente');
+
+      } catch (\Throwable $e) {
+          return ApiResponse::error($e);
+      }
+  }
+
+  public function eliminar_usuario(Request $r, int $id)
+  {
+    try {
+        $usuario = User::findOrFail($id);
+
+        // Actualizamos únicamente el estado a 0
+        $usuario->update([
+            'estado_trash' => 0
+        ]);
+
+        return ApiResponse::success([
+            'id_usuario' => $usuario->id,
+            'estado_trash' => 0
+        ], 'Eliminado correctamente');
+        
+    } catch (\Throwable $e) {
+        return ApiResponse::error($e);
+    }
+  }
+
   public function Listar_usuarios(Request $r)
   {
       // Parámetros de entrada del request
@@ -177,10 +281,13 @@ class UsuarioController extends Controller{
   }
 
     // Método para obtener todos roles personas
-  public function select2pers_sin_user()
+  public function select2pers_sin_user(Request $request)
   {
     try {
-      $data  = User::personas_sin_usuario();
+        // 👉 idpersona solo llegará cuando sea edición
+        $idpersona = $request->input('idpersona');
+
+        $data = User::personas_sin_usuario($idpersona);
 
       $options = ''; // string para concatenar HTML
       foreach ($data as $t) {

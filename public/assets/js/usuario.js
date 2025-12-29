@@ -152,7 +152,7 @@ function tabla_principal_usuario(){
 
 // Render filas de la tabla
 function renderFilas(rows){
-  const $tb = $("#tabla-proveedores tbody").empty();
+  const $tb = $("#tabla-usuarios tbody").empty();
   if (!rows || rows.length === 0){
     $tb.append('<tr><td colspan="15" class="text-center text-muted">Sin resultados</td></tr>');
     return;
@@ -163,11 +163,11 @@ function renderFilas(rows){
       <tr class="fila-proyecto" data-id="${r.id}">          
         <td class="py-1"> 
           <div class="btn-group btn-group-sm">
-            <button class="btn btn-warning text-nowrap bnt-editar-proyecto" onclick="ver_editar_proyecto(${r.id})" data-toggle="tooltip" data-original-title="Editar"><i class="ti ti-edit"></i></button>
-            <button class="btn btn-info text-nowrap bn-ver-proyecto" onclick="ver_detalle_proyecto(${r.id})" data-toggle="tooltip" data-original-title="Ver"><i class="ti ti-eye-cog"></i></button>
+            <button class="btn btn-warning text-nowrap bnt-editar-proyecto" onclick="ver_editar_usuario(${r.id})" data-toggle="tooltip" data-original-title="Editar"><i class="ti ti-edit"></i></button>
+            <button class="btn btn-danger text-nowrap bn-ver-proyecto" onclick="eliminar_usuario(${r.id}, '${r.nombre_razonsocial}')" data-toggle="tooltip" data-original-title="Eliminar"><i class="ti ti-trash"></i></button>
           </div>
         </td>
-        <td class="py-1 text-center" >${r.id ?? ''}</td>
+        <td class="py-1 text-center" > ${String(r.id).padStart(3, '0')}</td>
         <td class="py-1 text-nowrap" >${r.usuario ?? ''}</td>
         <td class="py-1" >${r.nombre_razonsocial ?? ''}</td>
         <td class="py-1" >${r.abreviatura ?? ''}</td>
@@ -175,7 +175,6 @@ function renderFilas(rows){
         <td class="py-1 text-nowrap" >${r.tipo_entidad_sunat ?? ''}</td>
         <td class="py-1 text-nowrap">${r.tipo_persona ?? ''}</td>
         <td class="py-1 text-nowrap">${ estado }</td>
-        
       </tr>
     `);
     $('[data-toggle="tooltip"]').tooltip(); 
@@ -202,18 +201,18 @@ function renderPaginacion(actual, total){
 
 // Marcar orden visualmente
 function marcarOrden(col, dir){
-  $("#tabla-proveedores thead th.sortable").each(function(){ const $th = $(this);  const c = $th.data('sort');  $th.removeClass('asc desc'); if (c === col) $th.addClass(dir);  });
+  $("#tabla-usuarios thead th.sortable").each(function(){ const $th = $(this);  const c = $th.data('sort');  $th.removeClass('asc desc'); if (c === col) $th.addClass(dir);  });
 }
 
 // Eventos: click en paginación
 $("#paginacion").on("click", "a.page-link", function(e){  
-  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Buscando...</td></tr>');
+  $("#tabla-usuarios tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Buscando...</td></tr>');
   e.preventDefault();   const page = parseInt($(this).data("page"), 10); if (!isNaN(page)){ state.page = Math.max(1, page); tabla_principal_usuario(); } 
 });
 
 // Eventos: ordenar al hacer clic en header
-$("#tabla-proveedores thead").on("click", "th.sortable", function(){
-  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Ordenando...</td></tr>');
+$("#tabla-usuarios thead").on("click", "th.sortable", function(){
+  $("#tabla-usuarios tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Ordenando...</td></tr>');
   const col = $(this).data("sort"); if (state.sort === col) { state.dir = (state.dir === 'asc') ? 'desc' : 'asc'; } else { state.sort = col;  state.dir  = 'asc'; } state.page = 1;    
   tabla_principal_usuario();
 });
@@ -221,13 +220,13 @@ $("#tabla-proveedores thead").on("click", "th.sortable", function(){
 // Búsqueda con debounce
 let t = null;
 $("#buscar").on("input", function(){
-  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Buscando...</td></tr>');
+  $("#tabla-usuarios tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Buscando...</td></tr>');
   const val = $(this).val(); clearTimeout(t); t = setTimeout(function(){ state.q = val; state.page = 1; tabla_principal_usuario(); }, 300);
 });
 
 // Cambiar tamaño de página
 $("#perPage").on("change", function(){
-  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');
+  $("#tabla-usuarios tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');
   state.per_page = parseInt($(this).val(), 10) || 20;  state.page = 1;
   tabla_principal_usuario();
 });
@@ -235,9 +234,9 @@ $("#perPage").on("change", function(){
 // Carga inicial
 tabla_principal_usuario();
 
-$(".recargar-tabla-proyecto").on("click", function(){
+$(".recargar-tabla-usuarios").on("click", function(){
   toastr_info('<i class="ti ti-checks"></i> Actualizando...', 'Los datos se estan actualizado', 500);
-  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');    
+  $("#tabla-usuarios tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');    
 
   tabla_principal_usuario();
 });
@@ -266,20 +265,27 @@ function limpiar_form_proyecto(){
   $(".error.invalid-feedback").remove();
 }
 
-function ver_editar_proyecto(idproyecto) {
+function ver_editar_usuario(id) {
   $("#cargando-1-formulario").hide();
   $("#cargando-2-formulario").show();
   limpiar_form_proyecto();
   $('#modal-agregar-usuario').modal('show');
-  $.getJSON(`/proyectos/${idproyecto}/ver-editar`, function (e) {
+  $.getJSON(`/usuario/${id}/ver-editar_usuario`, function (e) {
     if (e.status == true) {
-      $("#idproyecto").val(e.data.idproyecto);
-      $("#codigo").val(e.data.codigo);
-      $("#descripcion").val(e.data.descripcion);
-      $("#direccion").val(e.data.direccion);
-      $("#ubicacion").val(e.data.ubicacion);
-      $("#fecha_inicio").val(e.data.fecha_inicio);
-      $("#fecha_fin").val(e.data.fecha_fin);
+
+      $("#id").val(e.data.user.id);
+      lista_select2(`/select2/socionegocio?idpersona=${e.data.user.idpersona}`, '#idpersona',`${e.data.user.idpersona}`);
+      $("#email").val(e.data.user.email);
+      $("#tipoPersona").val(e.data.user.tipoPersona);
+
+      // Limpiar todos los checks
+      $('input[name="permisos[]"]').prop('checked', false);
+
+      // Marcar solo los permisos del usuario
+      e.data.permisos_usuario.forEach(function (idpermiso) {
+          $('#permiso_' + idpermiso).prop('checked', true);
+      });
+
 
       $("#cargando-1-formulario").show();
       $("#cargando-2-formulario").hide();
@@ -299,7 +305,7 @@ function guardar_y_editar_proveedor(e) {
   if (id == '') {
     url_editar_crear =  `/persona/crear_usuario` ;    
   } else {
-    url_editar_crear = `/proyectos/editar_proyecto/${id}`;
+    url_editar_crear = `/usuario/editar_usuario/${id}`;
     formData.append('_method', 'PUT'); // spoof para Laravel
   }
   
@@ -346,21 +352,51 @@ function guardar_y_editar_proveedor(e) {
   });
 }
 
-function empezar_proyecto(idproyecto, nombre_proyecto ) {
-  crud_simple_alerta(
-    '../ajax/proyecto.php?op=empezar_proyecto', 
-    idproyecto, 
-    '¿Está Seguro de  Empezar  el proyecto ?', 
-    `<b class="text-success">${nombre_proyecto}</b> <br> Tendras acceso a agregar o editar: provedores, trabajadores!`, 
-    'Si, Empezar!',
-    function(){ Swal.fire("En curso!", "Tu proyecto esta en curso.", "success"); },
-    function(){ tabla.ajax.reload(null, false);  box_proyecto();}
-  );  
+function eliminar_usuario(id, nombres) {
+
+  Swal.fire({
+    title: "¿Está Seguro de eliminar el registro?",
+    html: `<b class="text-danger"><del>${nombres}</del></b>`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#28a745",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Sí, eliminar!",
+  }).then((result) => {
+
+    if (result.isConfirmed) {
+
+      $.ajax({
+        url: `/usuario/eliminar_usuario/${id}`,
+        type: "PUT",
+        data: {
+          _token: $('meta[name="csrf-token"]').attr('content') // necesario para PUT
+        },
+        success: function (e) {
+          console.log(e);
+
+          if (e.status === true) {
+            Swal.fire("Eliminado!", "El registro ha sido eliminado.", "success");
+            tabla_principal_usuario();
+          } else {
+            Swal.fire("Error!", e.message, "error");
+          }
+        },
+        error: function (xhr) {
+          Swal.fire("Error!", "Ocurrió un error en el servidor.", "error");
+          console.log(xhr.responseText);
+        }
+      });
+
+    }
+  });
 }
+
+
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 // ═══════                                       S E C C I O N   DETALLE PROYECTO                                                        ═══════
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-function ver_detalle_proyecto(idproyecto) {
+function ver_detalle_usuario(idproyecto) {
   show_hide_escenario(2);
   $(".span-proyecto-charge").addClass('skeleton');
   $.getJSON(`/proyectos/detalle-html/${idproyecto}`, function (e) {
@@ -401,14 +437,14 @@ $(document).on("contextmenu", ".fila-proyecto", function (e) {
 $("#opcion-p-editar").on("click", function (e) {
   e.preventDefault();
   if (idproyecto_select) {
-    ver_editar_proyecto(idproyecto_select);
+    ver_editar_usuario(idproyecto_select);
   }
 });
 
 $("#opcion-p-ver-detalle").on("click", function (e) {
   e.preventDefault();
   if (idproyecto_select) {
-    ver_detalle_proyecto(idproyecto_select);
+    ver_detalle_usuario(idproyecto_select);
   }
 });
 

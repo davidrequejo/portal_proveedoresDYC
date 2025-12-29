@@ -74,7 +74,7 @@
     <!-- Main Sidebar Container -->
     @include('layouts.lte_aside')   
 
-    @if (auth()->user()->perm_recurso)
+    @if (auth()->user()->perm_persona)
 
       <!-- Content Wrapper. Contains page content -->
       <div class="content-wrapper">

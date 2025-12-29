@@ -16,6 +16,8 @@ Use App\Http\Controllers\ApiReniecSunatController;
 use App\Http\Controllers\UbigeoDistritoController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\Tipo_estandarController;
+use App\Http\Controllers\SubirDocsController;
+use App\Http\Controllers\ActualizardatosController;
 
 
 Route::get('/', function () {  return redirect()->route('login'); });
@@ -61,24 +63,43 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     //Route::put('/proyectos/editar_proyecto/{idproyecto}', [ProyectoController::class, 'editar_proyecto'])->whereNumber('idproyecto')->name('proyectos.editar_proyecto'); // editar
     //Route::get('/proyectos/detalle-html/{idproyecto}', [ProyectoController::class, 'detalleHtml'])->name('proyectos.detalleHtml');
 
+    Route::get('/proveedor/ver_listar_tipos_estandar_docs', [ProveedorController::class, 'listar_tipos_estandar_docs'])->name('proveedor.listar_tipos_estandar_docs'); //mostar para editar
     Route::get('/proveedor/tabla_principal', [ProveedorController::class, 'Listar_Proveedores'])->name('proveedor.Listar_Proveedores'); // AJAX
     //Route::get('/proyectos/{idproyecto}/ver-editar', [ProyectoController::class, 'ver_editar_proyecto'])->whereNumber('idproyecto')->name('proyectos.ver_editar');
+     Route::get('/select2/tipoestandar', [ProveedorController::class, 'selec2tipoEstandar']); //  ← select2 
     Route::resource('proveedor', ProveedorController::class);
 
-    // :::::::::::::::::::::::::::::: API SUNAT RENIEC ::::::::::::::::::::::::::::::
+    // :::::::::::::::::::::::::::::: API SUNAT RENIEC ok ::::::::::::::::::::::::::::::
     Route::post('/consulta/reniec', [ApiReniecSunatController::class, 'buscarReniec']);
     Route::post('/consulta/sunat', [ApiReniecSunatController::class, 'buscarSunat']);
-    // :::::::::::::::: S E L E C T 2   U B I G E O  D I S T R I T O  :::::::::::::::::::::
+
+    // :::::::::::::::: S E L E C T 2   U B I G E O  D I S T R I T O ok  :::::::::::::::::::::
     Route::get('/select2/obtener', [UbigeoDistritoController::class, 'obtenerDistritos']);
-    //:::::::::::::::::.:.::::::::::::::::::: usuarios  ::::::::::::::::::::::::::::::
+
+    //:::::::::::::::::.:.::::::::::::::::::: usuarios ok  ::::::::::::::::::::::::::::::
     Route::post('/persona/crear_usuario', [UsuarioController::class, 'crear_usuario'])->name('persona.crear_usuario');  
     Route::get('/usuario/tabla_principal', [UsuarioController::class, 'Listar_usuarios'])->name('usuario.Listar_usuarios'); // AJAX
+    Route::get('/usuario/{id}/ver-editar_usuario', [UsuarioController::class, 'mostrar_usuario_editar'])->whereNumber('id')->name('usuario.mostrar_usuario_editar'); //mostar para editar
+    Route::put('/usuario/editar_usuario/{id}', [UsuarioController::class, 'editar_usuario'])->whereNumber('id')->name('usuario.editar_usuario'); // editar
+    Route::put('/usuario/eliminar_usuario/{id}', [UsuarioController::class, 'eliminar_usuario'])->whereNumber('id')->name('tipoestandar.eliminar_usuario'); // eliminar
     Route::get('/usuario/permisos_crear', [UsuarioController::class, 'MostrarPermisos_crear'])->name('usuario.MostrarPermisos_crear');   // ← NUEVO
     Route::get('/select2/socionegocio', [UsuarioController::class, 'select2pers_sin_user']); //  ← select2 personas sin usuario
     
     Route::resource('usuario', UsuarioController::class);
 
-    
+
+    // :::::::::::::::::::::::::::::: S U B I R   D O C U M E N T O S  :::::::::::::::::::::::::::::: ver_doc_estandar
+
+    Route::post('/subir_docs/guardar_doc_estandar_proveedor', [SubirDocsController::class, 'guardar_doc_estandar_proveedor'])->name('subir_docs.guardar_doc_estandar_proveedor'); //Create 
+    Route::get('/subir_docs/ver_doc_estandar/{id}', [SubirDocsController::class, 'ver_doc_estandar'])->whereNumber('id')->name('subir_docs.ver_doc_estandar'); //mostar para editar
+
+    Route::get('/subir_docs/listar_docs_tipos_est_xuser', [SubirDocsController::class, 'listar_docs_tipos_est_xuser'])->name('subir_docs.listar_docs_tipos_est_xuser'); // AJAX
+
+    Route::get('/select2/lista_sin_docs_user', [SubirDocsController::class, 'select2_lista_sin_docs']); //  ← select2 docs pendientes por subir
+
+    Route::resource('subir_docs', SubirDocsController::class);
+    // :::::::::::::::::::::::::::::: A C T U A L I Z A R   D A T O S  ::::::::::::::::::::::::::::::
+    Route::resource('actualizardatos', ActualizardatosController::class);
 
 
 

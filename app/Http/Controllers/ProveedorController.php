@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
 use App\Models\Proveedor;
+use App\Models\User;
 use Illuminate\Support\Facades\DB; 
 use App\Models\Tipo_estandar;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CredencialesProveedorMail;
 
 class ProveedorController extends Controller
 {
@@ -22,6 +25,7 @@ class ProveedorController extends Controller
           $data = $r->validate([
               'idtipo_persona' => 'required|string',
               'idbanco' => 'required|string',
+              'idtipoestandarproveedor' => 'required|string',
               'tipo_entidad_sunat' => 'required|string',
               'tipo_documento' => 'required|string',
               'numero_documento' => 'required|string',
@@ -31,19 +35,56 @@ class ProveedorController extends Controller
               'email' => 'required|email',
               'distrito' => 'required|string',
               'provincia' => 'required|string',
-              'departamento' => 'required|string'
-          ]);
+              'departamento' => 'required|string',
+              'usuario_portal' => 'required|string',
+              'clave_portal' => 'required|string',
 
+          ]);
+          // 1. Crear  proveedor
           $createProveedor = Proveedor::create($data);
 
-            return ApiResponse::success([
+          // 2. Crear usuario para el proveedor
+          $user = User::create([
+              'idpersona' =>  $createProveedor->idpersona,
+              'name'      => 'PPROVEEDOR', 
+              'email'     => $r->usuario_portal,
+              'password'  => bcrypt($r->clave_portal)
+          ]);
+
+          // 3. Registrar permisos en tabla intermedia
+          if ($user->id   ) {
+
+                  DB::table('usuario_permiso')->insert([
+                      'users_id' => $user->id,
+                      'idpermiso' => '10'
+                  ]);
+              
+          }
+
+          // 4. Enviar credenciales al correo del proveedor
+          try {
+              Mail::to($createProveedor->email)->send(
+                  new CredencialesProveedorMail(
+                      nombre: $createProveedor->nombre_razonsocial,
+                      usuario: $r->usuario_portal,
+                      clave: $r->clave_portal
+                  )
+              );
+          } catch (\Throwable $e) {
+              // opcional: log
+              \Log::error("Error enviando correo proveedor: " . $e->getMessage());
+          }
+
+
+
+          return ApiResponse::success([
                 'idpersona' => $createProveedor->idpersona
             ], 'Proveedor creado correctamente');
+
         } catch (\Throwable $e) {
             return ApiResponse::error($e);
         }
     }
-
 
     public function Listar_Proveedores(Request $r)
     {
@@ -72,8 +113,10 @@ class ProveedorController extends Controller
         $query = DB::table('persona as p')
             ->join('tipo_persona as tp', 'p.idtipo_persona', '=', 'tp.idtipo_persona')
             ->join('sunat_c06_doc_identidad as doc', 'p.tipo_documento', '=', 'doc.code_sunat')
+            ->join('tipoestandarproveedor as test', 'p.idtipoestandarproveedor', '=', 'test.idtipoestandarproveedor')
             ->select(
                 'p.idpersona',
+                'p.idtipoestandarproveedor',
                 'tp.descripcion as tipoPersona',
                 'p.tipo_documento',
                 'p.nombre_razonsocial',
@@ -87,6 +130,8 @@ class ProveedorController extends Controller
                 'p.departamento',
                 'p.email',
                 'p.tipo_entidad_sunat',
+                'test.descripcion as tipo_estandar',
+                'test.nroDocumentos',
                 'p.estado'
             )
             ->where('p.estado', '1')  // Filtrar proveedores activos
@@ -120,6 +165,7 @@ class ProveedorController extends Controller
         $proveedores->getCollection()->transform(function ($proveedor) {
             return [
                 'idpersona'             => $proveedor->idpersona,
+                'idtipoestandarproveedor'=> $proveedor->idtipoestandarproveedor,
                 'tipoPersona'           => $proveedor->tipoPersona,
                 'tipo_documento'        => $proveedor->tipo_documento,
                 'nombre_razonsocial'    => $proveedor->nombre_razonsocial,
@@ -133,6 +179,8 @@ class ProveedorController extends Controller
                 'departamento'          => $proveedor->departamento,
                 'email'                 => $proveedor->email,
                 'tipo_entidad_sunat'    => $proveedor->tipo_entidad_sunat,
+                'tipo_estandar'         => $proveedor->tipo_estandar,
+                'nroDocumentos'         => $proveedor->nroDocumentos,
                 'estado'                => $proveedor->estado,
             ];
         });
@@ -169,6 +217,58 @@ class ProveedorController extends Controller
           return ApiResponse::error($e);
       }
 
+    }
+
+    // listar tipos de estandar y documentos asociados
+    public function listar_tipos_estandar_docs(Request $r)
+    {
+        try {
+            $id = $r->input('idtipoestandar');
+            $idpersona = $r->input('idpersona');
+
+        // Crear la consulta base idtipoestandar: id , idpersona
+        $data = DB::table('tipoestandarproveedor as est')
+            ->join('detalletipoestandarproveedor as det', 'est.idtipoestandarproveedor', '=', 'det.idtipoestandarproveedor')
+            ->join('persona as p', 'p.idtipoestandarproveedor', '=', 'est.idtipoestandarproveedor')
+            ->leftJoin('docsproveedortipoestandar as doc', 'det.iddetalletipoestandarproveedor', '=', 'doc.iddetalletipoestandarproveedor')
+            ->select(
+                'det.iddetalletipoestandarproveedor',
+                'det.idtipoestandarproveedor',
+                'det.detalle',
+                'det.estado_trash',
+                'det.estado_delete',
+                'doc.nombreDocumento',
+                'doc.archivo',
+                'doc.estado_trash as estado_trashDocs',
+                'doc.estado_delete as estado_deleteDocs'
+            )
+            ->where('est.idtipoestandarproveedor', $id)
+            ->where('p.idpersona', $idpersona) 
+                  ->get()
+            ->map(function ($row) {
+                return [
+                'iddetalletipoestandarproveedor' => $row->iddetalletipoestandarproveedor,
+                'idtipoestandarproveedor'        => $row->idtipoestandarproveedor,
+                'detalle'                        => $row->detalle,
+                'estado_trash'                   => $row->estado_trash,
+                'estado_delete'                  => $row->estado_delete,
+                'nombreDocumento'                => $row->nombreDocumento,
+                'archivo'                        => $row->archivo,
+                'estado_trashDocs'               => $row->estado_trashDocs,
+                'estado_deleteDocs'              => $row->estado_deleteDocs,
+                ];
+            });
+
+        return ApiResponse::success($data, 'Tipos de estandar y documentos obtenidos');
+
+        } catch (\Throwable $e) {
+            return ApiResponse::error($e);
+        }
+
+
+
+
+        
     }
 
 

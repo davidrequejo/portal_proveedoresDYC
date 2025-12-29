@@ -156,6 +156,7 @@
                             <th data-sort="email"       class="sortable">Email</th>
                             <th data-sort="direccion" class="sortable">Dirección</th>
                             <th data-sort="estado" class="sortable">Estado Documentos</th>
+                            <th data-sort="estado" class="sortable">Estado Documentos</th>
                             
                           </tr>
                         </thead>
@@ -173,7 +174,78 @@
                   </div>
                 </div>
               </div>
-              <div class="col-lg-12" id="div-ver-detalle-proyecto" style="display: none;">
+
+              <div class="col-lg-12" id="div-ver-detalle-documentos" style="display: none;">
+
+                <div class="row">
+                  <div class="col-lg-6">
+                    <div class="card">
+                      <div class="card-header border-0">
+                        <h3 class="card-title m-2 font-weight-bold text-info">Validación de Documentos</h3>
+                        <div class="card-tools m-2"></div>
+                      </div>
+                      <div class="card-body table-responsive ">
+                        <table class="table table-striped table-valign-middle">
+                          <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>Descripcion Doc.</th>
+                            <th>Estado</th>
+                            <th>Ver</th>
+                            <th class="text-center">Act. Estado</th>
+                          </tr>
+                          </thead>
+                          <tbody class="tbl_lista_documentos">
+                          <tr>
+                             <td>001</td>
+                            <td>
+                              <img src="/assets/images/default/pdf_icon.png" alt="Product 1" class="img-circle img-size-32 mr-2">
+                              Fecha Ruc de la empresa
+                            </td>
+                            <td><span class="badge bg-success">Verificado</span></td>
+                            <td>
+                              <a href="#" class="text-muted">
+                                <i class="fas fa-search"></i>
+                              </a>
+                            </td>
+                            <td class="text-center">
+                              <a class="btn btn-info btn-sm" href="#"><i class="fas fa-pencil-alt"></i> Editar</a>                              
+                            </td>
+                          </tr>
+
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="modal-footer justify-content-end">
+                        <!--<button type="button" class="btn btn-outline-warning" data-dismiss="modal">Close</button>
+                        <button type="button " class="btn btn-sm btn-outline-success">Guardar</button>-->
+                      </div>
+                    </div>
+                    <!-- /.card -->
+                  </div>
+                  <!-- /.col-md-6 -->
+                  <div class="col-lg-6">
+                    <div class="card">
+                      <div class="card-header border-0">
+                        <h3 class="card-title m-2 font-weight-bold text-info nombre_documento_pdf">Documento PDF</h3>
+                      </div>
+
+                      <div class="card-body">
+                        <div class="card-body p-0 mostrar_documento_pdf" style="height: 650px;">
+                          <div class="alert alert-info alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true" disabled></button>
+                            <h5><i class="icon fas fa-info"></i> Sin vista previa!</h5>
+                            Para visualizar un documento, haga clic en el ícono <i class="fas fa-search"></i> ubicado en la fila correspondiente de la tabla del lado izquierdo
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+
+                  </div>
+                  <!-- /.col-md-6 -->
+                </div>
+
                 
               </div>
             </div>
@@ -204,7 +276,7 @@
                         <div class="form-group">
                           <label for="descripcion">Tipo Estandar </label>                          
                           <!--<textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
-                          <select name="idtipoestadandarproveedor" id="idtipoestadandarproveedor" class="form-control is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
+                          <select name="idtipoestandarproveedor" id="idtipoestandarproveedor" class="form-control is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
                           </select>
                         </div>
                       </div>
@@ -249,7 +321,7 @@
                       </div>
 
                       <!-- Nombre y Apellidos -->
-                      <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                      <div class="col-12 col-sm-12 col-md-7 col-lg-7">
                         <div class="form-group">
                           <label for="Nombre_Apellidos">Nombre y Apellidos/Razon Social <sup class="text-danger">*</sup></label>
                           <input type="text" name="nombre_razonsocial" class="form-control" id="nombre_razonsocial"  />
@@ -262,21 +334,23 @@
                           <input type="text" name="celular" id="celular" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text">
                         </div>
                       </div>
+
+                      <!-- email -->
+                      <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                        <div class="form-group">
+                          <label for="email">Email</label>
+                           <input type="email" name="email" class="form-control" id="email" placeholder="Correo electrónico" onkeyup="convert_minuscula(this);">
+                        </div>
+                      </div>   
+
                       <!-- Dirección -->
-                      <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+                      <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                         <div class="form-group">
                           <label for="direccion">Dirección </label> <br>
                           <textarea name="direccion" id="direccion" class="form-control" rows="1"></textarea>
                         </div>
                       </div>
 
-                      <!-- email -->
-                      <div class="col-12 col-sm-12 col-md-6 col-lg-6">
-                        <div class="form-group">
-                          <label for="email">Email</label>
-                           <input type="email" name="email" class="form-control" id="email" placeholder="Correo electrónico" onkeyup="convert_minuscula(this);">
-                        </div>
-                      </div>                       
                       <!-- Distrito -->
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
@@ -431,6 +505,60 @@
             <!-- /.modal-dialog -->
           </div>
           <!-- /.modal -->
+
+
+        <div class="modal fade show" id="modal-actualizar-estado"  aria-modal="true" role="dialog">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h6 class="modal-title">Actualizar Estado : <strong class='text-info nombre_doc_edit'></strong> </h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <form id="form-actualizar-estado" name="form-actualizar-estado" method="POST">
+                  @csrf
+                  <input type="hidden" name="idpersona_estado" id="idpersona_estado" /> 
+
+                  <div class="form-group">
+
+                    <div class="col-12">
+                      <label for="estado_documentos">Estado de Documentos</label>
+                      <select name="estado_documentos_update" id="estado_documentos_update" class="form-control is-valid select2" placeholder="Estado de Documentos" aria-invalid="false">
+                        <option value="Registrado">Registrado</option>
+                        <option value="En proceso">En proceso</option>
+                        <option value="Aprobado">Aprobado</option>
+                        <option value="Rechazado">Rechazado</option>
+                      </select>
+                    </div>
+
+                    <div class="col-12 mt-2">
+                      <div class="form-group">
+                        <label for="direccion">Dirección </label> <br>
+                        <textarea name="direccion" id="direccion" class="form-control" rows="2"></textarea>
+                      </div>
+                    </div>
+
+                  </div>
+                </form>
+
+
+
+              </div>
+              <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-success">Guardar</button>
+              </div>
+            </div>
+            <!-- /.modal-content -->
+          </div>
+          <!-- /.modal-dialog -->
+        </div>
+
+
+
+
 
 
         </section>

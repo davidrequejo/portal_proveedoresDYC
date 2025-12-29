@@ -35,55 +35,41 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
 
-          
-         <!-- @if (auth()->user()->perm_presupuesto)
-          <li class="nav-item">
-            <a href="{{ route('presupuestos.index') }}" class="nav-link {{ request()->routeIs('presupuestos.*') ? 'active' : '' }}">
-              <i class="nav-icon fas fa-tachometer-alt"></i>
-              <p> Presupuestos <span class="right badge badge-danger">New</span>  </p>
-            </a>
-          </li>
-          @endif
-
-          @if (auth()->user()->perm_proyecto)
-          <li class="nav-item">
-            <a href="{{ route('proyectos.index') }}" class="nav-link {{ request()->routeIs('proyecto.*') ? 'active' : '' }}">
-              <i class="nav-icon ti ti-buildings"></i>
-              <p> Proyectos <span class="right badge badge-danger">New</span>  </p>
-            </a>
-          </li>
-          @endif-->
 
 
 
-          <!-- @if (auth()->user()->perm_recurso)
-          <li class="nav-item">
-            <a href="{{ route('recursos.index') }}" class="nav-link {{ request()->routeIs('recursos.*') ? 'active' : '' }}">
-              <i class="nav-icon ti ti-keyframes"></i>
-              <p> Recursos <span class="right badge badge-danger">New</span>  </p>
-            </a>
-          </li>
-          @endif*/-->
+            @if (auth()->user()->perm_proveedor)
+            <li class="nav-item">
+              <a href="{{ route('proveedor.index') }}" class="nav-link {{ request()->routeIs('proveedor.*') ? 'active' : '' }}">
+                <i class="nav-icon ti ti-user-cog"></i>
+                <p> Proveedores <span class="right badge badge-danger">New</span>  </p>
+              </a>
+            </li>
+            @endif
+            
+            @if (auth()->user()->perm_proveedor)
+            <li class="nav-item">
+              <a href="{{ route('subir_docs.index') }}" class="nav-link {{ request()->routeIs('subir_docs.*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-file"></i>
+                <p> Documentación <span class="right badge badge-danger">New</span>  </p>
+              </a>
+            </li>
+            @endif
 
-
-          @if (auth()->user()->perm_proveedor)
-          <li class="nav-item">
-            <a href="{{ route('proveedor.index') }}" class="nav-link {{ request()->routeIs('proveedor.*') ? 'active' : '' }}">
-              <i class="nav-icon ti ti-user-cog"></i>
-              <p> Proveedores <span class="right badge badge-danger">New</span>  </p>
-            </a>
-          </li>
-          @endif
-
-
-          
-
+            @if (auth()->user()->perm_proveedor)
+            <li class="nav-item">
+              <a href="{{ route('actualizardatos.index') }}" class="nav-link {{ request()->routeIs('actualizardatos.*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-edit"></i>
+                <p> Actualizar Datos <span class="right badge badge-danger">New</span>  </p>
+              </a>
+            </li>
+            @endif
           
           <li class="nav-header">DATOS DE CONFIGURACIÓN</li>
           <li class="nav-item">
-            @if (auth()->user()->grupo_utilitarios)
+            @if (auth()->user()->grupo_configuracion)
               <a href="#" class="nav-link">
-                <i class="nav-icon ti ti-settings"></i> <p>Configuracion<i class="fas fa-angle-left right"></i></p>
+                <i class="nav-icon ti ti-settings"></i> <p>Configuración<i class="fas fa-angle-left right"></i></p>
               </a>
             @endif
             <ul class="nav nav-treeview">
@@ -128,9 +114,11 @@
               @endif           
             </ul>
           </li>    
-          
-          
-         <!-- <li class="nav-header">EXTRAS</li>-->
+
+
+
+         <!-- <li class="nav-header">EXTRAS</li> -->
+
 
           
         </ul>

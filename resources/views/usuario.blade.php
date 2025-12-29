@@ -14,9 +14,9 @@
   <!--<link rel="stylesheet" href="{{ asset('assets/jstree-3.3.17/dist/themes/default/style.min.css') }}" />-->
 
   <style>
-    #tabla-proveedores_filter { width: calc(100% - 10px) !important; display: flex !important; justify-content: space-between !important; }
-    #tabla-proveedores_filter label { width: 100% !important;  }
-    #tabla-proveedores_filter label input { width: 100% !important;   }
+    #tabla-usuarios_filter { width: calc(100% - 10px) !important; display: flex !important; justify-content: space-between !important; }
+    #tabla-usuarios_filter label { width: 100% !important;  }
+    #tabla-usuarios_filter label input { width: 100% !important;   }
 
     /* Indicadores de orden simple (opcional) */
     th.sortable { cursor:pointer; position:relative; }
@@ -74,7 +74,7 @@
     <!-- Main Sidebar Container -->
     @include('layouts.lte_aside')   
 
-    @if (auth()->user()->perm_recurso)
+    @if (auth()->user()->perm_usuario)
 
       <!-- Content Wrapper. Contains page content -->
       <div class="content-wrapper">
@@ -125,7 +125,7 @@
                   <div class="card-body pb-1">
                     <div class="row mb-2">                    
                       <div class="col">
-                        <input type="search" id="buscar" class="form-control form-control-sm" placeholder="Buscar proyecto...">
+                        <input type="search" id="buscar" class="form-control form-control-sm" placeholder="Buscar Usuario...">
                       </div>
                       <div class="col-auto">
                         <select id="perPage" class="form-select form-select-sm">
@@ -137,13 +137,13 @@
                         </select>
                       </div>
                       <div class="col-auto">
-                        <button type="button" class="btn btn-sm btn-outline-info recargar-tabla-proyecto" data-toggle="tooltip" data-original-title="Recargar tabla" ><i class="ti ti-refresh"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-info recargar-tabla-usuarios" data-toggle="tooltip" data-original-title="Recargar tabla" ><i class="ti ti-refresh"></i></button>
                       </div>
                     </div>
                     
                     <div class="table-responsive">
                     
-                      <table class="table table-bordered table-hover" id="tabla-proveedores">
+                      <table class="table table-bordered table-hover" id="tabla-usuarios">
                         <thead>
                           <tr>                        
                             <th>Acciones</th>
@@ -155,7 +155,6 @@
                             <th data-sort="numero_documento"class="sortable">Tipo Entidad</th>
                             <th data-sort="numero_documento"class="sortable">Tipo Persona</th>
                             <th data-sort="numero_documento"class="sortable">Estado</th>
-                            
                           </tr>
                         </thead>
                         <tbody>                     
