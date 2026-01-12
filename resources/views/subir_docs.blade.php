@@ -77,7 +77,7 @@
                         <div class="float-right">
 
                           <div class="btn-group btn-agregar-proyecto">
-                            <button type="button" class="btn btn-success" style="border-color: #1a6b2c !important;" data-toggle="modal" data-target="#modal-crear_documento" onclick="limpiar_form_subir_doc();" ><i class="nav-icon fas fa-file"></i> Crear nuevo</button>
+                            <button type="button" class="btn btn-success" style="border-color: #1a6b2c !important;" data-toggle="modal" data-target="#modal-crear_documento" onclick="limpiar_form_subir_doc(); cargarselecttipoDocs();" ><i class="nav-icon fas fa-file"></i> Crear nuevo</button>
                           </div>
                         </div>
 
@@ -132,7 +132,7 @@
                       </div>
 
                       <div class="card-body">
-                        <div class="card-body p-0 mostrar_documento_pdf" style="height: 650px;">
+                        <div class="card-body p-0 mostrar_documento_pdf" style="height: 750px;">
                           <div class="alert alert-info alert-dismissible">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true" disabled></button>
                             <h5><i class="icon fas fa-info"></i> Sin vista previa!</h5>
@@ -167,6 +167,8 @@
                     @csrf
                     <input type="hidden" name="iddocsproveedortipoestandar" id="iddocsproveedortipoestandar" /> 
                     <input type="hidden" name="nombre_seleccion_tipo" id="nombre_seleccion_tipo" /> 
+                    <!-- $r->user()->idpersona; -->
+                    <input type="text" name="" id="" value="{{ auth()->user()->idpersona }}" >
 
                     <div  class="row" id="cargando-1-formulario">
 
@@ -177,17 +179,7 @@
                           <select name="listar_docs_sin_subir" id="listar_docs_sin_subir" class="form-control is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
                           </select>
                         </div>
-                      </div>
-
-                      
-                      <div class="col-12">
-                        <div class="form-group">
-                          <label for="descripcion">Tipo Documento</label>   
-                          <textarea class="form-control nombre_doc_edit"  name="nombre_doc_edit" id="nombre_doc_edit" cols="30" rows="1" placeholder="ejmpl. Los Jardines" disabled></textarea>                       
-                           <!--<input type="text" class="nombre_doc_edit" name="nombre_doc_edit" id="nombre_doc_edit" />-->
-
-                        </div>
-                      </div>
+                      </div>                    
 
                       <!-- Pdf 1 -->
                       <div class="col-12 mt-2">
@@ -203,7 +195,7 @@
                             <input style="display: none;" id="doc1" type="file" name="doc1" accept=".pdf, .docx, .doc" class="docpdf" />
                           </div>
                           <div class="col-6 col-md-6 col-lg-6 col-xl-6 text-center">
-                            <button type="button" class="btn btn-info btn-block btn-xs" onclick="re_visualizacion(1, 'subir_docs', 'Documento');"><i class="fa fa-eye"></i> PDF.</button>
+                            <button type="button" class="btn btn-info btn-block btn-xs" onclick="re_visualizacion(1, '', '');"><i class="fa fa-eye"></i> PDF.</button>
                           </div>
                         </div>
                         <div id="doc1_ver" class="text-center mt-4">
@@ -247,7 +239,7 @@
 
                 </div>
                 <div class="modal-footer justify-content-between">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                  <button type="button" class="btn btn-default" data-dismiss="modal" onclick="limpiar_form_subir_doc();">Cerrar</button>
                   <button type="button" class="btn btn-success" id="guardar_registro_docs_prov">Guardar</button>
                 </div>
               </div>

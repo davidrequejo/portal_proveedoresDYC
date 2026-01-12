@@ -12,28 +12,74 @@ class Proveedor extends Model
     // Define los campos que son asignables
     // Define los campos que son asignables
     protected $fillable = [
-        'idtipo_persona', 
-        'idbanco', 
+
+
+        /* ================== CLAVES ================== */
+        'idtipo_persona',
         'idtipoestandarproveedor',
-        'tipo_entidad_sunat', 
-        'nombre_razonsocial', 
-        'apellidos_nombrecomercial',
+
+        /* ================== CÓDIGOS ================== */
+        'codigo_s10',
+
+        /* ================== SUNAT ================== */
+        'tipo_entidad_sunat',
         'tipo_documento',
         'numero_documento',
+
+        /* ================== RAZÓN SOCIAL / COMERCIAL ================== */
+        'nombre_razonsocial',
+        'apellidos_nombrecomercial',
+
+        /* ================== PERSONA NATURAL ================== */
+        'nombre_persona_natural',
+        'apellido_paterno_per_natural',
+        'apellido_materno_per_natural',
+        'sexo',
         'fecha_nacimiento',
+        'tratamiento_pers_natural',
+        'ruc_persona_natural',
+
+        /* ================== REPRESENTANTE LEGAL ================== */
+        'nombre_apellidos_representante_legal',
+        'numerotelefo_representante_legal',
+
+        /* ================== CONTACTO COMERCIAL ================== */
+        'nombres_contacto_comercial',
+        'cargo_contacto_comercial',
+        'telefono_contacto_comercial',
+
+        /* ================== CONTACTO GENERAL ================== */
         'celular',
+        'email',
+
+        /* ================== DIRECCIÓN ================== */
         'direccion',
         'direccion_referencia',
         'departamento',
         'provincia',
         'distrito',
         'cod_ubigeo',
-        'email',
+
+        /* ================== PERIODO ================== */
+        'fecha_inicio_periodo',
+        'fecha_fin_periodo',
+
+        /* ================== CUENTAS ================== */
         'cuenta_bancaria',
         'cci',
         'titular_cuenta',
+
+        /* ================== SISTEMA ================== */
         'foto_perfil',
+        'estado_completoxproveedor',
         'estado',
+        'estado_delete',
+
+        /* ================== AUDITORÍA ================== */
+        'user_created',
+        'user_updated',
+        'user_delete',
+        'user_trash',
     ];
 
 

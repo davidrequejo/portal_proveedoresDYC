@@ -64,6 +64,15 @@
               </a>
             </li>
             @endif
+
+            @if (auth()->user()->perm_proveedor)
+            <li class="nav-item">
+              <a href="{{ route('prov_proveedor.index') }}" class="nav-link {{ request()->routeIs('prov_proveedor.*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-edit"></i>
+                <p> Cliente <span class="right badge badge-danger">New</span>  </p>
+              </a>
+            </li>
+            @endif
           
           <li class="nav-header">DATOS DE CONFIGURACIÓN</li>
           <li class="nav-item">
@@ -81,11 +90,19 @@
               @if (auth()->user()->perm_tipo_estandar)
                 <li class="nav-item">
                   <a href="{{ route('tipo_estandar.index') }}" class="nav-link {{ request()->routeIs('tipo_estandar.*') ? 'active' : '' }}">
-                    <i class="ti ti-user-shield nav-icon"></i>
+                    <i class="nav-icon fas fa-tenge"></i>
                     <p>Tipo Estandar</p>
                   </a>
                 </li>  
-              @endif          
+              @endif  
+              @if (auth()->user()->perm_tipo_estandar)
+                <li class="nav-item">
+                  <a href="{{ route('banco.index') }}" class="nav-link {{ request()->routeIs('banco.*') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-university"></i>
+                    <p>Bancos</p>
+                  </a>
+                </li>  
+              @endif         
             </ul>
           </li>
           

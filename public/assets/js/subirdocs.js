@@ -2,7 +2,7 @@
 
 $("#guardar_registro_docs_prov").on("click", function (e) { $("#submit-form-docs_prov").submit(); });   
 
-lista_select2('/select2/lista_sin_docs_user', '#listar_docs_sin_subir'); 
+//lista_select2('/select2/lista_sin_docs_user', '#listar_docs_sin_subir'); 
 
 $("#listar_docs_sin_subir").select2({ theme: "bootstrap4", placeholder: "Seleccionar tipo de documento", allowClear: true, });
 
@@ -13,6 +13,8 @@ ver_estados_docs_proveedor();
 
 $("#doc1_i").click(function() {  $('#doc1').trigger('click'); });
 $("#doc1").change(function(e) {  addImageApplication(e,$("#doc1").attr("id")) });
+
+//$(".view_hidetipo_doc").hide();
 
 // Eliminamos el DOC
 function doc1_eliminar() { $("#doc1").val("");	$("#doc1_ver").html('<img src="/assets/svg/pdf.svg" alt="" width="50%" >');	$("#doc1_nombre").html(""); }
@@ -36,8 +38,12 @@ function show_hide_escenario(flag) {
   }
 }
 
-    // capturamos el nombre del select y lo enviamos al input hidden
-  $('#listar_docs_sin_subir').change(function() { var nombre = $(this).find('option:selected').text().trim(); $('#nombre_seleccion_tipo').val(nombre);  });
+function cargarselecttipoDocs() {  
+  lista_select2('/select2/lista_sin_docs_user', '#listar_docs_sin_subir'); 
+}
+
+// capturamos el nombre del select y lo enviamos al input hidden
+$('#listar_docs_sin_subir').change(function() { var nombre = $(this).find('option:selected').text().trim(); $('#nombre_seleccion_tipo').val(nombre);  });
 
 
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -90,7 +96,7 @@ function guardar_y_editar_docs_prov(e) {
   if (id == '') {
     url_editar_crear =  `/subir_docs/guardar_doc_estandar_proveedor` ;    
   } else {
-    url_editar_crear = `/proyectos/editar_proyecto/${id}`;
+    url_editar_crear = `/subir_docs/editar_doc_estandar_proveedor/${id}`;
     formData.append('_method', 'PUT'); // spoof para Laravel
   }
   
@@ -150,9 +156,6 @@ function ver_estados_docs_proveedor() {
     if (e.status == true) {
       $(".tbl_lista_documentos").empty('');
       e.data.forEach(r => {
-        let estado_trash = r.estado_trash == 1 ? 'checked' : '';
-        let estado_delete = r.estado_delete == 1 ? 'checked' : '';
-      
         $(".tbl_lista_documentos").append(`
           <tr>
             <td class="py-1"> ${String(cont++).padStart(3, '0')} </td>
@@ -184,31 +187,37 @@ function ver_documento_proveedor(ruta_documento, nombre_documento) {
 
   $('.mostrar_documento_pdf').html(``); 
 
-  $('.mostrar_documento_pdf').html(`  <object data="${ruta_documento}" type="application/pdf" width="100%" height="100%">
-                            <p class="p-3 m-0">
-                              Tu navegador no soporta visor PDF.
-                              <a href="${ruta_documento}" target="_blank">Abrir PDF</a>
-                            </p>
-                          </object>`);
+  var doc_html = doc_view_extencion(ruta_documento, '', '', '100%', '100%' );
+
+  $('.mostrar_documento_pdf').html(doc_html);
 
 }
 
 function ver_editar_documento(id, nombre_documento) { 
 
-  console.log(nombre_documento);
-  
-  $(".nombre_doc_edit").text(`${nombre_documento}`);
-
   $("#modal-crear_documento").modal("show");
 
   $.getJSON(`/subir_docs/ver_doc_estandar/${id}`, function (e) {
-    console.log(e.data);
+
+    console.log(e.data.nombreDocumento);
     
     if (e.status == true) {
 
       $("#iddocsproveedortipoestandar").val(e.data.iddocsproveedortipoestandar);
-      $("#nombre_seleccion_tipo").val(e.data.nombreDocumento);
-      $("#listar_docs_sin_subir").val(e.data.iddetalletipoestandarproveedor).trigger('change');
+      lista_select2(`/select2/lista_sin_docs_user?iddetalle=${e.data.iddetalletipoestandarproveedor}`, '#listar_docs_sin_subir',`${e.data.iddetalletipoestandarproveedor}`);
+
+      //validamoos DOC-1
+      if (e.data.archivo != "" ) {
+        $("#doc_old_1").val(e.data.archivo);
+        $("#doc1_nombre").html(`${e.data.nombreDocumento}.` + extrae_extencion(e.data.archivo));
+        var doc_html = doc_view_extencion(e.data.archivo, '', '', '100%', '210' );
+        $("#doc1_ver").html(doc_html);         
+      } else {
+        $("#doc1_ver").html('<img src="/assets/svg/pdf.svg" alt="" width="50%" >');
+        $("#doc1_nombre").html('');
+        $("#doc_old_1").val("");
+      }
+
 
       $("#cargando-1-formulario").show();
       $("#cargando-2-formulario").hide();
@@ -217,7 +226,48 @@ function ver_editar_documento(id, nombre_documento) {
     }
   }).fail(function (xhr) { ver_errores(xhr); });
   
- }
+}
+
+
+function eliminar_documento(id, nombres) {
+
+  Swal.fire({
+    title: "¿Está Seguro de eliminar el registro?",
+    html: `<b class="text-danger"><del>${nombres}</del></b>`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#28a745",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Sí, eliminar!",
+  }).then((result) => {
+
+    if (result.isConfirmed) {
+
+      $.ajax({
+        url: `/subir_docs/eliminar_doc_estandar_proveedor/${id}`,
+        type: "PUT",
+        data: {
+          _token: $('meta[name="csrf-token"]').attr('content') // necesario para PUT
+        },
+        success: function (e) {
+          console.log(e);
+
+          if (e.status === true) {
+            Swal.fire("Eliminado!", "El registro ha sido eliminado.", "success");
+            ver_estados_docs_proveedor();
+          } else {
+            Swal.fire("Error!", e.message, "error");
+          }
+        },
+        error: function (xhr) {
+          Swal.fire("Error!", "Ocurrió un error en el servidor.", "error");
+          console.log(xhr.responseText);
+        }
+      });
+
+    }
+  });
+}
 
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 // ═══════                                       J Q   F O R M   V A L I D A T I O N S                                                              ═══════

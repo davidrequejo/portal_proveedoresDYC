@@ -8,64 +8,10 @@
       <li class="nav-item d-none d-sm-inline-block">
         <a href="index3.html" class="nav-link"><i class="ti ti-home"></i></a>
       </li>
-      <li class="nav-item dropdown">
-        <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Catalogo</a>
-        <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
-          <li><a href="#" class="dropdown-item"><i class="ti ti-keyframes"></i> Recursos </a></li>
-          <li><a href="#" class="dropdown-item"><i class="ti ti-buildings"></i> Proyecto</a></li>
-
-          <li class="dropdown-divider"></li>
-
-          <!-- Level two dropdown-->
-          <li class="dropdown-submenu dropdown-hover">
-            <a id="dropdownSubMenu2" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Otros</a>
-            <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">
-              <li>
-                <a tabindex="-1" href="#" class="dropdown-item">level 2</a>
-              </li>
-
-              <!-- Level three dropdown-->
-              <li class="dropdown-submenu">
-                <a id="dropdownSubMenu3" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">level 2</a>
-                <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
-                  <li><a href="#" class="dropdown-item">3rd level</a></li>
-                  <li><a href="#" class="dropdown-item">3rd level</a></li>
-                </ul>
-              </li>
-              <!-- End Level three -->
-
-              <li><a href="#" class="dropdown-item">level 2</a></li>
-              <li><a href="#" class="dropdown-item">level 2</a></li>
-            </ul>
-          </li>
-          <!-- End Level two -->
-        </ul>
-      </li>
     </ul>
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
-      <!-- Navbar Search -->
-      <li class="nav-item">
-        <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-          <i class="fas fa-search"></i>
-        </a>
-        <div class="navbar-search-block">
-          <form class="form-inline">
-            <div class="input-group input-group-sm">
-              <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
-              <div class="input-group-append">
-                <button class="btn btn-navbar" type="submit">
-                  <i class="fas fa-search"></i>
-                </button>
-                <button class="btn btn-navbar" type="button" data-widget="navbar-search">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </li>
 
       <!-- Messages Dropdown Menu -->
       <li class="nav-item dropdown">
@@ -217,7 +163,7 @@
 
       {{-- Config --}}
       <li class="nav-item">
-        <a class="nav-link" data-widget="control-sidebar" data-controlsidebar-slide="true" href="#" role="button">
+        <a class="nav-link" role="button">
           <i class="fas fa-th-large"></i>
         </a>
       </li>

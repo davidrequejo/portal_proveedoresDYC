@@ -1225,7 +1225,8 @@ function buscar_sunat_reniec(input='') {
 
       $.post("/consulta/reniec", { dni: dni_ruc }, function (data, status) {
 
-        //data = JSON.parse(data);  console.log(data);
+        //data = JSON.parse(data);  
+        console.log(data);
 
         if (data == null) {
 
@@ -1253,6 +1254,10 @@ function buscar_sunat_reniec(input='') {
             $(`#charge${input}`).hide();
 
             $(`#nombre_razonsocial${input}`).val(data.nombres + " " + data.apellidoPaterno + " " + data.apellidoMaterno);
+            $('#nombre_persona_natural').val(data.nombres);
+            $('#apellido_paterno_per_natural').val(data.apellidoPaterno);
+            $('#apellido_materno_per_natural').val(data.apellidoMaterno);
+
             $(`#titular_cuenta${input}`).val(data.nombres + " " + data.apellidoPaterno + " " + data.apellidoMaterno);
 
             toastr.success("Persona encontrada!!!!");
@@ -1279,7 +1284,7 @@ function buscar_sunat_reniec(input='') {
         $.post("/consulta/sunat", { ruc: dni_ruc }, function (data, status) {
 
 
-          //data = JSON.parse(data);    console.log(data);
+          console.log(data);
 
           if (data == null) {
             $(`#search${input}`).show();
@@ -1303,6 +1308,7 @@ function buscar_sunat_reniec(input='') {
             } else {
 
               if (data.estado == "ACTIVO") {
+                $(`.valido_novalido`).html('<span class="badge badge-info">ACTIVO</span>');
 
                 $(`#search${input}`).show();
 
@@ -1324,6 +1330,7 @@ function buscar_sunat_reniec(input='') {
                 toastr.success("Datos encontrados!!");
 
               } else {
+                $(`.valido_novalido`).html('<span class="badge badge-danger">NO ACTIVO</span>');
 
                 toastr.info("Se recomienda NO generar FACTURAS ó BOLETAS!!!");
 

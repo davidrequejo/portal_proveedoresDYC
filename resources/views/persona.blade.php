@@ -195,7 +195,6 @@
                     <div class="row" id="cargando-1-formulario">
                       <!-- id persona -->
                       <input type="hidden" name="idpersona" id="idpersona" /> 
-                      <input type="hidden" name="idbanco" id="idbanco" value="1" /> 
 
                       <div class="col-12 col-sm-6 col-md-4 col-lg-4">
                         <div class="form-group">
@@ -252,6 +251,15 @@
                         <div class="form-group">
                           <label for="Nombre_Apellidos">Nombre y Apellidos/Razon Social <sup class="text-danger">*</sup></label>
                           <input type="text" name="nombre_razonsocial" class="form-control" id="nombre_razonsocial"  />
+                        </div>
+                      </div> 
+                      <!-- Nombre apellidos maternos paternos  -->
+                      <div class="col-12 col-sm-12 col-md-7 col-lg-7" style="display: none">
+                        <div class="form-group">
+                          <label for="Nombre_Apellidos">Nombre <sup class="text-danger">*</sup></label>
+                          <input type="text" name="nombre_persona_natural" class="form-control" id="nombre_persona_natural"  />
+                          <input type="text" name="apellido_paterno_per_natural" class="form-control" id="apellido_paterno_per_natural"  />
+                          <input type="text" name="apellido_materno_per_natural" class="form-control" id="apellido_materno_per_natural"  />
                         </div>
                       </div> 
                       <!-- email -->

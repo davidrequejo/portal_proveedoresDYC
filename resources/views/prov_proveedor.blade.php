@@ -6,7 +6,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="app-url" content="{{ url('/') }}">
   
-  <title>Proveedores | Portal Proveedores D&C</title>
+  <title>Clientes | Portal Proveedores D&C</title>
 
   <link rel="icon" href="{{ asset('assets/images/brand-logos/ico-opt.png') }}" type="image/png">
 
@@ -25,9 +25,6 @@
 
     .fila-proyecto.selected {  background-color: #e7f1ff !important; }
     .fila-proyecto-presupuesto.selected {  background-color: #e7f1ff !important; }
-
-    .bg-orange { background-color: #fd7e14 !important; color: #fff;}
-
   </style>
 
 </head>
@@ -77,7 +74,7 @@
     <!-- Main Sidebar Container -->
     @include('layouts.lte_aside')   
 
-    @if (auth()->user()->perm_proveedor)
+    @if (auth()->user()->perm_persona)
 
       <!-- Content Wrapper. Contains page content -->
       <div class="content-wrapper">
@@ -86,14 +83,14 @@
           <div class="container-fluid">
             <div class="row mb-2">
               <div class="col-sm-6">
-                <h1 class="m-0">Proveedores</h1>
+                <h1 class="m-0">Clientes Proveedor</h1>
               </div><!-- /.col -->
               <div class="col-sm-6">
                 <div class="float-right">
 
-                  <div class="btn-group btn-agregar-proyecto">
-                    <button type="button" class="btn btn-success" style="border-color: #1a6b2c !important;" data-toggle="modal" data-target="#modal-agregar-proveedor" onclick="limpiar_form_proveedor();" ><i class="ti ti-users-plus"></i> Crear nuevo</button>
-                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" style="border-color: #1a6b2c !important;">
+                  <div class="btn-group btn-agregar-persona">
+                    <button type="button" class="btn btn-success" style="border-color: #2e6da4 !important;" data-toggle="modal" data-target="#modal-agregar-proyecto" onclick="limpiar_form_persona();" ><i class="ti ti-users-plus"></i> Crear nuevo</button>
+                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" style="border-color: #2e6da4 !important;">
                       <span class="sr-only">Toggle Dropdown</span>
                     </button>
                     <div class="dropdown-menu" role="menu">
@@ -122,7 +119,7 @@
 
               
               <!-- ./col -->
-              <div class="col" id="div-tabla-principal-proyecto">
+              <div class="col" id="div-tabla-principal-persona">
                 <div class="card">
                   
                   <div class="card-body pb-1">
@@ -158,8 +155,8 @@
                             <th data-sort="celular"   class="sortable">Teléfono</th>
                             <th data-sort="email"       class="sortable">Email</th>
                             <th data-sort="direccion" class="sortable">Dirección</th>
-                            <th data-sort="estado" class="sortable">Estado Documentos</th>
-                            <th data-sort="estado" class="sortable">Documentos</th>
+                            <th data-sort="direccion" class="sortable">Rol</th>
+                            <th data-sort="estado" class="sortable">Estado</th>
                             
                           </tr>
                         </thead>
@@ -177,91 +174,17 @@
                   </div>
                 </div>
               </div>
-
-              <div class="col-lg-12" id="div-ver-detalle-documentos" style="display: none;">
-
-                <div class="row">
-                  <div class="col-lg-6">
-                    <div class="card">
-                      <div class="card-header border-0">
-                        <h3 class="card-title m-2 font-weight-bold text-info">Validación de Documentos</h3>
-                        <div class="card-tools m-2"></div>
-                      </div>
-                      <div class="card-body table-responsive ">
-                        <table class="table table-striped table-valign-middle">
-                          <thead>
-                          <tr>
-                            <th>#</th>
-                            <th>Descripcion Doc.</th>
-                            <th>Estado</th>
-                            <th>Ver</th>
-                            <th class="text-center">Act. Estado</th>
-                          </tr>
-                          </thead>
-                          <tbody class="tbl_lista_documentos">
-                          <tr>
-                             <td>001</td>
-                            <td>
-                              <img src="/assets/images/default/pdf_icon.png" alt="Product 1" class="img-circle img-size-32 mr-2">
-                              Fecha Ruc de la empresa
-                            </td>
-                            <td><span class="badge bg-success">Verificado</span></td>
-                            <td>
-                              <a href="#" class="text-muted">
-                                <i class="fas fa-search"></i>
-                              </a>
-                            </td>
-                            <td class="text-center">
-                              <a class="btn btn-info btn-sm" href="#"><i class="fas fa-pencil-alt"></i> Editar</a>                              
-                            </td>
-                          </tr>
-
-                          </tbody>
-                        </table>
-                      </div>
-                      <div class="modal-footer justify-content-end">
-                        <!--<button type="button" class="btn btn-outline-warning" data-dismiss="modal">Close</button>
-                        <button type="button " class="btn btn-sm btn-outline-success">Guardar</button>-->
-                      </div>
-                    </div>
-                    <!-- /.card -->
-                  </div>
-                  <!-- /.col-md-6 -->
-                  <div class="col-lg-6">
-                    <div class="card">
-                      <div class="card-header border-0">
-                        <h3 class="card-title m-2 font-weight-bold text-info nombre_documento_pdf">Documento PDF</h3>
-                      </div>
-
-                      <div class="card-body">
-                        <div class="card-body p-0 mostrar_documento_pdf" style="height: 650px;">
-                          <div class="alert alert-info alert-dismissible">
-                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true" disabled></button>
-                            <h5><i class="icon fas fa-info"></i> Sin vista previa!</h5>
-                            Para visualizar un documento, haga clic en el ícono <i class="fas fa-search"></i> ubicado en la fila correspondiente de la tabla del lado izquierdo
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-
-                  </div>
-                  <!-- /.col-md-6 -->
-                </div>
-
-                
-              </div>
             </div>
             <!-- /.row -->
             
           </div><!-- /.container-fluid -->
 
 
-          <div class="modal fade" id="modal-agregar-proveedor">
+          <div class="modal fade" id="modal-agregar-proyecto">
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
               <div class="modal-content">
                 <div class="modal-header py-2">
-                  <h4 class="modal-title">Proveedores</h4>
+                  <h4 class="modal-title">Clientes Proveedor</h4>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span class="text-danger" aria-hidden="true">&times;</span>
                   </button>
@@ -272,39 +195,23 @@
                     <div class="row" id="cargando-1-formulario">
                       <!-- id persona -->
                       <input type="hidden" name="idpersona" id="idpersona" /> 
-                      <input type="hidden" name="idtipo_persona" id="idtipo_persona" value="3" /> 
 
-
-                      <div class="col-12 col-sm-6 col-md-5 col-lg-5">
-                        <div class="form-group">
-                          <label for="descripcion">Periodo Inicio </label>                          
-                            <input type="date" name="fecha_inicio_periodo" class="form-control" id="fecha_inicio_periodo"  />
-                          </select>
-                        </div>
-                      </div>
-
-                      <div class="col-12 col-sm-6 col-md-5 col-lg-5">
-                        <div class="form-group">
-                          <label for="descripcion">Periodo Fin </label>                          
-                            <input type="date" name="fecha_fin_periodo" class="form-control" id="fecha_fin_periodo"  />
-                          </select>
-                        </div>
-                      </div>
-                      
                       <div class="col-12 col-sm-6 col-md-4 col-lg-4">
                         <div class="form-group">
-                          <label for="descripcion">Tipo Estandar </label>                          
+                          <label for="descripcion">Rol </label>                          
                           <!--<textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
-                          <select name="idtipoestandarproveedor" id="idtipoestandarproveedor" class="form-control is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
+                          <select name="idtipo_persona" id="idtipo_persona" class="form-control is-valid select2" placeholder="Rol" aria-invalid="false">
+
                           </select>
                         </div>
                       </div>
+                      <!-- Tipo Entidad Sunat -->
 
                       <div class="col-12 col-sm-6 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label for="descripcion">Tipo Entidad Sunat</label>                          
                           <!--<textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
-                          <select name="tipo_entidad_sunat" id="tipo_entidad_sunat" class="form-control is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
+                          <select name="tipo_entidad_sunat" id="tipo_entidad_sunat" class="form-control is-valid select2" placeholder="Tipo Entidad" aria-invalid="false">
                             <option value="NATURAL">NATURAL</option>
                             <option value="JURIDICA">JURIDICA</option>
                           </select>
@@ -346,7 +253,7 @@
                           <input type="text" name="nombre_razonsocial" class="form-control" id="nombre_razonsocial"  />
                         </div>
                       </div> 
-                       <!-- Nombre apellidos maternos paternos  -->
+                      <!-- Nombre apellidos maternos paternos  -->
                       <div class="col-12 col-sm-12 col-md-7 col-lg-7" style="display: none">
                         <div class="form-group">
                           <label for="Nombre_Apellidos">Nombre <sup class="text-danger">*</sup></label>
@@ -355,22 +262,20 @@
                           <input type="text" name="apellido_materno_per_natural" class="form-control" id="apellido_materno_per_natural"  />
                         </div>
                       </div> 
+                      <!-- email -->
+                      <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+                        <div class="form-group">
+                          <label for="email">Email</label>
+                           <input type="email" name="email" class="form-control" id="email" placeholder="Correo electrónico" onkeyup="convert_minuscula(this);">
+                        </div>
+                      </div>      
                       <!-- Teléfono -->
-                      <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                      <div class="col-12 col-sm-12 col-md-3 col-lg-3">
                         <div class="form-group">
                           <label for="celular">Teléfono</label>
                           <input type="text" name="celular" id="celular" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text">
                         </div>
                       </div>
-
-                      <!-- email -->
-                      <div class="col-12 col-sm-12 col-md-8 col-lg-8">
-                        <div class="form-group">
-                          <label for="email">Email</label>
-                           <input type="email" name="email" class="form-control" id="email" placeholder="Correo electrónico" onkeyup="convert_minuscula(this);">
-                        </div>
-                      </div>   
-
                       <!-- Dirección -->
                       <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                         <div class="form-group">
@@ -379,6 +284,7 @@
                         </div>
                       </div>
 
+                 
                       <!-- Distrito -->
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
@@ -402,29 +308,6 @@
                           <input type="text" name="departamento" class="form-control" id="departamento"  readonly />
                         </div>
                       </div> 
-
-                      <div class="card border-info mb-3 col-12">
-                        <div class="card-header bg-color-0202022e font-weight-bold">Creación de Acceso al Portal <span class="text-center badge badge-info cursor-pointer" style=" font-size: 14px; pont" id="btn_generar_credenciales" >Generar credenciales</span></div>
-                        <div class="card-body text-secondary">
-                          <p class="card-text">Genera automáticamente el usuario y contraseña a partir de los datos del proveedor.</p>
-
-                          <div class="row">
-                               <input type="hidden" name="id" id="id" />
-                        
-                              <div class="form-group col-md-6">
-                                  <label>Usuario</label>
-                                  <input type="text" id="usuario_portal" name="usuario_portal" class="form-control"
-                                      placeholder="Usuario automático">
-                              </div>
-
-                              <div class="form-group col-md-6">
-                                  <label>Contraseña</label>
-                                  <input type="text" id="clave_portal" name="clave_portal" class="form-control"
-                                      placeholder="Contraseña automática">
-                              </div>
-                          </div> 
-                        </div>
-                      </div>
 
                       <!-- barprogress -->
                       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px;">
@@ -451,7 +334,7 @@
                 </div>
                 <div class="modal-footer justify-content-between py-1">
                   <button type="button" class="btn btn-outline-danger " data-dismiss="modal"><i class="ti ti-circle-dashed-x"></i>Cerrar</button>
-                  <button type="button" class="btn btn-success" id="guardar_registro_proveedor" ><i class="ti ti-device-floppy"></i> Guardar</button>
+                  <button type="button" class="btn btn-success" id="guardar_registro_persona" ><i class="ti ti-device-floppy"></i> Guardar</button>
                 </div>
               </div>
               <!-- /.modal-content -->
@@ -460,76 +343,77 @@
           </div>
           <!-- /.modal -->
 
-        <div class="modal fade show" id="modal-actualizar-estado"  aria-modal="true" role="dialog">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h6 class="modal-title">Actualizar Estado : <strong class='text-info nombre_doc_edit'></strong> </h6>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">×</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <form id="form-actualizar-estado" name="form-actualizar-estado" method="POST">
-                  @csrf
-                  <input type="text" name="iddocsproveedortipoestandar" id="iddocsproveedortipoestandar" /> 
-                  <input type="text" name="idpersonadoc" id="idpersonadoc" /> 
-                  <input type="text" name="inputnombre_razonsocial_tipo" id="inputnombre_razonsocial_tipo" />
-                  <input type="text" name="inputemail_proveedor_env_correo" id="inputemail_proveedor_env_correo" />
-
-                  <div  class="row" id="cargando-3-formulario">
-
-                    <div class="col-12">
-                      <label for="estado_documentos">Estado de Documento</label>
-                      <select name="estado_documentos_update" id="estado_documentos_update" class="form-control is-valid select2" placeholder="Estado de Documentos" aria-invalid="false">
-                        <option value="Aprobado">Aprobado</option>
-                        <option value="Rechazado">Observado</option>
-                        <option value="Rechazado">Rechazado</option>
-                      </select>
-                    </div>
-
-                    <div class="col-12 mt-2">
-                      <div class="form-group">
-                        <label for="observacion_est_up">Obs </label> <br>
-                        <textarea name="observacion_est_up" id="observacion_est_up" class="form-control" rows="2"></textarea>
-                      </div>
-                    </div>
-
+          <div class="modal fade" id="modal-agregar-persona">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+              <div class="modal-content">
+                <div class="modal-header py-2">
+                  <h4 class="modal-title">Presupuestos</h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span class="text-danger" aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="table-responsive">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th style="width: 10px">#</th>
+                          <th>Task</th>
+                          <th>Progress</th>
+                          <th style="width: 40px">Label</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>1.</td>
+                          <td>Update software</td>
+                          <td>
+                            <div class="progress progress-xs">
+                              <div class="progress-bar progress-bar-danger" style="width: 55%"></div>
+                            </div>
+                          </td>
+                          <td><span class="badge bg-danger">55%</span></td>
+                        </tr>
+                        <tr>
+                          <td>2.</td>
+                          <td>Clean database</td>
+                          <td>
+                            <div class="progress progress-xs">
+                              <div class="progress-bar bg-warning" style="width: 70%"></div>
+                            </div>
+                          </td>
+                          <td><span class="badge bg-warning">70%</span></td>
+                        </tr>
+                        <tr>
+                          <td>3.</td>
+                          <td>Cron job running</td>
+                          <td>
+                            <div class="progress progress-xs progress-striped active">
+                              <div class="progress-bar bg-primary" style="width: 30%"></div>
+                            </div>
+                          </td>
+                          <td><span class="badge bg-primary">30%</span></td>
+                        </tr>
+                        <tr>
+                          <td>4.</td>
+                          <td>Fix and squish bugs</td>
+                          <td>
+                            <div class="progress progress-xs progress-striped active">
+                              <div class="progress-bar bg-success" style="width: 90%"></div>
+                            </div>
+                          </td>
+                          <td><span class="badge bg-success">90%</span></td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
-                  
-                  <!-- barprogress -->
-                  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px;">
-                    <div class="progress" id="barra_progress_act_est_div">
-                      <div id="barra_progress_act_est" class="progress-bar" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: 0%;">
-                        0%
-                      </div>
-                    </div>
-                  </div> 
-
-                  <div class="row" id="cargando-4-formulario" style="display: none;">
-                    <div class="col-lg-12 text-center">
-                      <i class="fas fa-spinner fa-pulse fa-3x"></i><br />
-                      <br />
-                      <h4>Cargando...</h4>
-                    </div>
-                  </div>
-
-                  <button type="submit" style="display: none;" id="submit-form-actualizar_estado">Submit</button>
-                </form>
+                </div>              
               </div>
-              <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-success" id="guardar_registro_actualizar_estado" ><i class="ti ti-device-floppy"></i> Guardar</button>
-              </div>
+              <!-- /.modal-content -->
             </div>
-            <!-- /.modal-content -->
+            <!-- /.modal-dialog -->
           </div>
-          <!-- /.modal-dialog -->
-        </div>
-
-
-
-
+          <!-- /.modal -->
 
 
         </section>
@@ -553,7 +437,7 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/proveedor.js') }}?version_erp=01.02"></script>
+  <script src="{{ asset('assets/js/persona.js') }}?version_erp=01.02"></script>
 
   <script>
     $(function() {

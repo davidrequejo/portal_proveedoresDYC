@@ -1,52 +1,36 @@
 
-$("#guardar_registro_persona").on("click", function (e) { $("#submit-form-proveedor").submit(); });   
+$("#guardar_registro_cuenta_bank").on("click", function (e) { $("#submit-cuentabancaria").submit(); });   
+
+
+lista_select2('select2/bancos', '#idbanco');
+
+$("#idbanco").select2({ theme: "bootstrap4", placeholder: "Selec. Banco", allowClear: true, });
+
+$("#tipocuenta").select2({ theme: "bootstrap4", placeholder: "Tipo Cuenta", allowClear: true, });
+
+$("#moneda").select2({ theme: "bootstrap4", placeholder: "Selec. moneda", allowClear: true, });
+$("#predeterminado").select2({ theme: "bootstrap4", placeholder: "Selec. si es predeterminado", allowClear: true, });
 
 
 
 
- lista_select2('/select2/obtener', '#distrito');
 
- lista_select2('/select2/Rolpersona', '#idtipo_persona');
-
-
-
- $("#distrito").select2({ theme: "bootstrap4", placeholder: "Seleccionar Distrito", allowClear: true, });
- $("#idtipo_persona").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
-
- $("#tipo_entidad_sunat").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
- $("#tipo_documento").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
 
 function show_hide_escenario(flag) {
   if (flag == 1) {            // Tabla principal
-    $('#div-tabla-principal-persona').show();
-    $(".btn-agregar-persona").show();
+    $('#div-tabla-principal-banco').show();
+    $(".btn-agregar-banco").show();
     $(".btn-cancelar").hide();
     
   } else if (flag == 2) {     // Detalle proyecto
-    $('#div-tabla-principal-persona').hide();
-    $(".btn-agregar-persona").hide();
+    $('#div-tabla-principal-banco').hide();
+    $(".btn-agregar-banco").hide();
     $(".btn-cancelar").show();
   } else if (flag == 3) {     //
   } else if (flag == 4) {
     
   }
 }
-
-$(document).ready(function() {
-    // Cuando el valor del select cambia
-    $('#distrito').change(function() {
-        // Obtener el valor del atributo 'data-provincia' del option seleccionado
-        var provincia = $(this).find('option:selected').data('provincia');
-        var departamento = $(this).find('option:selected').data('departamento');
-
-        $('#provincia').val(provincia);
-        $('#departamento').val(departamento);
-
-        console.log(provincia);
-        
-
-    });
-});
 
 
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -62,9 +46,9 @@ const state = {
 };
 
 // Cargar datos
-function tabla_principal_cargar(){
+function tabla_principal_cnta_bank(){
   
-  $.getJSON("/persona/tabla_principal", state, function(res){
+  $.getJSON("/persona-cuenta-bancaria/tabla_principal", state, function(res){
 
     console.log(res.data);
     
@@ -76,35 +60,50 @@ function tabla_principal_cargar(){
 
 // Render filas de la tabla
 function renderFilas(rows){
-  const $tb = $("#tabla-proveedores tbody").empty();
+  const $tb = $("#tbl_lista_cuentas_bancarias tbody").empty();
+
   if (!rows || rows.length === 0){
-    $tb.append('<tr><td colspan="15" class="text-center text-muted">Sin resultados</td></tr>');
+    $tb.append('<tr><td colspan="6" class="text-center text-muted">Sin resultados</td></tr>');
     return;
   }
+
   rows.forEach(r => {
-     estado = r.estado == '1'?' <span class="text-center badge badge-success">Activado</span>':'Deshabilitado';
+    let estado = r.estado_trash == '1' ? '<span class="badge badge-success">Activo</span>' : '<span class="badge badge-danger">Inactivo</span>';
+
+    let tipoCuenta = '';
+    const tipocuenta = (r.estado_revision === null);
+
+    switch (r.tipocuenta) {
+        case 'C': tipoCuenta = `Corriente`; break;
+        case 'A': tipoCuenta = `Ahorros`; break;
+        case 'M': tipoCuenta = `Maestra`; break;
+        case 'T': tipoCuenta = `CTS`; break;
+        case 'D': tipoCuenta = `Detracción`; break;
+        case 'S': tipoCuenta = `Cuenta Sueldo`; break;
+    }
+
     $tb.append(`
-      <tr class="fila-proyecto" data-id="${r.idpersona}">          
-        <td class="py-1"> 
+      <tr class="fila-banco" data-id="${r.idpersona_CuentaBancaria}">
+        <td>
           <div class="btn-group btn-group-sm">
-            <button class="btn btn-warning text-nowrap bnt-editar-proyecto" onclick="ver_editar_persona(${r.idpersona})" data-toggle="tooltip" data-original-title="Editar"><i class="ti ti-edit"></i></button>
-            <button class="btn btn-danger text-nowrap bn-ver-proyecto" onclick="eliminar_persona(${r.idpersona}, '${r.nombre_razonsocial}')" data-toggle="tooltip" data-original-title="Ver"><i class="ti ti-trash"></i></button>
+            <button class="btn btn-warning" onclick="ver_editar_cuentabancaria(${r.idpersona_CuentaBancaria})">
+              <i class="ti ti-edit"></i>
+            </button>
+            <button class="btn btn-danger" onclick="eliminar_cuentabancaria(${r.idpersona_CuentaBancaria}, '${r.banco}')">
+              <i class="ti ti-trash"></i>
+            </button>
           </div>
         </td>
-        <td class="py-1 text-center" >${String(r.idpersona).padStart(3, '0')}</td>
-        <td class="py-1 text-nowrap" >${r.nombre_razonsocial ?? ''}</td>
-        <td class="py-1" >${r.tipo_entidad_sunat ?? ''}</td>
-        <td class="py-1" >${r.abreviatura ?? ''}</td>
-        <td class="py-1 text-nowrap" >${r.numero_documento ?? ''}</td>
-        <td class="py-1 text-nowrap" >${r.celular ?? ''}</td>
-        <td class="py-1 text-nowrap">${r.email ?? ''}</td>
-        <td class="py-1 text-nowrap">${ r.direccion }</td>
-        <td class="py-1 text-nowrap">${ r.tipoPersona }</td>
-        <td class="py-1 text-nowrap">${ estado }</td>
-        
+        <td>${r.banco}</td>
+        <td>${tipoCuenta}</td>
+        <td>${r.numero_cuenta ?? ''}</td>
+        <td>${r.predeterminado}</td>
+        <td>${r.moneda}</td>
+        <td>${r.cuenta_interbancaria}</td>
+        <td>${r.numero_cuenta_abono}</td>
+        <td>${estado}</td>
       </tr>
     `);
-    $('[data-toggle="tooltip"]').tooltip(); 
   });
 }
 
@@ -128,214 +127,153 @@ function renderPaginacion(actual, total){
 
 // Marcar orden visualmente
 function marcarOrden(col, dir){
-  $("#tabla-proveedores thead th.sortable").each(function(){ const $th = $(this);  const c = $th.data('sort');  $th.removeClass('asc desc'); if (c === col) $th.addClass(dir);  });
+  $("#tbl_lista_cuentas_bancarias thead th.sortable").each(function(){ const $th = $(this);  const c = $th.data('sort');  $th.removeClass('asc desc'); if (c === col) $th.addClass(dir);  });
 }
 
 // Eventos: click en paginación
 $("#paginacion").on("click", "a.page-link", function(e){  
-  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Buscando...</td></tr>');
-  e.preventDefault();   const page = parseInt($(this).data("page"), 10); if (!isNaN(page)){ state.page = Math.max(1, page); tabla_principal_cargar(); } 
+  $("#tbl_lista_cuentas_bancarias tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Buscando...</td></tr>');
+  e.preventDefault();   const page = parseInt($(this).data("page"), 10); if (!isNaN(page)){ state.page = Math.max(1, page); tabla_principal_cnta_bank(); } 
 });
 
 // Eventos: ordenar al hacer clic en header
-$("#tabla-proveedores thead").on("click", "th.sortable", function(){
-  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Ordenando...</td></tr>');
+$("#tbl_lista_cuentas_bancarias thead").on("click", "th.sortable", function(){
+  $("#tbl_lista_cuentas_bancarias tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Ordenando...</td></tr>');
   const col = $(this).data("sort"); if (state.sort === col) { state.dir = (state.dir === 'asc') ? 'desc' : 'asc'; } else { state.sort = col;  state.dir  = 'asc'; } state.page = 1;    
-  tabla_principal_cargar();
+  tabla_principal_cnta_bank();
 });
 
 // Búsqueda con debounce
 let t = null;
 $("#buscar").on("input", function(){
-  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Buscando...</td></tr>');
-  const val = $(this).val(); clearTimeout(t); t = setTimeout(function(){ state.q = val; state.page = 1; tabla_principal_cargar(); }, 300);
+  $("#tbl_lista_cuentas_bancarias tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Buscando...</td></tr>');
+  const val = $(this).val(); clearTimeout(t); t = setTimeout(function(){ state.q = val; state.page = 1; tabla_principal_cnta_bank(); }, 300);
 });
 
 // Cambiar tamaño de página
 $("#perPage").on("change", function(){
-  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');
+  $("#tbl_lista_cuentas_bancarias tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');
   state.per_page = parseInt($(this).val(), 10) || 20;  state.page = 1;
-  tabla_principal_cargar();
+  tabla_principal_cnta_bank();
 });
 
 // Carga inicial
-tabla_principal_cargar();
+tabla_principal_cnta_bank();
 
 $(".recargar-tabla-proyecto").on("click", function(){
   toastr_info('<i class="ti ti-checks"></i> Actualizando...', 'Los datos se estan actualizado', 500);
-  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');    
+  $("#tbl_lista_cuentas_bancarias tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');    
 
-  tabla_principal_cargar();
+  tabla_principal_cnta_bank();
 });
 
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 // ═══════                                       S E C C I O N   C R U D   P R O Y E C T O                                                          ═══════
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
-function limpiar_form_persona(){
-  
-  //Mostramos los Materiales
-  $("#idpersona").val("");
-  $("#nombre_razonsocial").val("");
-  $("#email").val("");
-  $("#celular").val("");
-  $("#direccion").val("");
-  $("#numero_documento").val(""); 
-  $("#provincia").val("");
-  $("#departamento").val("");
 
-  $("#idtipo_persona").val("").trigger('change');
-  $("#tipo_entidad_sunat").val("").trigger('change');
-  $("#tipo_documento").val("").trigger('change');
-  $("#distrito").val("").trigger('change');
+function limpiar_form_banco(){
+  $("#idpersona_CuentaBancaria").val('');
+  $("#idbanco").val('');
+  $("#tipocuenta").val('');
+  $("#moneda").val('');
+  $("#predeterminado").val('');
+  $("#numero_cuenta").val('');
+  $("#cuenta_interbancaria").val('');
 
-
-  // Limpiamos las validaciones
-  $(".form-control").removeClass('is-valid');
-  $(".form-control").removeClass('is-invalid');
+  $(".form-control").removeClass('is-valid is-invalid');
   $(".error.invalid-feedback").remove();
 }
 
-function ver_editar_persona(idpersona) {
-  $("#cargando-1-formulario").hide();
-  $("#cargando-2-formulario").show();
-  limpiar_form_persona();
-  $('#modal-agregar-proyecto').modal('show');
-  $.getJSON(`persona/${idpersona}/ver-editar`, function (e) {
-    if (e.status == true) {
+function ver_editar_cuentabancaria(idpersona_CuentaBancaria){
+
+  limpiar_form_banco();
+  $('#modal-crear_cuentabancaria').modal('show');
+
+  $.getJSON(`/persona-cuenta-bancaria/${idpersona_CuentaBancaria}/ver-editar`, function (e) {
+
+    if (e.status === true) {
+      $("#idpersona_CuentaBancaria").val(e.data.idpersona_CuentaBancaria);
       $("#idpersona").val(e.data.idpersona);
-      $("#idtipo_persona").val(e.data.idtipo_persona).trigger('change');
-      $("#tipo_entidad_sunat").val(e.data.tipo_entidad_sunat).trigger('change');
-      $("#tipo_documento").val(e.data.tipo_documento).trigger('change');
-      $("#numero_documento").val(e.data.numero_documento);
-      $("#nombre_razonsocial").val(e.data.nombre_razonsocial);
-      $("#nombre_persona_natural").val(e.data.nombre_persona_natural);
-      $("#apellido_paterno_per_natural").val(e.data.apellido_paterno_per_natural);
-      $("#apellido_materno_per_natural").val(e.data.apellido_materno_per_natural);
-      $("#direccion").val(e.data.direccion);
-      $("#celular").val(e.data.celular);
-      $("#telefono_fijo").val(e.data.telefono_fijo);
-      $("#email").val(e.data.email);
-      $("#distrito").val(e.data.distrito).trigger('change');
-      $("#provincia").val(e.data.provincia);
-      $("#departamento").val(e.data.departamento);
-      
-
-      $("#cargando-1-formulario").show();
-      $("#cargando-2-formulario").hide();
+      $("#idbanco").val(e.data.idbanco).trigger('change');
+      $("#tipocuenta").val(e.data.tipocuenta).trigger('change');
+      $("#moneda").val(e.data.moneda).trigger('change');
+      $("#predeterminado").val(e.data.predeterminado).trigger('change');
+      $("#numero_cuenta").val(e.data.numero_cuenta);
+      $("#cuenta_interbancaria").val(e.data.cuenta_interbancaria);
     } else {
-      alert("No se encontró el persona");
+      toastr.error('Registro no encontrado');
     }
-  }).fail(function (xhr) { ver_errores(xhr); });
 
+  }).fail(function (xhr) {
+    ver_errores(xhr);
+  });
 }
 
-function guardar_y_editar_persona(e) {
-  // e.preventDefault(); //No se activará la acción predeterminada del evento
-  var formData = new FormData($("#form-agregar-proveedor")[0]);
+function guardar_y_editar_cuentabancaria(e){
 
-  var id = $("#idpersona").val();
-  var url_editar_crear = '';
-  if (id == '') {
-    url_editar_crear =  `/persona/crear_persona` ;    
+  let formData = new FormData($("#form-cuenta-bancaria")[0]);
+  let id = $("#idpersona_CuentaBancaria").val();
+  let url = '';
+
+  if (id === '') {
+    url = '/persona-cuenta-bancaria/crear';
   } else {
-    url_editar_crear = `/persona/editar_persona/${id}`;
-    formData.append('_method', 'PUT'); // spoof para Laravel
+    url = `/persona-cuenta-bancaria/editar/${id}`;
+    formData.append('_method', 'PUT');
   }
-  
+
   $.ajax({
-    url: url_editar_crear,
+    url: url,
     type: "POST",
     data: formData,
     contentType: false,
     processData: false,
     success: function (e) {
-      try {        
-        if (e.status == true) {          
-          tabla_principal_cargar();
-          limpiar_form_persona();
-          Swal.fire("Correcto!", "Proyecto guardado correctamente", "success");          
-          $("#modal-agregar-proyecto").modal("hide");           
-        }else{
-          ver_errores(e);				 
-        }
-      } catch (err) { console.log('Error: ', err.message); toastr.error('<h5 class="font-size-16px">Error temporal!!</h5> puede intentalo mas tarde, o comuniquese con <i><a href="tel:+51921305769" >921-305-769</a></i> ─ <i><a href="tel:+51921487276" >921-487-276</a></i>'); } 
-      $("#guardar_registro_persona").html('Guardar Cambios').removeClass('disabled');
+      if (e.status === true) {
+        tabla_principal_cnta_bank();
+        limpiar_form_banco();
+        Swal.fire("Correcto!", "Banco guardado correctamente", "success");
+        $("#modal-crear_cuentabancaria").modal("hide");
+      } else {
+        ver_errores(e);
+      }
     },
-    xhr: function () {
-      var xhr = new window.XMLHttpRequest();
-      xhr.upload.addEventListener("progress", function (evt) {
-        if (evt.lengthComputable) {
-          var percentComplete = (evt.loaded / evt.total)*100; /*console.log(percentComplete + '%');*/
-          $("#barra_progress_proyecto").css({"width": percentComplete+'%'}); $("#barra_progress_proyecto").text(percentComplete.toFixed(2)+" %");
-        }
-      }, false);
-      return xhr;
-    },
-    beforeSend: function () {
-      $("#guardar_registro_persona").html('<i class="fas fa-spinner fa-pulse fa-lg"></i>').addClass('disabled');
-      $("#barra_progress_proyecto").css({ width: "0%",  });
-      $("#barra_progress_proyecto").text("0%");
-    },
-    complete: function () {
-      $("#barra_progress_proyecto").css({ width: "0%", });
-      $("#barra_progress_proyecto").text("0%");
-    },
-    error: function (jqXhr) { ver_errores(jqXhr); },
+    error: function (xhr) {
+      ver_errores(xhr);
+    }
   });
 }
 
-function eliminar_persona(idpersona, nombres) {
+function eliminar_cuentabancaria(id, descripcion){
 
   Swal.fire({
-    title: "¿Está Seguro de eliminar el registro?",
-    html: `<b class="text-danger"><del>${nombres}</del></b>`,
+    title: "¿Eliminar banco?",
+    html: `<b class="text-danger">${descripcion}</b>`,
     icon: "warning",
     showCancelButton: true,
-    confirmButtonColor: "#28a745",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Sí, eliminar!",
+    confirmButtonText: "Sí, eliminar"
   }).then((result) => {
 
     if (result.isConfirmed) {
 
       $.ajax({
-        url: `/persona/eliminar_persona/${idpersona}`,
+        url: `/persona-cuenta-bancaria/eliminar/${id}`,
         type: "PUT",
-        data: {
-          _token: $('meta[name="csrf-token"]').attr('content') // necesario para PUT
-        },
+        data: { _token: $('meta[name="csrf-token"]').attr('content') },
         success: function (e) {
-          console.log(e);
-
           if (e.status === true) {
-            Swal.fire("Eliminado!", "El registro ha sido eliminado.", "success");
-            tabla_principal_cargar();
+            Swal.fire("Eliminado!", "Banco eliminado correctamente", "success");
+            tabla_principal_cnta_bank();
           } else {
-            Swal.fire("Error!", e.message, "error");
+            Swal.fire("Error", e.message, "error");
           }
-        },
-        error: function (xhr) {
-          Swal.fire("Error!", "Ocurrió un error en el servidor.", "error");
-          console.log(xhr.responseText);
         }
       });
-
     }
   });
 }
 
-function empezar_proyecto(idproyecto, nombre_proyecto ) {
-  crud_simple_alerta(
-    '../ajax/proyecto.php?op=empezar_proyecto', 
-    idproyecto, 
-    '¿Está Seguro de  Empezar  el proyecto ?', 
-    `<b class="text-success">${nombre_proyecto}</b> <br> Tendras acceso a agregar o editar: provedores, trabajadores!`, 
-    'Si, Empezar!',
-    function(){ Swal.fire("En curso!", "Tu proyecto esta en curso.", "success"); },
-    function(){ tabla.ajax.reload(null, false);  box_proyecto();}
-  );  
-}
 
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 // ═══════                                       S E C C I O N   C L I C K   D E R E C H O   T A B L A                                              ═══════
@@ -366,7 +304,7 @@ $(document).on("contextmenu", ".fila-proyecto", function (e) {
 $("#opcion-p-editar").on("click", function (e) {
   e.preventDefault();
   if (idproyecto_select) {
-    ver_editar_persona(idproyecto_select);
+    ver_editar_tipoestandar(idproyecto_select);
   }
 });
 
@@ -445,33 +383,29 @@ $("#opcion-ap-eliminar").on("click", function (e) {
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 $(function () {    
 
-  // validamos el formulario  
+  $('#idbanco').on('change', function() { $(this).trigger('blur'); });
+  $('#tipocuenta').on('change', function() { $(this).trigger('blur'); });
+  $('#moneda').on('change', function() { $(this).trigger('blur'); });
+  $('#predeterminado').on('change', function() { $(this).trigger('blur'); });
 
-  $('#tipo_entidad_sunat').on('change', function() { $(this).trigger('blur'); });
-  $('#tipo_documento').on('change', function() { $(this).trigger('blur'); });
-
-  $("#form-agregar-proveedor").validate({
-    //ignore: '.select2-input, .select2-focusser',
+  $("#form-cuenta-bancaria").validate({
     rules: {
-
-      tipo_entidad_sunat:    { required: true, },
-      tipo_documento:  { required: true, },
-      numero_documento:   { required: true, },
-      direccion:       { required: true, },
-      nombre_razonsocial: { required: true, },
-      celular:        { required: true, },
-      email:           { required: true, },      
+      idbanco: { required: true },
+      tipocuenta: { required: true },
+      moneda:     { required: true },
+      predeterminado:     { required: true },
+      numero_cuenta: { required: true, number: true },
+      cuenta_interbancaria: { required: true, number: true },
     },
     messages: {
-      tipo_entidad_sunat:    { required: "Campo requerido.", },
-      tipo_documento:  { required: "Campo requerido.", },
-      numero_documento:   { required: "Campo requerido.", },
-      direccion:       { required: "Campo requerido.", },
-      nombre_razonsocial: { required: "Campo requerido.", },
-      celular:        { required: "Campo requerido.", },
-      email:           { required: "Campo requerido.", },
+      idbanco: { required: "Campo requerido" },
+      tipocuenta: { required: "Campo requerido" },
+      moneda:     { required: "Campo requerido" },
+      predeterminado:     { required: "Campo requerido" },
+      numero_cuenta: { required: "Campo requerido", number: "Ingrese un valor numérico" },
+      cuenta_interbancaria: { required: "Campo requerido", number: "Ingrese un valor numérico" },
+
     },
-    
     errorElement: "span",
 
     errorPlacement: function (error, element) {
@@ -489,11 +423,41 @@ $(function () {
 
     submitHandler: function (e) {
       $(".modal-body").animate({ scrollTop: $(document).height() }, 600); // Scrollea hasta abajo de la página
-      guardar_y_editar_persona(e);       
+      guardar_y_editar_cuentabancaria(e);       
     },
   });
 
-  $('#tipo_entidad_sunat').rules('add', { required: true, messages: {  required: "Campo requerido" } });
-  $('#tipo_documento').rules('add', { required: true, messages: {  required: "Campo requerido" } });
+  $('#idbanco').on('change', function() { $(this).trigger('blur'); });
+  $('#tipocuenta').on('change', function() { $(this).trigger('blur'); });
+  $('#moneda').on('change', function() { $(this).trigger('blur'); });
+  $('#predeterminado').on('change', function() { $(this).trigger('blur'); });
 
 });
+
+
+function soloNumeros(e) {
+    let key = e.which || e.keyCode;
+
+    // Permitir: backspace, tab, delete, flechas
+    if (
+        key === 8  || // backspace
+        key === 9  || // tab
+        key === 46 || // delete
+        (key >= 37 && key <= 40) // flechas
+    ) {
+        return true;
+    }
+
+    // Permitir solo números (0–9)
+    if (key >= 48 && key <= 57) {
+        return true;
+    }
+
+    e.preventDefault();
+    return false;
+}
+
+$('#numero_cuenta, #cuenta_interbancaria').on('input', function () {
+    this.value = this.value.replace(/[^0-9]/g, '');
+});
+

@@ -8,11 +8,11 @@ use App\Models\Persona;
 use Illuminate\Support\Facades\DB; 
 use App\Models\Rolpersona;
 
-class PersonaController extends Controller
+class ProvProveedorController extends Controller
 {
     public function index(Request $req)
     {        
-        return view('persona');
+        return view('prov_proveedor');
     }
 
     public function crear_persona(Request $r)

@@ -17,8 +17,20 @@ use App\Http\Controllers\UbigeoDistritoController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\Tipo_estandarController;
 use App\Http\Controllers\SubirDocsController;
-use App\Http\Controllers\ActualizardatosController;
+use App\Http\Controllers\BancoController;
+use App\Http\Controllers\PersonaCuentaBancariaController;
+use App\Http\Controllers\ActualizardatosproveedorController;
+use App\Http\Controllers\ProvProveedorController;
 
+
+Route::get('/test-db', function () {
+    try {
+        DB::connection()->getPdo();
+        return "Conexión a la base de datos exitosa!";
+    } catch (\Exception $e) {
+        return "Error al conectar a la base de datos: " . $e->getMessage();
+    }
+});
 
 Route::get('/', function () {  return redirect()->route('login'); });
 
@@ -31,6 +43,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::get('/inicio', function () {  return view('inicio');   })->name('inicio');
 
     // :::::::::::::::::::::::::::::: P R O Y E C T O ::::::::::::::::::::::::::::::
+
     Route::post('/proyectos/crear_proyecto', [ProyectoController::class, 'crear_proyecto'])->name('proyectos.crear_proyecto');                     // crear
     Route::put('/proyectos/editar_proyecto/{idproyecto}', [ProyectoController::class, 'editar_proyecto'])->whereNumber('idproyecto')->name('proyectos.editar_proyecto'); // editar
     Route::get('/proyectos/detalle-html/{idproyecto}', [ProyectoController::class, 'detalleHtml'])->name('proyectos.detalleHtml');
@@ -58,13 +71,16 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::resource('tipo_estandar', Tipo_estandarController::class);
 
     
-    // :::::::::::::::::::::::::::::: P R O V E E D O R E S ::::::::::::::::::::::::::::::
+    // :::::::::::::::::::::::::::::: P R O V E E D O R E S :::::::::::::::::::::::::::::: actualizar_estado_doc_estandar
     Route::post('/proveedor/crear_proveedor', [ProveedorController::class, 'crear_proveedor'])->name('proveedor.crear_proveedor');                     // crear
-    //Route::put('/proyectos/editar_proyecto/{idproyecto}', [ProyectoController::class, 'editar_proyecto'])->whereNumber('idproyecto')->name('proyectos.editar_proyecto'); // editar
-    //Route::get('/proyectos/detalle-html/{idproyecto}', [ProyectoController::class, 'detalleHtml'])->name('proyectos.detalleHtml');
-
-    Route::get('/proveedor/ver_listar_tipos_estandar_docs', [ProveedorController::class, 'listar_tipos_estandar_docs'])->name('proveedor.listar_tipos_estandar_docs'); //mostar para editar
+    Route::get('/proveedor/{idpersona}/mostrar_proveedor', [ProveedorController::class, 'mostrar_proveedor'])->whereNumber('idpersona')->name('proveedor.mostrar_proveedor'); //mostar para editar
+    Route::put('/proveedor/editar_proveedor/{idpersona}', [ProveedorController::class, 'editar_proveedor'])->whereNumber('idpersona')->name('proveedor.editar_proveedor'); // editar
+    Route::put('/proveedor/eliminar_proveedor/{idpersona}', [ProveedorController::class, 'eliminar_proveedor'])->whereNumber('idpersona')->name('proveedor.eliminar_proveedor'); // eliminar
     Route::get('/proveedor/tabla_principal', [ProveedorController::class, 'Listar_Proveedores'])->name('proveedor.Listar_Proveedores'); // AJAX
+    Route::get('/proveedor/ver_listar_tipos_estandar_docs', [ProveedorController::class, 'listar_tipos_estandar_docs'])->name('proveedor.listar_tipos_estandar_docs'); //mostar para editar
+    Route::put('/proveedor/actualizar_estado_doc_estandar/{id}', [ProveedorController::class, 'actualizar_estado_doc_estandar'])->whereNumber('id')->name('proveedor.actualizar_estado_doc_estandar'); // editar
+
+   
     //Route::get('/proyectos/{idproyecto}/ver-editar', [ProyectoController::class, 'ver_editar_proyecto'])->whereNumber('idproyecto')->name('proyectos.ver_editar');
      Route::get('/select2/tipoestandar', [ProveedorController::class, 'selec2tipoEstandar']); //  ← select2 
     Route::resource('proveedor', ProveedorController::class);
@@ -87,19 +103,44 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     
     Route::resource('usuario', UsuarioController::class);
 
+    //:::::::::::::::::::::::::. BANCO ::::::::::::::::::::::::::::::
+    Route::post('/banco/crear_banco', [BancoController::class, 'crear_banco'])->name('banco.crear_banco'); // crear
+    Route::get('/banco/tabla_principal', [BancoController::class, 'listar_banco'])->name('banco.listar_banco'); // AJAX
+    Route::get('/banco/{idbanco}/ver-editar', [BancoController::class, 'mostrar_banco'])->whereNumber('idbanco')->name('banco.mostrar_banco'); // mostrar para editar
+    Route::put('/banco/editar_banco/{idbanco}', [BancoController::class, 'editar_banco'])->whereNumber('idbanco')->name('banco.editar_banco'); // editar
+    Route::put('/banco/eliminar_banco/{idbanco}', [BancoController::class, 'eliminar_banco'])->whereNumber('idbanco')->name('banco.eliminar_banco'); // eliminar
+    Route::resource('banco', BancoController::class);
 
-    // :::::::::::::::::::::::::::::: S U B I R   D O C U M E N T O S  :::::::::::::::::::::::::::::: ver_doc_estandar
+
+    //::::::::::::::::::::::. PERSONA CUENTA BANCARIA :::::::::::::::::::::::
+    Route::post( '/persona-cuenta-bancaria/crear', [PersonaCuentaBancariaController::class, 'crear'])->name('persona_cuenta_bancaria.crear');
+    Route::get( '/persona-cuenta-bancaria/tabla_principal', [PersonaCuentaBancariaController::class, 'listar'])->name('persona_cuenta_bancaria.listar');
+    Route::get( '/persona-cuenta-bancaria/{id}/ver-editar', [PersonaCuentaBancariaController::class, 'mostrar'])->whereNumber('id') ->name('persona_cuenta_bancaria.mostrar');
+    Route::put( '/persona-cuenta-bancaria/editar/{id}', [PersonaCuentaBancariaController::class, 'editar'])->whereNumber('id') ->name('persona_cuenta_bancaria.editar');
+    Route::put( '/persona-cuenta-bancaria/eliminar/{id}', [PersonaCuentaBancariaController::class, 'eliminar'])->whereNumber('id') ->name('persona_cuenta_bancaria.eliminar'); 
+     Route::get( '/select2/bancos', [PersonaCuentaBancariaController::class, 'selec2banco']); //  ← select2 bancos
+    Route::resource( 'persona-cuenta-bancaria', PersonaCuentaBancariaController::class);
+
+     // :::::::::::::::::::::::::::::: A C T U A L I Z A R   D A T O S   P R O V E E D O  R :::::::::::::::::::::::::::::: 
+    Route::get('/actualizardatosproveedor/{id}/ver_proveedorupdate', [ActualizardatosproveedorController::class, 'ver_proveedorupdate'])->whereNumber('id')->name('actualizardatosproveedor.ver_proveedorupdate'); //mostar para editar
+    route::put('/actualizardatosproveedor/editarProveedor', [ActualizardatosproveedorController::class, 'editarProveedor'])->name('actualizardatosproveedor.editarProveedor'); // editar
+    Route::resource('actualizardatos', ActualizardatosproveedorController::class);
+
+
+
+    // :::::::::::::::::::::::::::::: S U B I R   D O C U M E N T O S  :::::::::::::::::::::::::::::: 
 
     Route::post('/subir_docs/guardar_doc_estandar_proveedor', [SubirDocsController::class, 'guardar_doc_estandar_proveedor'])->name('subir_docs.guardar_doc_estandar_proveedor'); //Create 
     Route::get('/subir_docs/ver_doc_estandar/{id}', [SubirDocsController::class, 'ver_doc_estandar'])->whereNumber('id')->name('subir_docs.ver_doc_estandar'); //mostar para editar
-
+    Route::put('/subir_docs/editar_doc_estandar_proveedor/{id}', [SubirDocsController::class, 'editar_doc_estandar_proveedor'])->whereNumber('id')->name('subir_docs.editar_doc_estandar_proveedor'); // editar
+    route::put('/subir_docs/eliminar_doc_estandar_proveedor/{iddocsproveedortipoestandar}', [SubirDocsController::class, 'eliminar_doc_estandar_proveedor'])->whereNumber('iddocsproveedortipoestandar')->name('subir_docs.eliminar_doc_estandar_proveedor'); // eliminar
     Route::get('/subir_docs/listar_docs_tipos_est_xuser', [SubirDocsController::class, 'listar_docs_tipos_est_xuser'])->name('subir_docs.listar_docs_tipos_est_xuser'); // AJAX
-
     Route::get('/select2/lista_sin_docs_user', [SubirDocsController::class, 'select2_lista_sin_docs']); //  ← select2 docs pendientes por subir
-
     Route::resource('subir_docs', SubirDocsController::class);
-    // :::::::::::::::::::::::::::::: A C T U A L I Z A R   D A T O S  ::::::::::::::::::::::::::::::
-    Route::resource('actualizardatos', ActualizardatosController::class);
+   
+    // :::::::::::::::::::::::::::::: REGISTRO DE PROVEEDORES DEL PROVEEDOR  :::::::::::::::::::::::::::::: 
+
+    Route::resource('prov_proveedor', ProvProveedorController::class);
 
 
 

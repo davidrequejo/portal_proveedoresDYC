@@ -20,7 +20,7 @@ class SubirDocsController extends Controller
 		{
 				try {
 						$doc = new DocsProveedorTipoEstandar();
-						$doc->idpersona = $r->user()->id;
+						$doc->idpersona = $r->user()->idpersona;
 						$doc->iddetalletipoestandarproveedor = $r->input('listar_docs_sin_subir');
 						$doc->nombreDocumento = $r->input('nombre_seleccion_tipo');
 
@@ -63,8 +63,95 @@ class SubirDocsController extends Controller
 						return ApiResponse::error($e);
 				}
 		}
+
+		// editar documento estandar
+		public function editar_doc_estandar_proveedor(Request $r, $iddocsproveedortipoestandar)
+		{
+				try {
+						$userId = $r->user()->idpersona;
+
+						// 1) Buscar doc y validar pertenencia
+						$doc = DocsProveedorTipoEstandar::where('iddocsproveedortipoestandar', $iddocsproveedortipoestandar)
+								->where('idpersona', $userId)
+								->firstOrFail();
+
+						// 2) Actualizar campos (ajusta según tu form)
+						$doc->idpersona = $userId;
+						$doc->iddetalletipoestandarproveedor = $r->input('listar_docs_sin_subir', $doc->iddetalletipoestandarproveedor);
+						$doc->nombreDocumento = $r->input('nombre_seleccion_tipo', $doc->nombreDocumento);
+
+						// 3) Si suben archivo nuevo, borrar anterior y guardar nuevo
+						if ($r->hasFile('doc1') && $r->file('doc1')->isValid()) {
+
+								// borrar archivo anterior si existe
+								if (!empty($doc->archivo)) {
+										$oldPath = public_path($doc->archivo); // doc->archivo es ruta relativa tipo uploads/...
+										if (is_file($oldPath)) {
+												@unlink($oldPath);
+										}
+								}
+
+								$file = $r->file('doc1');
+
+								$date_now = now()->format('Ymd_His');
+								$ext = $file->getClientOriginalExtension();
+
+								$filename = $date_now . '__' . random_int(0, 20)
+										. round(microtime(true))
+										. random_int(21, 41)
+										. '.' . $ext;
+
+								$destino = public_path('uploads/docs_proveedor_estandar');
+								if (!is_dir($destino)) {
+										mkdir($destino, 0755, true);
+								}
+
+								$file->move($destino, $filename);
+
+								// guardar ruta relativa nueva
+								$doc->archivo = 'uploads/docs_proveedor_estandar/' . $filename;
+						}
+
+						// 4) Guardar cambios
+						$doc->save();
+
+						return ApiResponse::success('Actualizado', 'Documento estándar actualizado correctamente');
+
+				} catch (\Throwable $e) {
+						return ApiResponse::error($e);
+				}
+		}
+
+		// eliminar documento estandar
+		public function eliminar_doc_estandar_proveedor(Request $r, $iddocsproveedortipoestandar)
+		{
+			try {
+				$userId = $r->user()->idpersona;
+
+				// 1) Buscar documento y validar que pertenezca al usuario
+				$doc = DocsProveedorTipoEstandar::where('iddocsproveedortipoestandar', $iddocsproveedortipoestandar)
+					->where('idpersona', $userId)
+					->firstOrFail();
+
+				// 2) Eliminar archivo físico si existe
+				if (!empty($doc->archivo)) {
+					$path = public_path($doc->archivo); // ruta relativa almacenada en BD
+					if (is_file($path)) {
+						@unlink($path);
+					}
+				}
+
+				// 3) Eliminar registro de BD
+				$doc->delete();
+
+				return ApiResponse::success('Eliminado', 'Documento estándar eliminado correctamente');
+
+			} catch (\Throwable $e) {
+				return ApiResponse::error($e);
+			}
+		}
 		
-		// Mostrar 
+		// Mostrar para editar documento estandar
 		public function ver_doc_estandar(Request $r, $id)
 		{
 				try {
@@ -82,99 +169,95 @@ class SubirDocsController extends Controller
 				}
 		}
 
-
-
 	  // listar para tabla tipos de estandar y documentos asociados
     public function listar_docs_tipos_est_xuser(Request $r)
     {
-			 $userId = $r->user()->id;   // usuario logueado
+        $userId = $r->user()->idpersona; // usuario logueado
 
         try {
-            //$id = $r->input('idtipoestandarproveedor');
+            $data = DB::table('tipoestandarproveedor as est')
+                ->join(
+                    'detalletipoestandarproveedor as det',
+                    'est.idtipoestandarproveedor',
+                    '=',
+                    'det.idtipoestandarproveedor'
+                )
+                ->join(
+                    'docsproveedortipoestandar as doc',
+                    'det.iddetalletipoestandarproveedor',
+                    '=',
+                    'doc.iddetalletipoestandarproveedor'
+                )
+                ->select(
+                    'doc.iddocsproveedortipoestandar',
+                    'det.iddetalletipoestandarproveedor',
+                    'det.idtipoestandarproveedor',
+                    'det.detalle',
+                    'doc.archivo',
+                    'doc.estado_revision',
+                    'doc.nombreDocumento',
+                    'det.estado_trash',
+                    'det.estado_delete',
+                    'doc.idpersona'
+                )
+                ->where('doc.idpersona', $userId)   // 🔥 FILTRO REAL
+                ->get();
 
-        // Crear la consulta base
-          $data = DB::table('tipoestandarproveedor as est')
-            ->join('detalletipoestandarproveedor as det', 'est.idtipoestandarproveedor', '=', 'det.idtipoestandarproveedor')
-            ->join('persona as p', 'p.idtipoestandarproveedor', '=', 'est.idtipoestandarproveedor')
-            ->Join('docsproveedortipoestandar as doc', 'det.iddetalletipoestandarproveedor', '=', 'doc.iddetalletipoestandarproveedor')
-            ->select(
-                'doc.iddocsproveedortipoestandar',
-                'det.iddetalletipoestandarproveedor',
-                'det.idtipoestandarproveedor',
-                'det.detalle',                
-								'doc.archivo',
-								'doc.estado_revision', 
-								'doc.nombreDocumento', 
-								'det.estado_trash',
-                'det.estado_delete'
-            )
-            ->where('p.idpersona', $userId) // Filtrar por el ID del usuario logueado
-                  ->get()
-            ->map(function ($row) {
-                return [
-                'iddocsproveedortipoestandar' => $row->iddocsproveedortipoestandar,
-                'iddetalletipoestandarproveedor' => $row->iddetalletipoestandarproveedor,
-                'idtipoestandarproveedor'        => $row->idtipoestandarproveedor,
-                'detalle'                        => $row->detalle,
-                'archivo'                        => $row->archivo,
-                'estado_revision'                => $row->estado_revision,
-                'nombreDocumento'                => $row->nombreDocumento,
-                'estado_trash'                   => $row->estado_trash,
-                'estado_delete'                  => $row->estado_delete
-                ];
-            });
-
-        return ApiResponse::success($data, 'Tipos de estandar y documentos obtenidos');
+            return ApiResponse::success($data, 'Tipos de estandar y documentos obtenidos');
 
         } catch (\Throwable $e) {
             return ApiResponse::error($e);
         }
-
-        
     }
 
 	  // listar tipos de estandar y documentos asociados
-    public function select2_lista_sin_docs(Request $r, )
-    {
-			 $userId = $r->user()->id;   // usuario logueado
-       $options = ''; // string para concatenar HTML
-        try {           
+		public function select2_lista_sin_docs(Request $r, $iddetalle = null)
+		{
 
-						$data = DB::table('tipoestandarproveedor as est')
-								->join('detalletipoestandarproveedor as det', 'est.idtipoestandarproveedor', '=', 'det.idtipoestandarproveedor')
-								->join('persona as p', 'p.idtipoestandarproveedor', '=', 'est.idtipoestandarproveedor')
+			$userId = $r->user()->idpersona;
 
-								// 👇 LEFT JOIN para poder detectar los que NO existen en doc
-								->leftJoin('docsproveedortipoestandar as doc', function ($join) use ($userId) {
-										$join->on('doc.iddetalletipoestandarproveedor', '=', 'det.iddetalletipoestandarproveedor')
-												->where('doc.idpersona', '=', $userId); // importante: comparar contra el usuario
-								})
+			// si viene por query string ?iddetalle=...
+			$iddetalle = $r->input('iddetalle', $iddetalle);
 
-								->select(
-										'det.iddetalletipoestandarproveedor',
-										'det.idtipoestandarproveedor',
-										'det.detalle',
-										'det.estado_trash',
-										'det.estado_delete'
-								)
-								->where('p.idpersona', $userId)                 // usuario logueado
-								->whereNull('doc.iddocsproveedortipoestandar')  // ✅ solo los que NO tienen doc
-								->orderBy('det.detalle')
-								->get();
+      try {
 
-              
-							foreach ($data as $t) {
-									$options .= '<option value="'.$t->iddetalletipoestandarproveedor.'" >' . e($t->detalle). '</option>';
-							}
+        // Query base
+        $query = DB::table('tipoestandarproveedor as est')
+            ->join('detalletipoestandarproveedor as det', 'est.idtipoestandarproveedor', '=', 'det.idtipoestandarproveedor')
+            ->join('persona as p', 'p.idtipoestandarproveedor', '=', 'est.idtipoestandarproveedor')
+            ->leftJoin('docsproveedortipoestandar as doc', function ($join) use ($userId) {
+                $join->on('doc.iddetalletipoestandarproveedor', '=', 'det.iddetalletipoestandarproveedor')
+                     ->where('doc.idpersona', '=', $userId);
+            })
+            ->select(
+                'det.iddetalletipoestandarproveedor',
+                'det.detalle'
+            )
+            ->where('p.idpersona', $userId);
 
-            return ApiResponse::success($options, 'Tipo Estandar obtenida');
-
-
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
+        if (filled($iddetalle)) {
+            // ✅ Caso 2: llega iddetalle -> filtrar por ese id, aunque tenga doc
+            $query->where('det.iddetalletipoestandarproveedor', (int)$iddetalle);
+        } else {
+            // ✅ Caso 1: NO llega iddetalle -> solo los que NO tienen doc
+            $query->whereNull('doc.iddocsproveedortipoestandar');
         }
 
-        
-    }
+        $data = $query->distinct()
+            ->orderBy('det.detalle')
+            ->get();
+
+        // Opciones HTML
+        $options = '';
+        foreach ($data as $t) {
+            $options .= '<option value="'.$t->iddetalletipoestandarproveedor.'">'.e($t->detalle).'</option>';
+        }
+
+				return ApiResponse::success($options, 'Tipos estándar sin documentos obtenidos');
+
+			} catch (\Throwable $e) {
+					return ApiResponse::error($e);
+			}
+		}
     
 }
