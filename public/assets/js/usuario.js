@@ -1,10 +1,12 @@
+const BASE_URL = document.querySelector('meta[name="app-url"]').content;
+const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 
 $("#guardar_registro_usuario").on("click", function (e) { $("#submit-form-usuario").submit(); });   
 
 // Cargar select2 de socios de negocio
- lista_select2('/select2/socionegocio', '#idpersona');
+lista_select2(`${BASE_URL}/select2/socionegocio`, '#idpersona');
 
- $("#idpersona").select2({ theme: "bootstrap4", placeholder: "Seleccionar Socio Negocio", allowClear: true, });
+$("#idpersona").select2({ theme: "bootstrap4", placeholder: "Seleccionar Socio Negocio", allowClear: true, });
 
 $('#tipo_persona').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
 $('#tipo_documento').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
@@ -44,7 +46,7 @@ $(document).ready(function() {
 // Cargar permisos de usuario
 function permisos_usuario(){
   
-  $.getJSON("/usuario/permisos_crear", state, function(res){
+  $.getJSON(`${BASE_URL}/usuario/permisos_crear`, state, function(res){
 
     console.log(res.data);
 
@@ -140,7 +142,7 @@ const state = {
 // Cargar datos
 function tabla_principal_usuario(){
   
-  $.getJSON("/usuario/tabla_principal", state, function(res){
+  $.getJSON(`${BASE_URL}/usuario/tabla_principal`, state, function(res){
 
     console.log(res.data);
     
@@ -270,11 +272,11 @@ function ver_editar_usuario(id) {
   $("#cargando-2-formulario").show();
   limpiar_form_proyecto();
   $('#modal-agregar-usuario').modal('show');
-  $.getJSON(`/usuario/${id}/ver-editar_usuario`, function (e) {
+  $.getJSON(`${BASE_URL}/usuario/${id}/ver-editar_usuario`, function (e) {
     if (e.status == true) {
 
       $("#id").val(e.data.user.id);
-      lista_select2(`/select2/socionegocio?idpersona=${e.data.user.idpersona}`, '#idpersona',`${e.data.user.idpersona}`);
+      lista_select2(`${BASE_URL}/select2/socionegocio?idpersona=${e.data.user.idpersona}`, '#idpersona',`${e.data.user.idpersona}`);
       $("#email").val(e.data.user.email);
       $("#tipoPersona").val(e.data.user.tipoPersona);
 
@@ -303,9 +305,9 @@ function guardar_y_editar_proveedor(e) {
   var id = $("#id").val();
   var url_editar_crear = '';
   if (id == '') {
-    url_editar_crear =  `/persona/crear_usuario` ;    
+    url_editar_crear =  `${BASE_URL}/persona/crear_usuario` ;    
   } else {
-    url_editar_crear = `/usuario/editar_usuario/${id}`;
+    url_editar_crear = `${BASE_URL}/usuario/editar_usuario/${id}`;
     formData.append('_method', 'PUT'); // spoof para Laravel
   }
   
@@ -367,7 +369,7 @@ function eliminar_usuario(id, nombres) {
     if (result.isConfirmed) {
 
       $.ajax({
-        url: `/usuario/eliminar_usuario/${id}`,
+        url: `${BASE_URL}/usuario/eliminar_usuario/${id}`,
         type: "PUT",
         data: {
           _token: $('meta[name="csrf-token"]').attr('content') // necesario para PUT
@@ -399,7 +401,7 @@ function eliminar_usuario(id, nombres) {
 function ver_detalle_usuario(idproyecto) {
   show_hide_escenario(2);
   $(".span-proyecto-charge").addClass('skeleton');
-  $.getJSON(`/proyectos/detalle-html/${idproyecto}`, function (e) {
+  $.getJSON(`${BASE_URL}/proyectos/detalle-html/${idproyecto}`, function (e) {
     if (e.status == true) {
      $("#div-ver-detalle-proyecto").html(e.data);
     } else {

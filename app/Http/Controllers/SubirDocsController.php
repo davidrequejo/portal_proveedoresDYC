@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\DocsProveedorTipoEstandar;
+use App\Models\PersonaFechaHomologacion;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\ApiResponse;
 
@@ -259,5 +260,57 @@ class SubirDocsController extends Controller
 					return ApiResponse::error($e);
 			}
 		}
+
+
+    public function periodo_homologacion_xpersona(Request $r)
+    {
+        $Id = $r->user()->idpersona; // usuario logueado
+
+        try {
+
+
+                  // Query base
+           $query = DB::table('fecha_homologacion AS fh')
+                ->join('persona_facha_homologacion as pfh', 'fh.idfecha_homologacion', '=', 'pfh.idfecha_homologacion')
+                ->select(
+                'pfh.idpersona_facha_homologacion',
+                'pfh.idpersona',
+                'pfh.idfecha_homologacion',
+                'fh.descripcion',
+                'fh.fecha_inicio',
+                'fh.fecha_fin',
+                'pfh.estado_trash',
+                'pfh.estado_delete'
+            )
+            ->where('pfh.estado_trash', '1')
+            ->where('pfh.estado_delete', '1')
+            ->where('pfh.idpersona', '35')
+            ->get();
+
+
+
+            return ApiResponse::success($query, 'Documentos estándar obtenidos');
+
+        } catch (\Throwable $e) {
+            return ApiResponse::error($e);
+        }
+    }
+
+    public function descargar_documento_estandar($iddocsproveedortipoestandar)
+    {
+        try {
+            $doc = DocsProveedorTipoEstandar::findOrFail($iddocsproveedortipoestandar);
+
+            $filePath = public_path($doc->archivo); // ruta completa
+
+            if (is_file($filePath)) {
+                return response()->download($filePath, $doc->nombreDocumento);
+            } else {
+                return abort(404, 'Archivo no encontrado');
+            }
+        } catch (\Throwable $e) {
+            return abort(500, 'Error al descargar el archivo');
+        }
+    }
     
 }

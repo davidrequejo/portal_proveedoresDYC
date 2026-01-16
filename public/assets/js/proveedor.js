@@ -1,3 +1,5 @@
+const BASE_URL = document.querySelector('meta[name="app-url"]').content;
+const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 var idpersona_tipo = null;
 var idtipoestandarproveedor_tipo = null;
 var nombre_razonsocial_tipo = null;
@@ -9,13 +11,14 @@ $("#guardar_registro_actualizar_estado").on("click", function (e) { $("#submit-f
 
 // lista_select2("../ajax/ajax_general.php?op=select2EmpresaACargo", '#empresa_acargo', null);
 
+lista_select2(`${BASE_URL}/select2/obtener`, '#distrito'); 
+lista_select2(`${BASE_URL}/select2/tipoestandar`, '#idtipoestandarproveedor');
+lista_select2(`${BASE_URL}/select2/periodohomologacion`, '#idfecha_homologacion');
 
 
- lista_select2('select2/obtener', '#distrito'); 
- lista_select2('/select2/tipoestandar', '#idtipoestandarproveedor');
-
- $("#distrito").select2({ theme: "bootstrap4", placeholder: "Seleccionar Distrito", allowClear: true, });
- $("#idtipoestandarproveedor").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
+$("#distrito").select2({ theme: "bootstrap4", placeholder: "Seleccionar Distrito", allowClear: true, });
+$("#idtipoestandarproveedor").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
+$("#idfecha_homologacion").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
 
 $('#tipo_persona').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
 $('#tipo_documento').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
@@ -110,7 +113,7 @@ const state = {
 // Cargar datos
 function tabla_principal_cargar(){
   
-  $.getJSON("/proveedor/tabla_principal", state, function(res){
+  $.getJSON(`${BASE_URL}/proveedor/tabla_principal`, state, function(res){
 
     console.log(res.data);
     
@@ -263,7 +266,7 @@ function ver_editar_proveedor(idpersona) {
   $("#cargando-2-formulario").show();
   limpiar_form_proveedor();
   $('#modal-agregar-proveedor').modal('show');
-  $.getJSON(`/proveedor/${idpersona}/mostrar_proveedor`, function (e) {
+  $.getJSON(`${BASE_URL}/proveedor/${idpersona}/mostrar_proveedor`, function (e) {
     console.log(e.data);
 
     if (e.status == true) {
@@ -315,9 +318,9 @@ function guardar_y_editar_proveedor(e) {
   var id = $("#idpersona").val();
   var url_editar_crear = '';
   if (id == '') {
-    url_editar_crear =  `/proveedor/crear_proveedor` ;    
+    url_editar_crear =  `${BASE_URL}/proveedor/crear_proveedor` ;    
   } else {
-    url_editar_crear = `/proveedor/editar_proveedor/${id}`;
+    url_editar_crear = `${BASE_URL}/proveedor/editar_proveedor/${id}`;
     formData.append('_method', 'PUT'); // spoof para Laravel
   }
   
@@ -379,7 +382,7 @@ function eliminar_proveedor(id, nombres) {
     if (result.isConfirmed) {
 
       $.ajax({
-        url: `/proveedor/eliminar_proveedor/${id}`,
+        url: `${BASE_URL}/proveedor/eliminar_proveedor/${id}`,
         type: "PUT",
         data: {
           _token: $('meta[name="csrf-token"]').attr('content') // necesario para PUT
@@ -422,7 +425,7 @@ function ver_estados_docs_proveedor(idpersona, id, nombre_razonsocial, email) {
 
    var cont =1;
 
-  $.getJSON(`/proveedor/ver_listar_tipos_estandar_docs`,{  idtipoestandar: id , idpersona: idpersona}, function (e) {
+  $.getJSON(`${BASE_URL}/proveedor/ver_listar_tipos_estandar_docs`,{  idtipoestandar: id , idpersona: idpersona}, function (e) {
     if (e.status == true) {
       $(".tbl_lista_documentos").empty('');
       e.data.forEach(r => {
@@ -516,7 +519,7 @@ function guardar_y_editar_act_estado(e) {
   if (id == '') {
     url_editar_crear =  `` ;    
   } else {
-    url_editar_crear = `/proveedor/actualizar_estado_doc_estandar/${id}`;
+    url_editar_crear = `${BASE_URL}/proveedor/actualizar_estado_doc_estandar/${id}`;
     formData.append('_method', 'PUT'); // spoof para Laravel
   }
   
@@ -673,6 +676,7 @@ $(function () {
 
   // validamos el formulario  
 
+  $('#idfecha_homologacion').on('change', function() { $(this).trigger('blur'); });
   $('#tipo_entidad_sunat').on('change', function() { $(this).trigger('blur'); });
   $('#tipo_documento').on('change', function() { $(this).trigger('blur'); });
   $('#estado_documentos_update').on('change', function() { $(this).trigger('blur'); });
@@ -680,8 +684,7 @@ $(function () {
   $("#form-agregar-proveedor").validate({
     //ignore: '.select2-input, .select2-focusser',
     rules: {
-      fecha_inicio_periodo:    { required: true, },
-      fecha_fin_periodo:    { required: true, },
+      idfecha_homologacion:    { required: true, },
       tipo_entidad_sunat:    { required: true, },
       tipo_documento:  { required: true, },
       numero_documento:   { required: true, },
@@ -691,8 +694,7 @@ $(function () {
       email:           { required: true, },      
     },
     messages: {
-      fecha_inicio_periodo:    { required: "Campo requerido.", },
-      fecha_fin_periodo:    { required: "Campo requerido.", },
+      idfecha_homologacion:    { required: "Campo requerido.", },
       tipo_entidad_sunat:    { required: "Campo requerido.", },
       tipo_documento:  { required: "Campo requerido.", },
       numero_documento:   { required: "Campo requerido.", },
@@ -754,6 +756,7 @@ $(function () {
     },
   });
 
+  $('#idfecha_homologacion').rules('add', { required: true, messages: {  required: "Campo requerido" } });
   $('#tipo_entidad_sunat').rules('add', { required: true, messages: {  required: "Campo requerido" } });
   $('#tipo_documento').rules('add', { required: true, messages: {  required: "Campo requerido" } });
   $('#estado_documentos_update').rules('add', { required: true, messages: {  required: "Campo requerido" } });

@@ -7,6 +7,8 @@ use App\Helpers\ApiResponse;
 use App\Models\Persona;
 use Illuminate\Support\Facades\DB; 
 use App\Models\Rolpersona;
+use App\Models\FechaHomologacion;
+
 
 class ProvProveedorController extends Controller
 {
@@ -256,7 +258,24 @@ class ProvProveedorController extends Controller
       }
 
     }
-    
+
+    public function selec2periodohomologacion()
+    {
+      try {
+        $data  = FechaHomologacion::select2Homologacion();
+
+        $options = ''; // string para concatenar HTML
+        foreach ($data as $t) {
+            $options .= '<option value="'.$t->idfecha_homologacion.'" >' . e($t->descripcion). ' ('. e($t->fecha_inicio) .' - '. e($t->fecha_fin) .' )</option>';
+        }
+
+        return ApiResponse::success($options, 'Lista Homologaciones obtenida');
+
+      } catch (\Throwable $e) {
+          return ApiResponse::error($e);
+      }
+
+    }
 
 
 

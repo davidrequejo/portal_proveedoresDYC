@@ -64,5 +64,5 @@
 <script src="{{ asset('adminlte3/plugins/datatables2/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script> --}}
 
 <!-- Funciones generales -->
-<script src="{{ asset('assets/js/funcion_crud.js') }}?version_erp=01.02"></script>
-<script src="{{ asset('assets/js/funcion_general.js') }}?version_erp=01.02"></script>
+<script src="{{ asset('assets/js/funcion_crud.js') }}?version_erp=01.03"></script>
+<script src="{{ asset('assets/js/funcion_general.js') }}?version_erp=01.03"></script>

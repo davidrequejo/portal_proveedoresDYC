@@ -41,21 +41,15 @@
     <!-- Main Sidebar Container -->
     @include('layouts.lte_aside')   
 
-    @if (auth()->user()->perm_proveedor)
+    @if (auth()->user()->perm_proveedor_vista_documentos_client)
 
       <!-- Content Wrapper. Contains page content -->
       <div class="content-wrapper">
         <!-- Content Header (Page header) -->
         <div class="content-header">
           <div class="container-fluid">
-            <div class="row mb-2">
-              <div class="col-sm-6">
-                <h1 class="m-0">Cargar o Actualizar Documentos</h1>
-              </div><!-- /.col -->
-            </div><!-- /.row -->
           </div><!-- /.container-fluid -->
         </div>
-        <!-- /.content-header -->
 
         <!-- Main content -->
         <section class="content">
@@ -68,81 +62,153 @@
 
                 <div class="row">
 
-                  <div class="col-lg-6">
-                    <div class="card">
-                      <div class="card-header border-0">
-                              
-                        <h3 class="card-title m-2 font-weight-bold text-info">Validación de Documentos
-                        </h3>
-                        <div class="float-right">
+                  <div class="col-12 div_view_periodos_homologacion">
 
-                          <div class="btn-group btn-agregar-proyecto">
-                            <button type="button" class="btn btn-success" style="border-color: #1a6b2c !important;" data-toggle="modal" data-target="#modal-crear_documento" onclick="limpiar_form_subir_doc(); cargarselecttipoDocs();" ><i class="nav-icon fas fa-file"></i> Crear nuevo</button>
+                      <div class="col-sm-12 col-md-9 col-lg-9">
+                        <div class="card">
+                          <div class="card-header border-0"  style="background-color: aliceblue;">
+                                  
+                            <h3 class="card-title m-2 font-weight-bold text-info">Mis Periodos de Homologación
+                            </h3>
+                          </div>
+                          <div class="card-body table-responsive ">
+                            <table class="table table-striped table-valign-middle">
+                              <thead>
+                              <tr>
+                                <th>#</th>
+                                <th class="text-center">Ver</th>
+                                <th >Descripcion</th>
+                                <th >Fecha Inicio</th>
+                                <th >Fecha Fin</th>
+                                <th class="text-center">Estado</th>
+                              </tr>
+                              </thead>
+                              <tbody class="tbl_lista_periodos_homologacion">
+                              <tr>
+                                <td>001</td>
+                                <td>
+                                  <img src="/assets/images/default/pdf_icon.png" alt="Product 1" class="img-circle img-size-32 mr-2">
+                                  Fecha Ruc de la empresa
+                                </td>
+                                <td><span class="badge bg-success">Verificado</span></td>
+                                <td>
+                                  <a href="#" class="text-muted">
+                                    <i class="fas fa-search"></i>
+                                  </a>
+                                </td>
+                                <td class="text-center">
+                                  <a class="btn btn-info btn-sm" href="#"><i class="fas fa-pencil-alt"></i> Editar</a>                              
+                                </td>
+                              </tr>
+
+                              </tbody>
+                            </table>
+                          </div>
+                          <div class="modal-footer justify-content-end">
+                            <!--<button type="button" class="btn btn-outline-warning" data-dismiss="modal">Close</button>
+                            <button type="button " class="btn btn-sm btn-outline-success">Guardar</button>-->
                           </div>
                         </div>
-
-                        <div class="card-tools m-2"></div>
-
+                        <!-- /.card -->
                       </div>
-                      <div class="card-body table-responsive ">
-                        <table class="table table-striped table-valign-middle">
-                          <thead>
-                          <tr>
-                            <th>#</th>
-                            <th>Descripcion Doc.</th>
-                            <th>Estado</th>
-                            <th>Ver</th>
-                            <th class="text-center">Act. Estado</th>
-                          </tr>
-                          </thead>
-                          <tbody class="tbl_lista_documentos">
-                          <tr>
-                            <td>001</td>
-                            <td>
-                              <img src="/assets/images/default/pdf_icon.png" alt="Product 1" class="img-circle img-size-32 mr-2">
-                              Fecha Ruc de la empresa
-                            </td>
-                            <td><span class="badge bg-success">Verificado</span></td>
-                            <td>
-                              <a href="#" class="text-muted">
-                                <i class="fas fa-search"></i>
-                              </a>
-                            </td>
-                            <td class="text-center">
-                              <a class="btn btn-info btn-sm" href="#"><i class="fas fa-pencil-alt"></i> Editar</a>                              
-                            </td>
-                          </tr>
 
-                          </tbody>
-                        </table>
-                      </div>
-                      <div class="modal-footer justify-content-end">
-                        <!--<button type="button" class="btn btn-outline-warning" data-dismiss="modal">Close</button>
-                        <button type="button " class="btn btn-sm btn-outline-success">Guardar</button>-->
-                      </div>
-                    </div>
-                    <!-- /.card -->
                   </div>
-                  <!-- /.col-md-6 -->
+                  <div class="col-12 m-3 p-2 btn_regresar_principal" style="background-color: aliceblue; display: none">
 
-                  <div class="col-lg-6">
-                    <div class="card">
-                      <div class="card-header border-0">
-                        <h3 class="card-title m-2 font-weight-bold text-info nombre_documento_pdf">Documento PDF</h3>
+                    <div class="card-header" style="display: flex;  align-items: center;">
+                      <h3 class="card-title">
+                                                
+                        <button type="button" class="btn btn-warning btn-lg btn-cancelar m-r-10px" onclick="show_hide_escenario(1);" style="display: none;"><i class="ri-arrow-left-line"></i> Regresar</button>
+                        
+                        <h4 class="nombre_periodo_homologacion"></h4>
+                      </h3>
+                    </div>
+
+       
+
+                  </div>
+
+                  <div class="col-12 div_view_subir_documentos" style="display: none" >
+                    <div class="row">
+
+                      <div class="col-lg-6">
+                        <div class="card">
+                          <div class="card-header border-0" style="background-color: aliceblue;">
+                                  
+                            <h3 class="card-title m-2 font-weight-bold text-info">Validación de Documentos
+                            </h3>
+                            <div class="float-right">
+
+                              <div class="btn-group btn-agregar-proyecto">
+                                <button type="button" class="btn btn-success" style="border-color: #1a6b2c !important;" data-toggle="modal" data-target="#modal-crear_documento" onclick="limpiar_form_subir_doc(); cargarselecttipoDocs();" ><i class="nav-icon fas fa-file"></i> Crear nuevo</button>
+                              </div>
+                            </div>
+
+                            <div class="card-tools m-2"></div>
+
+                          </div>
+                          <div class="card-body table-responsive ">
+                            <table class="table table-striped table-valign-middle">
+                              <thead>
+                              <tr>
+                                <th>#</th>
+                                <th>Descripcion Doc.</th>
+                                <th>Estado</th>
+                                <th>Ver</th>
+                                <th class="text-center">Act. Estado</th>
+                              </tr>
+                              </thead>
+                              <tbody class="tbl_lista_documentos">
+                              <tr>
+                                <td>001</td>
+                                <td>
+                                  <img src="/assets/images/default/pdf_icon.png" alt="Product 1" class="img-circle img-size-32 mr-2">
+                                  Fecha Ruc de la empresa
+                                </td>
+                                <td><span class="badge bg-success">Verificado</span></td>
+                                <td>
+                                  <a href="#" class="text-muted">
+                                    <i class="fas fa-search"></i>
+                                  </a>
+                                </td>
+                                <td class="text-center">
+                                  <a class="btn btn-info btn-sm" href="#"><i class="fas fa-pencil-alt"></i> Editar</a>                              
+                                </td>
+                              </tr>
+
+                              </tbody>
+                            </table>
+                          </div>
+                          <div class="modal-footer justify-content-end">
+                            <!--<button type="button" class="btn btn-outline-warning" data-dismiss="modal">Close</button>
+                            <button type="button " class="btn btn-sm btn-outline-success">Guardar</button>-->
+                          </div>
+                        </div>
+                        <!-- /.card -->
                       </div>
+                      <!-- /.col-md-6 -->
 
-                      <div class="card-body">
-                        <div class="card-body p-0 mostrar_documento_pdf" style="height: 750px;">
-                          <div class="alert alert-info alert-dismissible">
-                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true" disabled></button>
-                            <h5><i class="icon fas fa-info"></i> Sin vista previa!</h5>
-                            Para visualizar un documento, haga clic en el ícono <i class="fas fa-search"></i> ubicado en la fila correspondiente de la tabla del lado izquierdo
+                      <div class="col-lg-6">
+                        <div class="card">
+                          <div class="card-header border-0" style="background-color: aliceblue;">
+                            <h3 class="card-title m-2 font-weight-bold text-info nombre_documento_pdf">Documento PDF</h3>
+                          </div>
+
+                          <div class="card-body">
+                            <div class="card-body p-0 mostrar_documento_pdf" style="height: 750px;">
+                              <div class="alert alert-info alert-dismissible">
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true" disabled></button>
+                                <h5><i class="icon fas fa-info"></i> Sin vista previa!</h5>
+                                Para visualizar un documento, haga clic en el ícono <i class="fas fa-search"></i> ubicado en la fila correspondiente de la tabla del lado izquierdo
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
+                      <!-- /.col-md-6 -->
+                   </div>
                   </div>
-                  <!-- /.col-md-6 -->
+
                 </div>
                 
               </div>
@@ -269,7 +335,7 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/subirdocs.js') }}?version_erp=01.02"></script>
+  <script src="{{ asset('assets/js/subirdocs.js') }}?version_erp=01.03"></script>
 
   <script>
     $(function() {

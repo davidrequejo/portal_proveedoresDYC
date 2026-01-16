@@ -1,3 +1,5 @@
+const BASE_URL = document.querySelector('meta[name="app-url"]').content;
+const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 
 $("#guardar_registro_banco").on("click", function (e) { $("#submit-form-banco").submit(); });   
 
@@ -34,7 +36,7 @@ const state = {
 // Cargar datos
 function tabla_principal_cargar_banco(){
   
-  $.getJSON("/banco/tabla_principal", state, function(res){
+  $.getJSON(`${BASE_URL}/banco/tabla_principal`, state, function(res){
 
     console.log(res.data);
     
@@ -160,7 +162,7 @@ function ver_editar_banco(idbanco){
   limpiar_form_banco();
   $('#modal-agregar-banco').modal('show');
 
-  $.getJSON(`/banco/${idbanco}/ver-editar`, function (e) {
+  $.getJSON(`${BASE_URL}/banco/${idbanco}/ver-editar`, function (e) {
 
     if (e.status === true) {
       $("#idbanco").val(e.data.idbanco);
@@ -183,9 +185,9 @@ function guardar_y_editar_banco(e){
   let url = '';
 
   if (id === '') {
-    url = '/banco/crear_banco';
+    url = `${BASE_URL}/banco/crear_banco`;
   } else {
-    url = `/banco/editar_banco/${id}`;
+    url = `${BASE_URL}/banco/editar_banco/${id}`;
     formData.append('_method', 'PUT');
   }
 
@@ -224,7 +226,7 @@ function eliminar_banco(idbanco, descripcion){
     if (result.isConfirmed) {
 
       $.ajax({
-        url: `/banco/eliminar_banco/${idbanco}`,
+        url: `${BASE_URL}/banco/eliminar_banco/${idbanco}`,
         type: "PUT",
         data: { _token: $('meta[name="csrf-token"]').attr('content') },
         success: function (e) {

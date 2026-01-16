@@ -129,15 +129,15 @@
               <div class="dropdown-divider"></div>
               <a href="#" class="dropdown-item">
                 <i class="fas fa-address-card"></i>
-               DNI: 000000000000         
+               Doc: {{ auth()->user()->persona?->numero_documento }}        
               </a>
               <div class="dropdown-divider"></div>
               <a href="#" class="dropdown-item">
-                <i class="fas fa-phone-alt"></i> Telefono: 999999999999999
+                <i class="fas fa-phone-alt"></i> Tel: {{ auth()->user()->persona?->celular }}
               </a>
               <div class="dropdown-divider"></div>
               <a href="#" class="dropdown-item w-280px recorte-text">
-                <i class="fas fa-envelope"></i> Email: {{ Auth::user()->email }}
+                <i class="fas fa-user"></i> Usuario: {{ Auth::user()->email }}
               </a>
               <div class="dropdown-divider"></div>
               <a href="#" class="dropdown-item dropdown-footer"> <small>Más informacion cominicarse con el administrador </small>  </a>

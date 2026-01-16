@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\CredencialesProveedorMail;
 use App\Models\DocsProveedorTipoEstandar;
 use App\Mail\EstadoDocumentoLogisticaMail;
+use App\Models\FechaHomologacion;
 
 
 class ProveedorController extends Controller
@@ -80,11 +81,19 @@ class ProveedorController extends Controller
               ]);
 
               // 3. Registrar permisos en tabla intermedia si el usuario fue creado
+              $permisos = [8, 9];
+
               if ($user->id) {
-                  DB::table('usuario_permiso')->insert([
-                      'users_id' => $user->id,
-                      'idpermiso' => '10',
-                  ]);
+                  $data = [];
+
+                  foreach ($permisos as $permiso) {
+                      $data[] = [
+                          'users_id' => $user->id,
+                          'idpermiso' => $permiso,
+                      ];
+                  }
+
+                  DB::table('usuario_permiso')->insert($data);
               }
 
               // 4. Enviar correo con credenciales al proveedor
@@ -449,6 +458,30 @@ class ProveedorController extends Controller
       }
 
     }
+
+    
+    public function selec2periodohomologacion()
+    {
+      try {
+        $data  = FechaHomologacion::select2Homologacion();
+
+        $options = ''; // string para concatenar HTML
+        foreach ($data as $t) {
+            $options .= '<option value="'.$t->idfecha_homologacion.'" >' . e($t->descripcion). ' ('. e($t->fecha_inicio) .' - '. e($t->fecha_fin) .' )</option>';
+        }
+
+        return ApiResponse::success($options, 'Lista Homologaciones obtenida');
+
+      } catch (\Throwable $e) {
+          return ApiResponse::error($e);
+      }
+
+    }
+
+
+
+
+
 
     // listar tipos de estandar y documentos asociados
     public function listar_tipos_estandar_docs(Request $r)

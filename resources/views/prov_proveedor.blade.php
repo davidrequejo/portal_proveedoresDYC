@@ -74,7 +74,7 @@
     <!-- Main Sidebar Container -->
     @include('layouts.lte_aside')   
 
-    @if (auth()->user()->perm_persona)
+    @if (auth()->user()->perm_client_vista_client)
 
       <!-- Content Wrapper. Contains page content -->
       <div class="content-wrapper">
@@ -83,7 +83,7 @@
           <div class="container-fluid">
             <div class="row mb-2">
               <div class="col-sm-6">
-                <h1 class="m-0">Clientes Proveedor</h1>
+                <h1 class="m-0">Clientes</h1>
               </div><!-- /.col -->
               <div class="col-sm-6">
                 <div class="float-right">
@@ -184,7 +184,7 @@
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
               <div class="modal-content">
                 <div class="modal-header py-2">
-                  <h4 class="modal-title">Clientes Proveedor</h4>
+                  <h4 class="modal-title">Clientes</h4>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span class="text-danger" aria-hidden="true">&times;</span>
                   </button>
@@ -437,7 +437,7 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/persona.js') }}?version_erp=01.02"></script>
+  <script src="{{ asset('assets/js/persona.js') }}?version_erp=01.03"></script>
 
   <script>
     $(function() {

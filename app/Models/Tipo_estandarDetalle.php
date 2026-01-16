@@ -14,6 +14,7 @@ class Tipo_estandarDetalle extends Model
 
     protected $fillable = [
         'idtipoestandarproveedor',  // FK correcta
+        'iddocumento_tipo_estandar',  // FK correcta
         'detalle',
         'estado_trash'
     ];

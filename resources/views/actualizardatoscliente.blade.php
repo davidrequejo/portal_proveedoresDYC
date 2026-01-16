@@ -98,7 +98,7 @@
     <!-- Main Sidebar Container -->
     @include('layouts.lte_aside')   
 
-    @if (auth()->user()->perm_proveedor_vista_act_datos_client)
+    @if (auth()->user()->perm_client_vista_client)
 
       <!-- Content Wrapper. Contains page content -->
       <div class="content-wrapper">
@@ -107,7 +107,7 @@
           <div class="container-fluid">
             <div class="row mb-2">
               <div class="col-sm-6">
-                <h1 class="m-0">Actualizar Información Proveedor</h1>
+                <h1 class="m-0">Actualizar Información Cliente</h1>
               </div><!-- /.col -->
 
             </div><!-- /.row -->
@@ -127,12 +127,12 @@
                   <div class=" col-12 col-sm-12 col-md-6 col-lg-5">
                     <div class="card">
                       <div class="card-header border-0" style="background-color: aliceblue;">
-                        <h3 class="card-title m-2 font-weight-bold text-info">Información del Proveedor</h3>
+                        <h3 class="card-title m-2 font-weight-bold text-info">Información del Cliente</h3>
                         <div class="card-tools m-2"></div>
                       </div>
                       <div class="modal-body vista_inicial titulo-separador"><i class="fas fa-spinner fa-spin fa-lg " style="color: #e60f00;"></i>  <Span style="color: #e60f00;"> Cargando...</Span> </div>  
                       <div class="modal-body vista_datos" style="display: none">
-                        <form id="form-editar-proveedor" name="form-editar-proveedor" method="POST">
+                        <form id="form-editar-cliente" name="form-editar-cliente" method="POST">
                           @csrf
                           <div class="row" id="cargando-1-formulario">
 
@@ -141,7 +141,7 @@
 
                             <div class="col-12 pb-3">
                               <div class="titulo-separador">
-                                <span class="text-bold text-info" >Datos Generales Proveedor</span>
+                                <span class="text-bold text-info" >Datos Generales Cliente</span>
                               </div>
                             </div>
 
@@ -380,12 +380,12 @@
                           </div>
                           
                           <!-- /.card-body -->
-                          <button type="submit" style="display: none;" id="submit-form-editarproveedor">Submit</button>
+                          <button type="submit" style="display: none;" id="submit-form-editarcliente">Submit</button>
                         </form>
 
                       </div>
                       <div class="modal-footer justify-content-end py-1">
-                        <button type="button" class="btn btn-success" id="editar_registro_proveedor" ><i class="ti ti-device-floppy"></i> Actualizar</button>
+                        <button type="button" class="btn btn-success" id="editar_registro_cliente" ><i class="ti ti-device-floppy"></i> Actualizar</button>
                       </div>
 
                     </div>
@@ -585,7 +585,7 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/actualizardatosproveedor.js') }}?version_erp=01.03"></script>
+  <script src="{{ asset('assets/js/actualizardatoscliente.js') }}?version_erp=01.03"></script>
   <script src="{{ asset('assets/js/persona_cuentabancaria.js') }}?version_erp=01.03"></script>
 
   <script>

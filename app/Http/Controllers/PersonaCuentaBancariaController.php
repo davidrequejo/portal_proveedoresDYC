@@ -53,7 +53,7 @@ class PersonaCuentaBancariaController extends Controller
             ]);
 
             return ApiResponse::success([
-                'idpersona_CuentaBancaria' => $data
+                'idpersona_cuentaBancaria' => $data
             ], 'Cuenta bancaria creada correctamente');
 
         } catch (\Throwable $e) {
@@ -82,7 +82,7 @@ class PersonaCuentaBancariaController extends Controller
 
             if ($r->predeterminado === '1') {
                 PersonaCuentaBancaria::where('idpersona', $cuenta->idpersona)
-                    ->where('idpersona_CuentaBancaria', '!=', $id)
+                    ->where('idpersona_cuentaBancaria', '!=', $id)
                     ->update(['predeterminado' => '0']);
             }
 
@@ -98,7 +98,7 @@ class PersonaCuentaBancariaController extends Controller
             ]);
 
             return ApiResponse::success([
-                'idpersona_CuentaBancaria' => $cuenta->idpersona_CuentaBancaria
+                'idpersona_cuentaBancaria' => $cuenta->idpersona_cuentaBancaria
             ], 'Cuenta bancaria actualizada correctamente');
 
         } catch (\Throwable $e) {
@@ -121,7 +121,7 @@ class PersonaCuentaBancariaController extends Controller
             ]);
 
             return ApiResponse::success([
-                'idpersona_CuentaBancaria' => $id,
+                'idpersona_cuentaBancaria' => $id,
                 'estado_trash' => 0
             ], 'Cuenta bancaria eliminada correctamente');
 
@@ -135,12 +135,12 @@ class PersonaCuentaBancariaController extends Controller
      * ========================= */
     public function listar(Request $r)
     {
-        $idpersona = $r->input('idpersona');
+        $idpersona = $r->user()->idpersona; // usuario logueado
 
-        $query = DB::table('persona_CuentaBancaria as pcb')
+        $query = DB::table('persona_cuentabancaria as pcb')
             ->join('banco as b', 'b.idbanco', '=', 'pcb.idbanco')
             ->select(
-                'pcb.idpersona_CuentaBancaria',
+                'pcb.idpersona_cuentaBancaria',
                 'pcb.idpersona',
                 'pcb.tipocuenta',
                 'pcb.moneda',

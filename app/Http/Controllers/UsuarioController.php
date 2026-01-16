@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\User;
 use Illuminate\Support\Facades\DB; 
 use App\Models\Permiso;
 use App\Helpers\ApiResponse;
+
 
 class UsuarioController extends Controller{
 
@@ -104,7 +106,7 @@ class UsuarioController extends Controller{
               'id'          => 'required|integer|exists:users,id',
               'idpersona'   => 'required|integer',
               'tipoPersona' => 'required|string',
-              'email'       => 'required|string|unique:users,email,' . $r->id,
+              'email'       => [ 'required', Rule::unique('users','email')->ignore($r->id, 'id'), ],
               'password'    => 'nullable|string|min:8',
               'permisos'    => 'nullable|array',
               'permisos.*'  => 'integer'

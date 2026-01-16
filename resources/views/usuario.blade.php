@@ -300,7 +300,7 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/usuario.js') }}?version_erp=01.02"></script>
+  <script src="{{ asset('assets/js/usuario.js') }}?version_erp=01.03"></script>
 
   <script>
     $(function() {

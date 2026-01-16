@@ -1,6 +1,7 @@
 // Configuración del token CSRF
 $.ajaxSetup({headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')    }});
 
+
 /*  ══════════════════════════════════════════ - F E C H A S - ══════════════════════════════════════════ */
 
 function sumar_mes(m = 1, fecha) { var date = new Date(fecha);   return new Date( date.setMonth(date.getMonth() + m ) ).toISOString().slice(0, 10); }
@@ -1223,7 +1224,7 @@ function buscar_sunat_reniec(input='') {
 
     if (dni_ruc.length == "8") {
 
-      $.post("/consulta/reniec", { dni: dni_ruc }, function (data, status) {
+      $.post(`${BASE_URL}/consulta/reniec`, { dni: dni_ruc }, function (data, status) {
 
         //data = JSON.parse(data);  
         console.log(data);
@@ -1281,7 +1282,7 @@ function buscar_sunat_reniec(input='') {
     if (tipo_doc == "6") { //ruc
 
       if (dni_ruc.length == "11") {
-        $.post("/consulta/sunat", { ruc: dni_ruc }, function (data, status) {
+        $.post(`${BASE_URL}/consulta/sunat`, { ruc: dni_ruc }, function (data, status) {
 
 
           console.log(data);

@@ -6,17 +6,17 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="app-url" content="{{ url('/') }}">
   
-  <title>Proyecto | ERP Optimiza 360</title>
+  <title>Fecha Homologación | Portal Proveedores D&C</title>
 
   <link rel="icon" href="{{ asset('assets/images/brand-logos/ico-opt.png') }}" type="image/png">
 
   @include('layouts.lte_head')
-  <link rel="stylesheet" href="{{ asset('assets/jstree-3.3.17/dist/themes/default/style.min.css') }}" />
+  <!--<link rel="stylesheet" href="{{ asset('assets/jstree-3.3.17/dist/themes/default/style.min.css') }}" />-->
 
   <style>
-    #tabla-proyectos_filter { width: calc(100% - 10px) !important; display: flex !important; justify-content: space-between !important; }
-    #tabla-proyectos_filter label { width: 100% !important;  }
-    #tabla-proyectos_filter label input { width: 100% !important;   }
+    #tabla-bancos_filter { width: calc(100% - 10px) !important; display: flex !important; justify-content: space-between !important; }
+    #tabla-bancos_filter label { width: 100% !important;  }
+    #tabla-bancos_filter label input { width: 100% !important;   }
 
     /* Indicadores de orden simple (opcional) */
     th.sortable { cursor:pointer; position:relative; }
@@ -25,6 +25,13 @@
 
     .fila-proyecto.selected {  background-color: #e7f1ff !important; }
     .fila-proyecto-presupuesto.selected {  background-color: #e7f1ff !important; }
+
+    .sin-borde { border: none !important; border-bottom: 1px solid #bfc4c9 !important; background: transparent !important; box-shadow: none !important;}
+
+    #tabla_documentos tbody tr td { padding-top: 2px !important; padding-bottom: 2px !important;}
+    #tabla_documentos thead tr th { padding-top: 2px !important; padding-bottom: 2px !important;}
+
+    #tabla_documentos tbody input.form-control { height: 24px !important; padding: 1px 4px !important; font-size: 13px !important;}
   </style>
 
 </head>
@@ -74,7 +81,7 @@
     <!-- Main Sidebar Container -->
     @include('layouts.lte_aside')   
 
-    @if (auth()->user()->perm_recurso)
+    @if (auth()->user()->perm_periodo_homologacion)
 
       <!-- Content Wrapper. Contains page content -->
       <div class="content-wrapper">
@@ -82,15 +89,15 @@
         <div class="content-header">
           <div class="container-fluid">
             <div class="row mb-2">
-              <div class="col-sm-6">
-                <h1 class="m-0">Proyectos</h1>
+              <div class="col-3">
+                <h1 class="m-0">Homologaciones</h1>
               </div><!-- /.col -->
-              <div class="col-sm-6">
+              <div class="col-3">
                 <div class="float-right">
 
-                  <div class="btn-group btn-agregar-proyecto">
-                    <button type="button" class="btn btn-success" style="border-color: #1a6b2c !important;" data-toggle="modal" data-target="#modal-agregar-proyecto" onclick="limpiar_form_proyecto();" ><i class="ti ti-users-plus"></i> Crear nuevo</button>
-                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" style="border-color: #1a6b2c !important;">
+                  <div class="btn-group btn-agregar-banco">
+                    <button type="button" class="btn btn-success" style="border-color: #2e6da4 !important;" data-toggle="modal" data-target="#modal-agregar-fechahomologacion" onclick="limpiar_form_fecha_homologacion();" ><i class="fas fa-plus-circle"></i> Crear nuevo</button>
+                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" style="border-color: #2e6da4 !important;">
                       <span class="sr-only">Toggle Dropdown</span>
                     </button>
                     <div class="dropdown-menu" role="menu">
@@ -119,7 +126,7 @@
 
               
               <!-- ./col -->
-              <div class="col" id="div-tabla-principal-proyecto">
+              <div class="col-6" id="div-tabla-principal-banco">
                 <div class="card">
                   
                   <div class="card-body pb-1">
@@ -143,19 +150,15 @@
                     
                     <div class="table-responsive">
                     
-                      <table class="table table-bordered table-hover" id="tabla-proyectos">
+                      <table class="table table-bordered table-hover" id="tabla-fechahomologacion">
                         <thead>
                           <tr>                        
                             <th>Acciones</th>
-                            <th data-sort="codigo"      class="sortable">Código</th>
-                            <th data-sort="descripcion" class="sortable">Descripción</th>
-                            <th data-sort="cliente"     class="sortable">Cliente</th>
-                            <th data-sort="empresa"     class="sortable">Empresa</th>
-                            <th data-sort="fecha_inicio"class="sortable">F. Inicio</th>
-                            <th data-sort="fecha_fin"   class="sortable">F. Fin</th>
-                            <th data-sort="total_presupuesto" class="sortable">Presupuesto</th>
-                            <th data-sort="direccion" class="sortable">direccion</th>
-                            <th data-sort="ubicacion" class="sortable">ubicacion</th>
+                            <th data-sort="codigo" class="sortable">Código</th>
+                            <th data-sort="cod_s10" class="sortable">Cod s10</th>
+                            <th data-sort="descripcion" class="sortable">Descripcion</th>
+                            <th data-sort="abreviatura" class="sortable">Abreviatura</th>
+                            <th data-sort="estado" class="sortable">Estado</th>
                             
                           </tr>
                         </thead>
@@ -173,100 +176,51 @@
                   </div>
                 </div>
               </div>
-              <div class="col-lg-12" id="div-ver-detalle-proyecto" style="display: none;">
-                
-              </div>
             </div>
             <!-- /.row -->
             
           </div><!-- /.container-fluid -->
 
 
-          <div class="modal fade" id="modal-agregar-proyecto">
+          <div class="modal fade" id="modal-agregar-fechahomologacion">
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
               <div class="modal-content">
                 <div class="modal-header py-2">
-                  <h4 class="modal-title">Proyecto</h4>
+                  <h4 class="modal-title">Periodo Homologación</h4>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span class="text-danger" aria-hidden="true">&times;</span>
                   </button>
                 </div>
                 <div class="modal-body">
-                  <form id="form-agregar-proyecto" name="form-agregar-proyecto" method="POST">
+                  <form id="form-agregar-fechahomologacion" name="form-agregar-fechahomologacion" method="POST">
                     @csrf
                     <div class="row" id="cargando-1-formulario">
-                      <!-- id proyecto -->
-                      <input type="hidden" name="idproyecto" id="idproyecto" />
+                      <!-- tipo estandar -->
+                      <input type="hidden" name="idfecha_homologacion" id="idfecha_homologacion" /> 
 
-                      <!-- Tipo de documento -->
-                      <div class="col-12 col-sm-6 col-md-6 col-lg-4">
+                      <!-- descripcion -->
+                      <div class="col-12">
                         <div class="form-group">
-                          <label for="codigo">Cod proyecto</label>
-                          <input type="text" name="codigo" class="form-control" id="codigo" placeholder="ejmpl. 200343" />
+                          <label for="descripcion">Descripción <sup class="text-danger">*</sup></label>
+                          <textarea name="descripcion" id="descripcion" class="form-control" rows="1"></textarea>
                         </div>
-                      </div>
+                      </div>    
 
-                      <!-- Nombre -->
-                      <div class="col-12 col-sm-6 col-md-8 col-lg-8">
-                        <div class="form-group">
-                          <label for="descripcion">Descripción</label>                          
-                          <textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>
-                        </div>
-                      </div>
-                      <!-- Direccion -->
+                      <!-- fecha inicio -->
                       <div class="col-12 col-sm-12 col-md-6 col-lg-6">
                         <div class="form-group">
-                          <label for="direccion">Dirección</label>
-                          <textarea class="form-control" name="direccion" id="direccion" cols="30" rows="2" placeholder="ejmpl. Jiron. las flores cdr 3"></textarea>
-                        </div>
-                      </div> 
-                      <!-- Direccion -->
-                      <div class="col-12 col-sm-12 col-md-6 col-lg-6">
-                        <div class="form-group">
-                          <label for="ubicacion">Ubicacion</label>
-                          <textarea class="form-control" name="ubicacion" id="ubicacion" cols="30" rows="2" placeholder="ejmpl. Lima lima Peru"></textarea>
-                        </div>
-                      </div> 
-
-                      <!-- Fecha Inicio -->
-                      <div class="col-12 col-sm-12 col-md-6 col-lg-6">
-                        <div class="form-group">
-                          <label for="fecha_inicio">Fecha inicio</label>
+                          <label for="fecha_inicio">Fecha Inicio <sup class="text-danger">*</sup></label>
                           <input type="date" name="fecha_inicio" class="form-control" id="fecha_inicio"  />
                         </div>
-                      </div> 
-                      <!-- Fecha fin -->
+                      </div>  
+
+                      <!-- fecha fin -->
                       <div class="col-12 col-sm-12 col-md-6 col-lg-6">
                         <div class="form-group">
-                          <label for="fecha_fin">Fecha fin</label>
+                          <label for="fecha_fin">Fecha Fin <sup class="text-danger">*</sup></label>
                           <input type="date" name="fecha_fin" class="form-control" id="fecha_fin"  />
                         </div>
-                      </div>                                          
-
-                      <!-- Empresa -->
-                      <div class="col-12 col-sm-6 col-md-6 col-lg-6">
-                        <div class="form-group">
-                          <label for="idempresa">Empresa</label>
-                          <select name="idempresa" id="idempresa" class="form-control select2" style="width: 100%;"> </select>                          
-                        </div>
-                      </div>
-
-                      <!-- Socio Negocio -->
-                      <div class="col-12 col-sm-6 col-md-6 col-lg-6">
-                        <div class="form-group">
-                          <label for="idsocio_negocio">Socio Negocio</label>
-                          <select name="idsocio_negocio" id="idsocio_negocio" class="form-control select2" style="width: 100%;"> </select>                          
-                        </div>
-                      </div>
-
-                      <!-- barprogress -->
-                      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px;">
-                        <div class="progress" id="barra_progress_proyecto_div">
-                          <div id="barra_progress_proyecto" class="progress-bar" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: 0%;">
-                            0%
-                          </div>
-                        </div>
-                      </div> 
+                      </div>  
 
                     </div>
 
@@ -279,12 +233,12 @@
                     </div>
                     
                     <!-- /.card-body -->
-                    <button type="submit" style="display: none;" id="submit-form-proyecto">Submit</button>
+                    <button type="submit" style="display: none;" id="submit-form-fecha-homologacion">Submit</button>
                   </form>
                 </div>
                 <div class="modal-footer justify-content-between py-1">
                   <button type="button" class="btn btn-outline-danger " data-dismiss="modal"><i class="ti ti-circle-dashed-x"></i>Cerrar</button>
-                  <button type="button" class="btn btn-success" id="guardar_registro_proyecto" ><i class="ti ti-device-floppy"></i> Guardar</button>
+                  <button type="button" class="btn btn-success" id="guardar_registro_fecha_homologacion" ><i class="ti ti-device-floppy"></i> Guardar</button>
                 </div>
               </div>
               <!-- /.modal-content -->
@@ -292,79 +246,6 @@
             <!-- /.modal-dialog -->
           </div>
           <!-- /.modal -->
-
-          <div class="modal fade" id="modal-agregar-presupuesto">
-            <div class="modal-dialog modal-lg modal-dialog-scrollable">
-              <div class="modal-content">
-                <div class="modal-header py-2">
-                  <h4 class="modal-title">Presupuestos</h4>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span class="text-danger" aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body">
-                  <div class="table-responsive">
-                    <table class="table table-bordered">
-                      <thead>
-                        <tr>
-                          <th style="width: 10px">#</th>
-                          <th>Task</th>
-                          <th>Progress</th>
-                          <th style="width: 40px">Label</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>1.</td>
-                          <td>Update software</td>
-                          <td>
-                            <div class="progress progress-xs">
-                              <div class="progress-bar progress-bar-danger" style="width: 55%"></div>
-                            </div>
-                          </td>
-                          <td><span class="badge bg-danger">55%</span></td>
-                        </tr>
-                        <tr>
-                          <td>2.</td>
-                          <td>Clean database</td>
-                          <td>
-                            <div class="progress progress-xs">
-                              <div class="progress-bar bg-warning" style="width: 70%"></div>
-                            </div>
-                          </td>
-                          <td><span class="badge bg-warning">70%</span></td>
-                        </tr>
-                        <tr>
-                          <td>3.</td>
-                          <td>Cron job running</td>
-                          <td>
-                            <div class="progress progress-xs progress-striped active">
-                              <div class="progress-bar bg-primary" style="width: 30%"></div>
-                            </div>
-                          </td>
-                          <td><span class="badge bg-primary">30%</span></td>
-                        </tr>
-                        <tr>
-                          <td>4.</td>
-                          <td>Fix and squish bugs</td>
-                          <td>
-                            <div class="progress progress-xs progress-striped active">
-                              <div class="progress-bar bg-success" style="width: 90%"></div>
-                            </div>
-                          </td>
-                          <td><span class="badge bg-success">90%</span></td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>              
-              </div>
-              <!-- /.modal-content -->
-            </div>
-            <!-- /.modal-dialog -->
-          </div>
-          <!-- /.modal -->
-
 
         </section>
         <!-- /.content -->
@@ -386,8 +267,8 @@
 
   @include('layouts.lte_script')  
 
-  <script src="{{ asset('assets/jstree-3.3.17/dist/jstree.min.js') }}"></script>
-  <script src="{{ asset('assets/js/proyecto.js') }}?version_erp=01.02"></script>
+
+  <script src="{{ asset('assets/js/fechahomologacion.js') }}?version_erp=01.03"></script>
 
   <script>
     $(function() {

@@ -1,10 +1,10 @@
-
+    
 (() => {
+
   const BASE_URL = document.querySelector('meta[name="app-url"]').content;
   const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 
-
-  const state = {
+  const state1 = {
     page: 1,
     per_page: 10,
     sort: 'codigo',
@@ -13,71 +13,44 @@
   };
 
 
-   lista_select2(`${BASE_URL}/tipoestandar/select2docstipoestandar`, '#selectiddocumento_tipo_estandar');
-
-   //$("#selectiddocumento_tipo_estandar").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
-   $("#selectiddocumento_tipo_estandar").select2();
-
-
-    $("#guardar_registro_tipoestandar").on("click", function (e) { $("#submit-form-proveedor").submit(); });   
-    tabla_principal_cargar();
-
-
-
-  function show_hide_escenario(flag) {
-    if (flag == 1) {            // Tabla principal
-      $(".btn-agregar-tipo_estandar").show();
-      $(".btn-cancelar").hide();
-      
-    } else if (flag == 2) {     // Detalle proyecto
-      $(".btn-agregar-tipo_estandar").hide();
-      $(".btn-cancelar").show();
-    } else if (flag == 3) {     //
-    } else if (flag == 4) {
-      
-    }
-  }
-
-
-  // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-  // ═══════                                       S E C C I O N   T A B L A   P R O Y E C T O                                                        ═══════
+  $("#guardar_registro_docs").on("click", function (e) { $("#submit-form-docs").submit(); });   
   // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
-
+    // Carga inicial
+  tabla_principal_cargar_docstipo();
 
   // Cargar datos
-  function tabla_principal_cargar(){
+  function tabla_principal_cargar_docstipo(){
     
-    $.getJSON(`${BASE_URL}/tipoestandar/tabla_principal`, state, function(res){
+    $.getJSON(`${BASE_URL}/documento-tipo-estandar/tabla_principal_conf_docs`, state1, function(res){
 
       console.log(res.data);
       
       renderFilas(res.data);
       renderPaginacion(res.current_page, res.last_page);
-      marcarOrden(state.sort, state.dir);
+      marcarOrden(state1.sort, state1.dir);
     }).fail(function (xhr) { ver_errores(xhr); });
   }
 
   // Render filas de la tabla
   function renderFilas(rows){
-    const $tb = $("#tabla-tipo_estandar tbody").empty();
+    const $tbl = $("#tabladocumento-test tbody").empty();
     if (!rows || rows.length === 0){
-      $tb.append('<tr><td colspan="15" class="text-center text-muted">Sin resultados</td></tr>');
+      $tbl.append('<tr><td colspan="15" class="text-center text-muted">Sin resultados</td></tr>');
       return;
     }
     rows.forEach(r => {
       estado = r.estado_trash == '1'?' <span class="text-center badge badge-success">Activado</span>':'Deshabilitado';
-      $tb.append(`
-        <tr class="fila-proyecto" data-id="${r.idtipoestandarproveedor}">          
+      $tbl.append(`
+        <tr class="fila_docs" data-id="${r.iddocumento_tipo_estandar}">          
           <td class="py-1"> 
             <div class="btn-group btn-group-sm">
-              <button class="btn btn-warning text-nowrap btn-editar-tipoestand" data-id="${r.idtipoestandarproveedor}" data-toggle="tooltip" data-original-title="Editar"><i class="ti ti-edit"></i></button>
-              <button class="btn btn-danger text-nowrap btn-eliminar-tipoestand"  data-id="${r.idtipoestandarproveedor}" data-name="${r.descripcion}"  data-toggle="tooltip" data-original-title="Ver"><i class="ti ti-trash"></i></button>
+              <button class="btn btn-warning text-nowrap btn-editar-doc " data-id="${r.iddocumento_tipo_estandar}" data-toggle="tooltip" data-original-title="Editar"><i class="ti ti-edit"></i></button>
+              <button class="btn btn-danger text-nowrap btn-eliminar-doc" data-id="${r.iddocumento_tipo_estandar}" data-name="${r.descripcion}" data-toggle="tooltip" data-original-title="Ver"><i class="ti ti-trash"></i></button>
             </div>
           </td>
-          <td class="py-1 text-center" >${String(r.idtipoestandarproveedor).padStart(3, '0')}</td>
+          <td class="py-1 text-center" >${String(r.iddocumento_tipo_estandar).padStart(3, '0')}</td>
           <td class="py-1 text-nowrap" >${r.descripcion ?? ''}</td>
-          <td class="py-1" >${r.nroDocumentos ?? ''}</td>
           <td class="py-1 text-nowrap">${ estado }</td>
           
         </tr>
@@ -88,7 +61,7 @@
 
   // Render paginación Bootstrap (ventana de 5 páginas)
   function renderPaginacion(actual, total){
-    const $p = $("#paginacion_ts").empty();
+    const $p = $("#paginacion_docs").empty();
     const mkItem = (label, page, disabled=false, active=false) => `<li class="page-item ${disabled?'disabled':''} ${active?'active':''}"> <a class="page-link" href="#" data-page="${page}">${label}</a> </li>`;
 
     $p.append(mkItem('Ant.', actual-1, actual<=1)); // Prev
@@ -106,107 +79,99 @@
 
   // Marcar orden visualmente
   function marcarOrden(col, dir){
-    $("#tabla-tipo_estandar thead th.sortable").each(function(){ const $th = $(this);  const c = $th.data('sort');  $th.removeClass('asc desc'); if (c === col) $th.addClass(dir);  });
+    $("#tabladocumento-test thead th.sortable").each(function(){ const $th = $(this);  const c = $th.data('sort');  $th.removeClass('asc desc'); if (c === col) $th.addClass(dir);  });
   }
 
   // Eventos: click en paginación
-  $("#paginacion_ts").on("click", "a.page-link", function(e){  
-    $("#tabla-tipo_estandar tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Buscando...</td></tr>');
-    e.preventDefault();   const page = parseInt($(this).data("page"), 10); if (!isNaN(page)){ state.page = Math.max(1, page); tabla_principal_cargar(); } 
+  $("#paginacion_docs").on("click", "a.page-link", function(e){  
+    $("#tabladocumento-test tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Buscando...</td></tr>');
+    e.preventDefault();   const page = parseInt($(this).data("page"), 10); if (!isNaN(page)){ state1.page = Math.max(1, page); tabla_principal_cargar_docstipo(); } 
   });
 
   // Eventos: ordenar al hacer clic en header
-  $("#tabla-tipo_estandar thead").on("click", "th.sortable", function(){
-    $("#tabla-tipo_estandar tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Ordenando...</td></tr>');
-    const col = $(this).data("sort"); if (state.sort === col) { state.dir = (state.dir === 'asc') ? 'desc' : 'asc'; } else { state.sort = col;  state.dir  = 'asc'; } state.page = 1;    
-    tabla_principal_cargar();
+  $("#tabladocumento-test thead").on("click", "th.sortable", function(){
+    $("#tabladocumento-test tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Ordenando...</td></tr>');
+    const col = $(this).data("sort"); if (state1.sort === col) { state1.dir = (state1.dir === 'asc') ? 'desc' : 'asc'; } else { state1.sort = col;  state1.dir  = 'asc'; } state1.page = 1;    
+    tabla_principal_cargar_docstipo();
   });
 
   // Búsqueda con debounce
-  let t = null;
-  $("#buscar_ts").on("input", function(){
-    $("#tabla-tipo_estandar tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Buscando...</td></tr>');
-    const val = $(this).val(); clearTimeout(t); t = setTimeout(function(){ state.q = val; state.page = 1; tabla_principal_cargar(); }, 300);
+  let tb = null;
+  $("#buscar_docs").on("input", function(){
+    $("#tabladocumento-test tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Buscando...</td></tr>');
+    const val = $(this).val(); clearTimeout(tb); tb = setTimeout(function(){ state1.q = val; state1.page = 1; tabla_principal_cargar_docstipo(); }, 300);
   });
 
   // Cambiar tamaño de página
-  $("#perPage_ts").on("change", function(){
-    $("#tabla-tipo_estandar tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');
-    state.per_page = parseInt($(this).val(), 10) || 20;  state.page = 1;
-    tabla_principal_cargar();
+  $("#perPage_docs").on("change", function(){
+    $("#tabladocumento-test tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');
+    state1.per_page = parseInt($(this).val(), 10) || 20;  state1.page = 1;
+    tabla_principal_cargar_docstipo();
   });
 
-
-
-  $(".recargar-tabla_tipo_estandar").on("click", function(){
+  $(".recargar-tabla-documento").on("click", function(){
     toastr_info('<i class="ti ti-checks"></i> Actualizando...', 'Los datos se estan actualizado', 500);
-    $("#tabla-tipo_estandar tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');    
+    $("#tabladocumento-test tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');    
 
-    tabla_principal_cargar();
+    tabla_principal_cargar_docstipo();
   });
 
   // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
   // ═══════                                       S E C C I O N   C R U D   P R O Y E C T O                                                          ═══════
   // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
-  
     // EDITAR
-  $(document).on('click', '.btn-editar-tipoestand', function () {
+  $(document).on('click', '.btn-editar-doc', function () {
       const id = $(this).data('id');
-      ver_editar_tipoestandar(id);
+      ver_editar_docs(id);
   });
 
   // ELIMINAR
-  $(document).on('click', '.btn-eliminar-tipoestand', function () {
+  $(document).on('click', '.btn-eliminar-doc', function () {
       const id = $(this).data('id');
       const nombre = $(this).data('name');
-      eliminar_tipoestandar(id, nombre);
-  });
-  //LIMPIAR
-  $(document).on('click', '.limpiar_form_tipoestandar', function () {
-      limpiar_form_tipoestandar();
+      eliminar_docs(id, nombre);
   });
 
+  $(document).on('click', '.limpiar_form_docs', function () {
+     limpiar_form_docs();
+  });
 
-  function limpiar_form_tipoestandar(){
-
+  function limpiar_form_docs(){
+    
     //Mostramos los Materiales
-    $("#idtipoestandarproveedor").val('');
-    $("#descripcion").val('');
-    $("#nroDocumentos").val('');
-    $("#selectiddocumento_tipo_estandar").val([]).trigger("change");
-
+    $("#iddocumento_tipo_estandar").val('');
+    $("#descripcion_docs").val('');
 
     // Limpiamos las validaciones
     $(".form-control").removeClass('is-valid');
     $(".form-control").removeClass('is-invalid');
     $(".error.invalid-feedback").remove();
 
+    // 🔥 LIMPIAR TABLA DETALLES
+    $("#tabla_documentos tbody").html("");
   }
 
-  function ver_editar_tipoestandar(idtipoestandarproveedor) {
+  function ver_editar_docs(iddocumento_tipo_estandar) {
 
-    $("#cargando-1-formulario").hide();
-    $("#cargando-2-formulario").show();
-    limpiar_form_tipoestandar();
-    $('#modal-agregar-tipoestandar').modal('show');
+    console.log('ver_editar_docs ');
+    
 
-    $.getJSON(`${BASE_URL}/tipoestandar/${idtipoestandarproveedor}/ver-editar`, function (e) {
+    $("#cargando-3-formulario").hide();
+    $("#cargando-4-formulario").show();
+    limpiar_form_docs();
+    $("#modal-agregar-docs").modal('show');
+
+    $.getJSON(`${BASE_URL}/documento-tipo-estandar/${iddocumento_tipo_estandar}/ver-editar_conf_docs`, function (e) {
 
       if (e.status == true) {
 
-        $("#idtipoestandarproveedor").val(e.data.idtipoestandarproveedor);
-        $("#descripcion").val(e.data.descripcion);
-        $("#nroDocumentos").val(e.data.nroDocumentos);
-        //FALTA
-         $("#selectiddocumento_tipo_estandar").val([]).trigger("change");
+        $("#iddocumento_tipo_estandar").val(e.data.iddocumento_tipo_estandar);
+        $("#descripcion_docs").val(e.data.descripcion);
 
-        // 🔥 AGREGAR SELECR MULTIPLE
-        let valores = e.data.detalles.map(item => item.iddocumento_tipo_estandar);
-        $("#selectiddocumento_tipo_estandar").val(valores).trigger("change");
 
-        $("#cargando-1-formulario").show();
-        $("#cargando-2-formulario").hide();
+        $("#cargando-3-formulario").show();
+        $("#cargando-4-formulario").hide();
 
       } else {
         alert("No se encontró el tipo de estandar");
@@ -217,16 +182,16 @@
     });
   }
 
-  function guardar_y_editar_persona(e) {
+  function guardar_y_editar_docs(e) {
     // e.preventDefault(); //No se activará la acción predeterminada del evento
-    var formData = new FormData($("#form-agregar-tipoestandar")[0]);
+    var formData = new FormData($("#form-agregar-docs")[0]);
 
-    var id = $("#idtipoestandarproveedor").val();
+    var id = $("#iddocumento_tipo_estandar").val();
     var url_editar_crear = '';
     if (id == '') {
-      url_editar_crear =  `${BASE_URL}/tipoestandar/crear_tipoestandar` ;    
+      url_editar_crear =  `${BASE_URL}/documento-tipo-estandar/crear_conf_docs` ;    
     } else {
-      url_editar_crear = `${BASE_URL}/tipoestandar/editar_tipoestandar/${id}`;
+      url_editar_crear = `${BASE_URL}/documento-tipo-estandar/editar_conf_docs/${id}`;
       formData.append('_method', 'PUT'); // spoof para Laravel
     }
     
@@ -239,40 +204,40 @@
       success: function (e) {
         try {        
           if (e.status == true) {          
-            tabla_principal_cargar();
-            limpiar_form_tipoestandar();
-            Swal.fire("Correcto!", "Tipo Estandar guardado correctamente", "success");          
-            $("#modal-agregar-tipoestandar").modal("hide");           
+            tabla_principal_cargar_docstipo();
+            limpiar_form_docs();
+            Swal.fire("Correcto!", "Documento guardado correctamente", "success");          
+            $("#modal-agregar-docs").modal("hide");           
           }else{
             ver_errores(e);				 
           }
         } catch (err) { console.log('Error: ', err.message); toastr.error('<h5 class="font-size-16px">Error temporal!!</h5> puede intentalo mas tarde, o comuniquese con <i><a href="tel:+51921305769" >921-305-769</a></i> ─ <i><a href="tel:+51921487276" >921-487-276</a></i>'); } 
-        $("#guardar_registro_tipoestandar").html('Guardar Cambios').removeClass('disabled');
+        $("#guardar_registro_docs").html('Guardar Cambios').removeClass('disabled');
       },
       xhr: function () {
         var xhr = new window.XMLHttpRequest();
         xhr.upload.addEventListener("progress", function (evt) {
           if (evt.lengthComputable) {
             var percentComplete = (evt.loaded / evt.total)*100; /*console.log(percentComplete + '%');*/
-            $("#barra_progress_tipoestandar").css({"width": percentComplete+'%'}); $("#barra_progress_tipoestandar").text(percentComplete.toFixed(2)+" %");
+            $("#barra_progress_docs").css({"width": percentComplete+'%'}); $("#barra_progress_docs").text(percentComplete.toFixed(2)+" %");
           }
         }, false);
         return xhr;
       },
       beforeSend: function () {
-        $("#guardar_registro_tipoestandar").html('<i class="fas fa-spinner fa-pulse fa-lg"></i>').addClass('disabled');
-        $("#barra_progress_tipoestandar").css({ width: "0%",  });
-        $("#barra_progress_tipoestandar").text("0%");
+        $("#guardar_registro_docs").html('<i class="fas fa-spinner fa-pulse fa-lg"></i>').addClass('disabled');
+        $("#barra_progress_docs").css({ width: "0%",  });
+        $("#barra_progress_docs").text("0%");
       },
       complete: function () {
-        $("#barra_progress_tipoestandar").css({ width: "0%", });
-        $("#barra_progress_tipoestandar").text("0%");
+        $("#barra_progress_docs").css({ width: "0%", });
+        $("#barra_progress_docs").text("0%");
       },
       error: function (jqXhr) { ver_errores(jqXhr); },
     });
   }
 
-  function eliminar_tipoestandar(idtipoestandar, nombres) {
+  function eliminar_docs(id, nombres) {
 
     Swal.fire({
       title: "¿Está Seguro de eliminar el registro?",
@@ -287,15 +252,17 @@
       if (result.isConfirmed) {
 
         $.ajax({
-          url: `${BASE_URL}/tipoestandar/eliminar_tipoestandar/${idtipoestandar}`,
+          url: `${BASE_URL}/documento-tipo-estandar/eliminar_conf_docs/${id}`,
           type: "PUT",
           data: {
             _token: $('meta[name="csrf-token"]').attr('content') // necesario para PUT
           },
           success: function (e) {
+            console.log(e);
+
             if (e.status === true) {
               Swal.fire("Eliminado!", "El registro ha sido eliminado.", "success");
-              tabla_principal_cargar();
+              tabla_principal_cargar_docstipo();
             } else {
               Swal.fire("Error!", e.message, "error");
             }
@@ -315,8 +282,8 @@
   // ═══════                                       S E C C I O N   C L I C K   D E R E C H O   T A B L A                                              ═══════
   // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
-  let idproyecto_select = null;
-  let idpresupuesto_select = null;
+  let iddocs_select = null;
+  let idpresup_select = null;
 
   // Ocultar menú al hacer clic en otro lugar
   $(document).on("click", () => {  
@@ -326,12 +293,12 @@
   });
 
   // Mostrar menú contextual al hacer clic derecho en fila
-  $(document).on("contextmenu", ".fila-proyecto", function (e) {
+  $(document).on("contextmenu", ".fila_docs", function (e) {
     e.preventDefault();
     
-    $(".fila-proyecto").removeClass("selected");// Remover selección previa  
+    $(".fila_docs").removeClass("selected");// Remover selección previa  
     $(this).addClass("selected");// Marcar esta fila como seleccionada
-    idproyecto_select = $(this).data("id");
+    iddocs_select = $(this).data("id");
 
     $("#menu-contextual-proyecto").css({ top: e.pageY + "px", left: e.pageX + "px", }).show();
   });
@@ -339,47 +306,47 @@
   // Opciones del menú contextual
   $("#opcion-p-editar").on("click", function (e) {
     e.preventDefault();
-    if (idproyecto_select) {
-      ver_editar_tipoestandar(idproyecto_select);
+    if (iddocs_select) {
+      ver_editar_docs(iddocs_select);
     }
   });
 
   $("#opcion-p-ver-detalle").on("click", function (e) {
     e.preventDefault();
-    if (idproyecto_select) {
-      ver_detalle_proyecto(idproyecto_select);
+    if (iddocs_select) {
+      ver_detalle_proyecto(iddocs_select);
     }
   });
 
   $("#opcion-p-eliminar").on("click", function (e) {
     e.preventDefault();
-    if (idproyecto_select) {
+    if (iddocs_select) {
       toastr_info('En desarrollo!!', 'Sea paciente, esta opcion esta disponible pronto.');
     }
   });
 
   $("#opcion-p-enviar-terminado").on("click", function (e) {
     e.preventDefault();
-    if (idproyecto_select) {
+    if (iddocs_select) {
       toastr_info('En desarrollo!!', 'Sea paciente, esta opcion esta disponible pronto.');
     }
   });
 
   $("#opcion-p-enviar-papelera").on("click", function (e) {
     e.preventDefault();
-    if (idproyecto_select) {
+    if (iddocs_select) {
       toastr_info('En desarrollo!!', 'Sea paciente, esta opcion esta disponible pronto.');
     }
   });
 
-  $(document).on("contextmenu", ".fila-proyecto-presupuesto", function (e) {
+  $(document).on("contextmenu", ".fila_docs-presupuesto", function (e) {
     e.preventDefault();
     
-    $(".fila-proyecto-presupuesto").removeClass("selected");// Remover selección previa  
+    $(".fila_docs-presupuesto").removeClass("selected");// Remover selección previa  
     $(this).addClass("selected");// Marcar esta fila como seleccionada
-    idpresupuesto_select = $(this).data("idpresupuesto");
+    idpresup_select = $(this).data("idpresupuesto");
 
-    if (idpresupuesto_select == null || idpresupuesto_select == '') {
+    if (idpresup_select == null || idpresup_select == '') {
       $('#opcion-ap-agregar').show();
       $('#opcion-ap-ver-detalle').hide();
       $('#opcion-ap-actualizar').hide();
@@ -419,25 +386,14 @@
   // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
   $(function () {    
 
-    // validamos el formulario  
-
-    $('#tipo_entidad_sunat').on('change', function() { $(this).trigger('blur'); });
-    $('#tipo_documento').on('change', function() { $(this).trigger('blur'); });
-    $('#selectiddocumento_tipo_estandar').on('change', function() { $(this).trigger('blur'); });
-    
-
-    $("#form-agregar-tipoestandar").validate({
+    $("#form-agregar-docs").validate({
       //ignore: '.select2-input, .select2-focusser',
       rules: {
 
-        descripcion:    { required: true, },
-        nroDocumentos:  { required: true, },    
-        selectiddocumento_tipo_estandar :  { required: true, },    
+        descripcion_docs:    { required: true, }, 
       },
       messages: {
-        descripcion:    { required: "Campo requerido.", },
-        nroDocumentos:  { required: "Campo requerido.", },
-        selectiddocumento_tipo_estandar:  { required: "Campo requerido.", },
+        descripcion_docs:    { required: "Campo requerido.", },
       },
       
       errorElement: "span",
@@ -457,49 +413,12 @@
 
       submitHandler: function (e) {
         $(".modal-body").animate({ scrollTop: $(document).height() }, 600); // Scrollea hasta abajo de la página
-        guardar_y_editar_persona(e);       
+        guardar_y_editar_docs(e);       
       },
     });
 
-    $('#tipo_entidad_sunat').rules('add', { required: true, messages: {  required: "Campo requerido" } });
-    $('#tipo_documento').rules('add', { required: true, messages: {  required: "Campo requerido" } });
-    $('#selectiddocumento_tipo_estandar').rules('add', { required: true, messages: {  required: "Campo requerido" } });
 
   });
-
-
-  // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-  // ═══════                                       F I N   D E L   F I C H E R O                                                              ═══════
-  // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-
-  /*function actualizarNumeros() { $('#tabla_documentos tbody tr').each(function (index) { $(this).find('td:eq(0)').text(index + 1); });}
-
-  // Agregar fila con límite
-  $('#agregar_fila').on('click', function () {
-
-      let limite = parseInt($('#nroDocumentos').val());  // cantidad máxima permitida
-      let actuales = $('#tabla_documentos tbody tr').length;  // cantidad actual
-
-      if (isNaN(limite) || limite <= 0) { toastr.warning('Primero ingresa un número válido en Nro Documentos.'); return; }
-
-      if (actuales >= limite) { toastr.warning('Ha alcanzado el límite de documentos permitidos.'); return; }
-
-      let nuevaFila = `
-          <tr>
-              <td class="text-center" style=" font-size: 12px; "></td>
-              <td> <input type="text" class="form-control sin-borde" name="detalle[]" placeholder="Nombre del documento"> </td>
-              <td class="text-center"> <button class="btn btn-danger btn-xs eliminar_fila"> <i class="ti ti-trash"></i> </button> </td>
-          </tr>
-      `;
-
-      $('#tabla_documentos tbody').append(nuevaFila);
-      actualizarNumeros();
-
-      // 🚀 Toastr de éxito al agregar fila
-      toastr.success('Fila agregada correctamente.');
-  });
-
-  // Eliminar fila
-  $(document).on('click', '.eliminar_fila', function () { $(this).closest('tr').remove(); actualizarNumeros();});*/
 
 })();
+

@@ -1,20 +1,19 @@
 
+const BASE_URL = document.querySelector('meta[name="app-url"]').content;
+const CSRF = document.querySelector('meta[name="csrf-token"]').content;
+
 $("#guardar_registro_persona").on("click", function (e) { $("#submit-form-proveedor").submit(); });   
 
 
+lista_select2(`${BASE_URL}/select2/obtener`, '#distrito');
 
+lista_select2(`${BASE_URL}/select2/Rolpersona`, '#idtipo_persona');
 
- lista_select2('/select2/obtener', '#distrito');
+$("#distrito").select2({ theme: "bootstrap4", placeholder: "Seleccionar Distrito", allowClear: true, });
+$("#idtipo_persona").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
 
- lista_select2('/select2/Rolpersona', '#idtipo_persona');
-
-
-
- $("#distrito").select2({ theme: "bootstrap4", placeholder: "Seleccionar Distrito", allowClear: true, });
- $("#idtipo_persona").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
-
- $("#tipo_entidad_sunat").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
- $("#tipo_documento").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
+$("#tipo_entidad_sunat").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
+$("#tipo_documento").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
 
 function show_hide_escenario(flag) {
   if (flag == 1) {            // Tabla principal
@@ -42,9 +41,6 @@ $(document).ready(function() {
         $('#provincia').val(provincia);
         $('#departamento').val(departamento);
 
-        console.log(provincia);
-        
-
     });
 });
 
@@ -64,7 +60,7 @@ const state = {
 // Cargar datos
 function tabla_principal_cargar(){
   
-  $.getJSON("/persona/tabla_principal", state, function(res){
+  $.getJSON(`${BASE_URL}/persona/tabla_principal`, state, function(res){
 
     console.log(res.data);
     
@@ -201,7 +197,7 @@ function ver_editar_persona(idpersona) {
   $("#cargando-2-formulario").show();
   limpiar_form_persona();
   $('#modal-agregar-proyecto').modal('show');
-  $.getJSON(`persona/${idpersona}/ver-editar`, function (e) {
+  $.getJSON(`${BASE_URL}/persona/${idpersona}/ver-editar`, function (e) {
     if (e.status == true) {
       $("#idpersona").val(e.data.idpersona);
       $("#idtipo_persona").val(e.data.idtipo_persona).trigger('change');
@@ -237,9 +233,9 @@ function guardar_y_editar_persona(e) {
   var id = $("#idpersona").val();
   var url_editar_crear = '';
   if (id == '') {
-    url_editar_crear =  `/persona/crear_persona` ;    
+    url_editar_crear =  `${BASE_URL}/persona/crear_persona` ;    
   } else {
-    url_editar_crear = `/persona/editar_persona/${id}`;
+    url_editar_crear = `${BASE_URL}/persona/editar_persona/${id}`;
     formData.append('_method', 'PUT'); // spoof para Laravel
   }
   
@@ -300,7 +296,7 @@ function eliminar_persona(idpersona, nombres) {
     if (result.isConfirmed) {
 
       $.ajax({
-        url: `/persona/eliminar_persona/${idpersona}`,
+        url: `${BASE_URL}/persona/eliminar_persona/${idpersona}`,
         type: "PUT",
         data: {
           _token: $('meta[name="csrf-token"]').attr('content') // necesario para PUT
@@ -325,17 +321,6 @@ function eliminar_persona(idpersona, nombres) {
   });
 }
 
-function empezar_proyecto(idproyecto, nombre_proyecto ) {
-  crud_simple_alerta(
-    '../ajax/proyecto.php?op=empezar_proyecto', 
-    idproyecto, 
-    '¿Está Seguro de  Empezar  el proyecto ?', 
-    `<b class="text-success">${nombre_proyecto}</b> <br> Tendras acceso a agregar o editar: provedores, trabajadores!`, 
-    'Si, Empezar!',
-    function(){ Swal.fire("En curso!", "Tu proyecto esta en curso.", "success"); },
-    function(){ tabla.ajax.reload(null, false);  box_proyecto();}
-  );  
-}
 
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 // ═══════                                       S E C C I O N   C L I C K   D E R E C H O   T A B L A                                              ═══════

@@ -10,10 +10,10 @@ class PersonaCuentaBancaria extends Model
     use HasFactory;
 
     // Nombre real de la tabla
-    protected $table = 'persona_CuentaBancaria';
+    protected $table = 'persona_cuentaBancaria';
 
     // Primary Key
-    protected $primaryKey = 'idpersona_CuentaBancaria';
+    protected $primaryKey = 'idpersona_cuentaBancaria';
 
     // Auto incremento
     public $incrementing = true;

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
 use App\Models\Tipo_estandar;
 use App\Models\Tipo_estandarDetalle;
+use App\Models\DocumentoTipoEstandar;
 use Illuminate\Support\Facades\DB; 
 
 
@@ -25,8 +26,9 @@ class Tipo_estandarController extends Controller
             $data = $r->validate([
                 'descripcion'   => 'required|string',
                 'nroDocumentos' => 'required|integer|min:1',
-                'detalle'       => 'nullable|array',
-                'detalle.*'     => 'nullable|string',
+                'selectiddocumento_tipo_estandar'       => 'nullable|array',
+                'selectiddocumento_tipo_estandar.*'     => 'nullable|string',
+                
             ]);
 
             // Crear el tipo de estándar
@@ -36,8 +38,8 @@ class Tipo_estandarController extends Controller
             ]);
 
             // Registrar detalles (solo si hay valores)
-            if ($r->detalle) {
-                foreach ($r->detalle as $item) {
+            if ($r->selectiddocumento_tipo_estandar) {
+                foreach ($r->selectiddocumento_tipo_estandar as $item) {
 
                     // Si está vacío, NO lo guardamos
                     if (trim($item) == '') {
@@ -45,8 +47,8 @@ class Tipo_estandarController extends Controller
                     } 
 
                     Tipo_estandarDetalle::create([
-                        'idtipoestadandarproveedor' => $createtipo->idtipoestandarproveedor,
-                        'detalle' => $item,
+                        'idtipoestandarproveedor' => $createtipo->idtipoestandarproveedor,
+                        'iddocumento_tipo_estandar' => $item,
                     ]);
                 }
             }
@@ -68,8 +70,8 @@ class Tipo_estandarController extends Controller
             $data = $r->validate([
                 'descripcion'   => 'required|string',
                 'nroDocumentos' => 'required|integer|min:1',
-                'detalle'       => 'nullable|array',
-                'detalle.*'     => 'nullable|string',
+                'selectiddocumento_tipo_estandar'       => 'nullable|array',
+                'selectiddocumento_tipo_estandar.*'     => 'nullable|string',
             ]);
 
             // Buscar maestro
@@ -86,8 +88,8 @@ class Tipo_estandarController extends Controller
 
 
             // 🔥 VOLVER A REGISTRAR NUEVOS DETALLES
-            if ($r->detalle) {
-                foreach ($r->detalle as $item) {
+            if ($r->selectiddocumento_tipo_estandar) {
+                foreach ($r->selectiddocumento_tipo_estandar as $item) {
 
                     if (trim($item) == '') {
                         continue; // no guardar vacíos
@@ -95,7 +97,7 @@ class Tipo_estandarController extends Controller
 
                     Tipo_estandarDetalle::create([
                         'idtipoestandarproveedor' => $id,
-                        'detalle' => $item,
+                        'iddocumento_tipo_estandar' => $item,
                     ]);
                 }
             }
@@ -198,7 +200,7 @@ class Tipo_estandarController extends Controller
                     'nroDocumentos'
                 ])
                 ->whereKey($idtipoestandarproveedor)
-                ->with(['detalles:iddetalletipoestandarproveedor,detalle,idtipoestandarproveedor'])
+                ->with(['detalles:iddetalletipoestandarproveedor,detalle,idtipoestandarproveedor,iddocumento_tipo_estandar'])
                 ->firstOrFail();
 
             return ApiResponse::success($tipo_estandar, 'Tipo estandar obtenido correctamente');
@@ -213,15 +215,26 @@ class Tipo_estandarController extends Controller
         }
     }
 
+    public function select2DocumentoTipoEstandar()
+    {
+
+      try {
+
+          $data = DocumentoTipoEstandar::select2DocumentoTipoEstandar();
+
+        $options = ''; // string para concatenar HTML
+        foreach ($data as $t) {
+            $options .= '<option value="'.$t->iddocumento_tipo_estandar.'" data-nombre="'.$t->descripcion.'">' . e($t->descripcion). ' </option>';
+        }
+
+        return ApiResponse::success($options, 'Lista de docs obtenidos');
+
+      } catch (\Throwable $e) {
+          return ApiResponse::error($e);
+      }
 
 
-
-
-
-
-
-
-
+    }
 
 
 }

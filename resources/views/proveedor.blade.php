@@ -77,7 +77,7 @@
     <!-- Main Sidebar Container -->
     @include('layouts.lte_aside')   
 
-    @if (auth()->user()->perm_proveedor)
+    @if (auth()->user()->perm_proveedor_vista_adm)
 
       <!-- Content Wrapper. Contains page content -->
       <div class="content-wrapper">
@@ -275,17 +275,26 @@
                       <input type="hidden" name="idtipo_persona" id="idtipo_persona" value="3" /> 
 
 
-                      <div class="col-12 col-sm-6 col-md-5 col-lg-5">
+                      <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                         <div class="form-group">
-                          <label for="descripcion">Periodo Inicio </label>                          
-                            <input type="date" name="fecha_inicio_periodo" class="form-control" id="fecha_inicio_periodo"  />
+                          <label for="descripcion">Periodo Homologación </label>                          
+                          <select name="idfecha_homologacion" id="idfecha_homologacion" class="form-control is-valid select2" placeholder="Periodo" aria-invalid="false">
                           </select>
                         </div>
                       </div>
 
-                      <div class="col-12 col-sm-6 col-md-5 col-lg-5">
+                      <div class="col-12 col-sm-6 col-md-5 col-lg-5" >
                         <div class="form-group">
-                          <label for="descripcion">Periodo Fin </label>                          
+                          <label for="descripcion">Periodo Inicio Homologación </label>                          
+                            <input type="date" name="fecha_inicio_periodo" class="form-control" id="fecha_inicio_periodo"  />
+                          </select>
+                        </div>
+                      </div>
+                      
+
+                      <div class="col-12 col-sm-6 col-md-5 col-lg-5" >
+                        <div class="form-group">
+                          <label for="descripcion"> Fin Homologación </label>         
                             <input type="date" name="fecha_fin_periodo" class="form-control" id="fecha_fin_periodo"  />
                           </select>
                         </div>
@@ -553,7 +562,7 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/proveedor.js') }}?version_erp=01.02"></script>
+  <script src="{{ asset('assets/js/proveedor.js') }}?version_erp=01.03"></script>
 
   <script>
     $(function() {

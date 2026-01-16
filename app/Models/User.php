@@ -11,6 +11,7 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\DB;
 use App\Models\Permiso;
+use App\Models\Persona;
 
 class User extends Authenticatable
 {
@@ -74,6 +75,11 @@ class User extends Authenticatable
         ];
     }
 
+    public function persona()
+    {
+        return $this->belongsTo(Persona::class, 'idpersona', 'idpersona');
+    }
+
     public function permisos()
     {
         return $this->belongsToMany(Permiso::class, 'usuario_permiso', 'users_id', 'idpermiso')
@@ -122,6 +128,7 @@ class User extends Authenticatable
     public function getGrupoUtilitariosAttribute(): bool         { return $this->hasGrupo('Utilitarios'); }        // grupo_utilitarios
     public function getGrupoconfiguracionAttribute(): bool        { return $this->hasGrupo('Configuración'); }     // grupo_configuracion
     public function getGrupoconProveedorAttribute(): bool        { return $this->hasGrupo('Proveedor'); }        // grupo_Proveedor
+    public function getGrupoconClienteAttribute(): bool        { return $this->hasGrupo('Cliente'); }        // grupo_Cliente
 
 
 
@@ -136,15 +143,22 @@ class User extends Authenticatable
 
 
     // atajos (para llamarlos como Auth::user()->perm_presupuesto)
-    /*public function getPermPresupuestoAttribute(): bool         { return $this->hasPermiso('presupuesto'); }        // perm_presupuesto
-    public function getPermProyectoAttribute(): bool            { return $this->hasPermiso('proyecto'); }           // perm_proyecto
-    public function getPermRecursoAttribute(): bool             { return $this->hasPermiso('recurso'); }            // perm_recurso
-    public function getPermConfiguracionAttribute(): bool       { return $this->hasPermiso('configuracion'); }      // perm_configuracion
-    public function getPermUtilitarioAttribute(): bool          { return $this->hasPermiso('utilitario'); }         // perm_utilitario
-    public function getPermCombinarTxtAttribute(): bool         { return $this->hasPermiso('combinar_txt'); }  */     // perm_combinar_txt
+
+    //UTILITARIOS
     public function getPermUsuarioAttribute(): bool             { return $this->hasPermiso('usuarios'); }           // perm_usuario
-    public function getPermTipoSocioNogocioAttribute(): bool    { return $this->hasPermiso('tipo_socio_negocio'); }  // perm_tipo_socio_negocio
-    public function getPermTipoEstandarAttribute(): bool        { return $this->hasPermiso('tipo_estandar'); }      // perm_tipo_estandar
-    public function getPermProveedorAttribute(): bool           { return $this->hasPermiso('proveedor'); }           // perm_proveedor
     public function getPermPersonaAttribute(): bool             { return $this->hasPermiso('persona'); }           // perm_persona
+    //CONFIGURACION
+    public function getPermProveedorTipoAttribute(): bool    { return $this->hasPermiso('proveedor_tipo'); }  // perm_proveedor_tipo
+    public function getPermBancosAttribute(): bool    { return $this->hasPermiso('bancos'); }  // perm_bancos
+    public function getPermPeriodoHomologacionAttribute(): bool    { return $this->hasPermiso('periodo_homologacion'); }  // perm_periodo_homologacion
+
+    //Proveedor
+    public function getPermProveedorVistaAdmAttribute(): bool { return $this->hasPermiso('proveedor_vista_adm'); }      // perm_proveedor_vista_adm
+    public function getPermProveedorVistaDocumentosClientAttribute(): bool { return $this->hasPermiso('proveedor_vista_documentos_client'); }      // perm_proveedor_vista_documentos_client
+    public function getPermProveedorVistaActDatosClientAttribute(): bool { return $this->hasPermiso('proveedor_vista_act_datos_client'); }      // perm_proveedor_vista_act_datos_client
+    
+    //cliente
+    public function getPermClientVistaAdmAttribute(): bool           { return $this->hasPermiso('client_vista_adm'); }           // perm_client_vista_adm
+    public function getPermClientVistaClientAttribute(): bool           { return $this->hasPermiso('client_vista_client'); }           // perm_client_vista_client
+
 }

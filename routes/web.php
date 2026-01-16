@@ -1,15 +1,6 @@
 <?php
 
-use App\Http\Controllers\CombinarExcelAfpController;
-use App\Http\Controllers\CombinarTxtController;
-use App\Http\Controllers\ImportarHoraDetalleObertiController;
-use App\Http\Controllers\ImportarHoraObertiController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PresupuestoController;
-use App\Http\Controllers\PresupuestoDetalleController;
-use App\Http\Controllers\PresupuestoGrupoController;
-use App\Http\Controllers\ProyectoController;
-use App\Http\Controllers\RecursoController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\PersonaController;
 Use App\Http\Controllers\ApiReniecSunatController;
@@ -20,17 +11,12 @@ use App\Http\Controllers\SubirDocsController;
 use App\Http\Controllers\BancoController;
 use App\Http\Controllers\PersonaCuentaBancariaController;
 use App\Http\Controllers\ActualizardatosproveedorController;
+use App\Http\Controllers\ActualizardatosclienteController;
 use App\Http\Controllers\ProvProveedorController;
+use App\Http\Controllers\FechaHomologacionController;
+use App\Http\Controllers\DocumentoTipoEstandarController;
 
 
-Route::get('/test-db', function () {
-    try {
-        DB::connection()->getPdo();
-        return "Conexión a la base de datos exitosa!";
-    } catch (\Exception $e) {
-        return "Error al conectar a la base de datos: " . $e->getMessage();
-    }
-});
 
 Route::get('/', function () {  return redirect()->route('login'); });
 
@@ -38,21 +24,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
     Route::get('/dashboard', function () {  return view('inicio');   })->name('dashboard');
 
-
     // :::::::::::::::::::::::::::::: I N I C I O ::::::::::::::::::::::::::::::
     Route::get('/inicio', function () {  return view('inicio');   })->name('inicio');
 
-    // :::::::::::::::::::::::::::::: P R O Y E C T O ::::::::::::::::::::::::::::::
-
-    Route::post('/proyectos/crear_proyecto', [ProyectoController::class, 'crear_proyecto'])->name('proyectos.crear_proyecto');                     // crear
-    Route::put('/proyectos/editar_proyecto/{idproyecto}', [ProyectoController::class, 'editar_proyecto'])->whereNumber('idproyecto')->name('proyectos.editar_proyecto'); // editar
-    Route::get('/proyectos/detalle-html/{idproyecto}', [ProyectoController::class, 'detalleHtml'])->name('proyectos.detalleHtml');
-
-    Route::get('/proyectos/tabla_principal', [ProyectoController::class, 'tabla_principal'])->name('proyectos.datatable'); // AJAX
-    Route::get('/proyectos/{idproyecto}/ver-editar', [ProyectoController::class, 'ver_editar_proyecto'])->whereNumber('idproyecto')->name('proyectos.ver_editar');
-    Route::resource('proyectos', ProyectoController::class);
-
-        // ::::::::::::::::: PERSONAS SOCIO NEGOCIO ::::::::::::::::::::::::::::::
+    // ::::::::::::::::: PERSONAS SOCIO NEGOCIO ::::::::::::::::::::::::::::::
     Route::post('/persona/crear_persona', [PersonaController::class, 'crear_persona'])->name('persona.crear_persona');                     // crear
     Route::get('/persona/tabla_principal', [PersonaController::class, 'Listar_personas'])->name('persona.Listar_personas'); // AJAX
     Route::get('/select2/Rolpersona', [PersonaController::class, 'selec2Rolpersona']);
@@ -61,16 +36,24 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::put('/persona/eliminar_persona/{idpersona}', [PersonaController::class, 'eliminar_persona'])->whereNumber('idpersona')->name('persona.eliminar_persona'); // eliminar
     Route::resource('persona', PersonaController::class);
 
-
     //:::::::::::::::::::::::::. TIPO ESTANDAR ::::::::::::::::::::::::::::::
     Route::post('/tipoestandar/crear_tipoestandar', [Tipo_estandarController::class, 'crear_tipoestandar'])->name('tipoestandar.crear_tipoestandar');                     // crear
     Route::get('/tipoestandar/tabla_principal', [Tipo_estandarController::class, 'Listar_tipoestandar'])->name('tipoestandar.Listar_tipoestandar'); // AJAX
     Route::get('/tipoestandar/{idtipoestandarproveedor}/ver-editar', [Tipo_estandarController::class, 'mostrar_tipoestandar'])->whereNumber('idtipoestandarproveedor')->name('tipoestandar.mostrar_tipoestandar'); //mostar para editar
     Route::put('/tipoestandar/editar_tipoestandar/{idtipoestandarproveedor}', [Tipo_estandarController::class, 'editar_tipoestandar'])->whereNumber('idtipoestandarproveedor')->name('tipoestandar.editar_tipoestandar'); // editar
     Route::put('/tipoestandar/eliminar_tipoestandar/{idtipoestandarproveedor}', [Tipo_estandarController::class, 'eliminar_tipoestandar'])->whereNumber('idtipoestandarproveedor')->name('tipoestandar.eliminar_tipoestandar'); // eliminar
+    Route::get('/tipoestandar/select2docstipoestandar', [Tipo_estandarController::class, 'select2DocumentoTipoEstandar']);
+    
     Route::resource('tipo_estandar', Tipo_estandarController::class);
 
-    
+    //:::::::::::::::::::: DOCUMENTO TIPO ESTÁNDAR :::::::::::::::::::::::
+    Route::post('/documento-tipo-estandar/crear_conf_docs', [DocumentoTipoEstandarController::class, 'crear_documento_tipo_estandar'])->name('documento_tipo_estandar.crear');
+    Route::get('/documento-tipo-estandar/tabla_principal_conf_docs', [DocumentoTipoEstandarController::class, 'listar_documento_tipo_estandar'])->name('documento_tipo_estandar.listar');
+    Route::get('/documento-tipo-estandar/{id}/ver-editar_conf_docs', [DocumentoTipoEstandarController::class, 'mostrar_documento_tipo_estandar'])->whereNumber('id')->name('documento_tipo_estandar.mostrar');
+    Route::put('/documento-tipo-estandar/editar_conf_docs/{id}', [DocumentoTipoEstandarController::class, 'editar_documento_tipo_estandar'])->whereNumber('id')->name('documento_tipo_estandar.editar');
+    Route::put('/documento-tipo-estandar/eliminar_conf_docs/{id}', [DocumentoTipoEstandarController::class, 'eliminar_documento_tipo_estandar'])->whereNumber('id')->name('documento_tipo_estandar.eliminar');
+    Route::resource('documento-tipo-estandar', DocumentoTipoEstandarController::class);
+        
     // :::::::::::::::::::::::::::::: P R O V E E D O R E S :::::::::::::::::::::::::::::: actualizar_estado_doc_estandar
     Route::post('/proveedor/crear_proveedor', [ProveedorController::class, 'crear_proveedor'])->name('proveedor.crear_proveedor');                     // crear
     Route::get('/proveedor/{idpersona}/mostrar_proveedor', [ProveedorController::class, 'mostrar_proveedor'])->whereNumber('idpersona')->name('proveedor.mostrar_proveedor'); //mostar para editar
@@ -80,9 +63,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::get('/proveedor/ver_listar_tipos_estandar_docs', [ProveedorController::class, 'listar_tipos_estandar_docs'])->name('proveedor.listar_tipos_estandar_docs'); //mostar para editar
     Route::put('/proveedor/actualizar_estado_doc_estandar/{id}', [ProveedorController::class, 'actualizar_estado_doc_estandar'])->whereNumber('id')->name('proveedor.actualizar_estado_doc_estandar'); // editar
 
-   
-    //Route::get('/proyectos/{idproyecto}/ver-editar', [ProyectoController::class, 'ver_editar_proyecto'])->whereNumber('idproyecto')->name('proyectos.ver_editar');
-     Route::get('/select2/tipoestandar', [ProveedorController::class, 'selec2tipoEstandar']); //  ← select2 
+    Route::get('/select2/tipoestandar', [ProveedorController::class, 'selec2tipoEstandar']); //  ← select2  
+    Route::get('/select2/periodohomologacion', [ProveedorController::class, 'selec2periodohomologacion']); //  ← select2  
     Route::resource('proveedor', ProveedorController::class);
 
     // :::::::::::::::::::::::::::::: API SUNAT RENIEC ok ::::::::::::::::::::::::::::::
@@ -111,7 +93,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::put('/banco/eliminar_banco/{idbanco}', [BancoController::class, 'eliminar_banco'])->whereNumber('idbanco')->name('banco.eliminar_banco'); // eliminar
     Route::resource('banco', BancoController::class);
 
-
     //::::::::::::::::::::::. PERSONA CUENTA BANCARIA :::::::::::::::::::::::
     Route::post( '/persona-cuenta-bancaria/crear', [PersonaCuentaBancariaController::class, 'crear'])->name('persona_cuenta_bancaria.crear');
     Route::get( '/persona-cuenta-bancaria/tabla_principal', [PersonaCuentaBancariaController::class, 'listar'])->name('persona_cuenta_bancaria.listar');
@@ -126,30 +107,39 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     route::put('/actualizardatosproveedor/editarProveedor', [ActualizardatosproveedorController::class, 'editarProveedor'])->name('actualizardatosproveedor.editarProveedor'); // editar
     Route::resource('actualizardatos', ActualizardatosproveedorController::class);
 
+    // :::::::::::::::::::::::::::::: A C T U A L I Z A R   D A T O S  C L I E N T E :::::::::::::::::::::::::::::: 
+    Route::get('/actualizardatoscliente/{id}/ver_clienteupdate', [ActualizardatosclienteController::class, 'ver_clienteupdate'])->whereNumber('id')->name('actualizardatoscliente.ver_clienteupdate'); //mostar para editar
+    route::put('/actualizardatoscliente/editarcliente', [ActualizardatosclienteController::class, 'editarcliente'])->name('actualizardatoscliente.editarcliente'); // editar
+    Route::resource('actualizardatoscliente', ActualizardatosclienteController::class);
 
+    //:::::::::::::::::::::::::. FECHA HOMOLOGACIÓN ::::::::::::::::::::::::::::::
+    Route::post('/fechahomologacion/crear_fecha_homologacion', [FechaHomologacionController::class, 'crear_fecha_homologacion'] )->name('fechahomologacion.crear_fecha_homologacion'); // crear
+    Route::get('/fechahomologacion/tabla_principal', [FechaHomologacionController::class, 'listar_fecha_homologacion'] )->name('fechahomologacion.listar_fecha_homologacion'); // AJAX
+    Route::get('/fechahomologacion/{id}/ver-editar', [FechaHomologacionController::class, 'mostrar_fecha_homologacion'] )->whereNumber('id')->name('fechahomologacion.mostrar_fecha_homologacion'); // mostrar para editar
+    Route::put('/fechahomologacion/editar_fecha_homologacion/{id}',[FechaHomologacionController::class, 'editar_fecha_homologacion'] )->whereNumber('id')->name('fechahomologacion.editar_fecha_homologacion'); // editar
+    Route::put('/fechahomologacion/eliminar_fecha_homologacion/{id}', [FechaHomologacionController::class, 'eliminar_fecha_homologacion'])->whereNumber('id')->name('fechahomologacion.eliminar_fecha_homologacion'); // eliminar
+    Route::resource('fechahomologacion', FechaHomologacionController::class );
 
-    // :::::::::::::::::::::::::::::: S U B I R   D O C U M E N T O S  :::::::::::::::::::::::::::::: 
-
+    // :::::::::::::::::::::::::::::: S U B I R   D O C U M E N T O S  ::::::::::::::::::::::::::::::  periodo_homologacion_xpersona
+ 
     Route::post('/subir_docs/guardar_doc_estandar_proveedor', [SubirDocsController::class, 'guardar_doc_estandar_proveedor'])->name('subir_docs.guardar_doc_estandar_proveedor'); //Create 
     Route::get('/subir_docs/ver_doc_estandar/{id}', [SubirDocsController::class, 'ver_doc_estandar'])->whereNumber('id')->name('subir_docs.ver_doc_estandar'); //mostar para editar
     Route::put('/subir_docs/editar_doc_estandar_proveedor/{id}', [SubirDocsController::class, 'editar_doc_estandar_proveedor'])->whereNumber('id')->name('subir_docs.editar_doc_estandar_proveedor'); // editar
     route::put('/subir_docs/eliminar_doc_estandar_proveedor/{iddocsproveedortipoestandar}', [SubirDocsController::class, 'eliminar_doc_estandar_proveedor'])->whereNumber('iddocsproveedortipoestandar')->name('subir_docs.eliminar_doc_estandar_proveedor'); // eliminar
     Route::get('/subir_docs/listar_docs_tipos_est_xuser', [SubirDocsController::class, 'listar_docs_tipos_est_xuser'])->name('subir_docs.listar_docs_tipos_est_xuser'); // AJAX
     Route::get('/select2/lista_sin_docs_user', [SubirDocsController::class, 'select2_lista_sin_docs']); //  ← select2 docs pendientes por subir
+    Route::get('/subir_docs/periodo_homologacion', [SubirDocsController::class, 'periodo_homologacion_xpersona']); //  ← Lista inicial 
     Route::resource('subir_docs', SubirDocsController::class);
    
     // :::::::::::::::::::::::::::::: REGISTRO DE PROVEEDORES DEL PROVEEDOR  :::::::::::::::::::::::::::::: 
 
     Route::resource('prov_proveedor', ProvProveedorController::class);
 
-
-
     // :::::::::::::::::::::::::::::: P R E S U P U E S T O S ::::::::::::::::::::::::::::::
     Route::post('/presupuestos/crear_cabecera',                         [PresupuestoController::class, 'crear_cabecera_presupuesto'])->name('presupuestos.crear.cabecera');
      Route::put('/presupuestos/{idpresupuesto}/actualizar_cabecera',    [PresupuestoController::class, 'actualizar_cabecera_presupuesto'])->name('presupuestos.actualizar_cabecera');    
      Route::get('/presupuestos/{idpresupuesto}/mostrar',                [PresupuestoController::class, 'mostrar_editar'])->name('presupuestos.mostrar');
     Route::resource('presupuestos', PresupuestoController::class);
-    
     
     // :::::::::::::::::::::::::::::: R E C U R S O S  ::::::::::::::::::::::::::::::
     Route::get('/recursos/listar_recursos_x_niveles',       [RecursoController::class, 'getlistar_recursos_x_nivel'])->name('recursos.getlistar_recursos_x_nivel');
@@ -162,35 +152,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::put('/grupos/{idpresupuesto_grupo}/actualizar',  [PresupuestoGrupoController::class, 'actualizar_grupo'])->name('grupo.actualizar');    
     Route::get('/grupos/{idpresupuesto_grupo}/mostrar',     [PresupuestoGrupoController::class, 'mostrar_editar'])->name('grupo.mostrar');
     Route::delete('/grupos/{id}',                           [PresupuestoGrupoController::class, 'destroy'])->name('grupo.delete');
-    
 
-
-    // :::::::::::::::::::::::::::::: EXCEL OBERTI  ::::::::::::::::::::::::::::::
-    Route::post('/horas/plantilla/llenar',  [ImportarHoraObertiController::class, 'fillTemplate'])->name('horas.template.fill');
-    Route::get('/horas/cabeceras',          [ImportarHoraObertiController::class, 'listCabeceras'])->name('horas.cabeceras'); // JSON con paginación + búsqueda
-    Route::get('/horas/mostrar_detalle',    [ImportarHoraObertiController::class, 'mostrar_detalle_hora'])->name('horas.mostrar_detalle_hora'); // JSON con paginación + búsqueda
-    Route::post('/horas/preview',           [ImportarHoraObertiController::class, 'preview'])->name('horas.preview');   // ← NUEVO
-    Route::post('/horas/importar',          [ImportarHoraObertiController::class, 'import'])->name('horas.import');
-    Route::delete('/horas/cabeceras/{idregistro_horas}', [ImportarHoraObertiController::class, 'destroy'])->name('horas.cabeceras.destroy');
-    Route::patch( '/registro-horas-detalle/{detalle}/celda',  [ImportarHoraDetalleObertiController::class, 'actualizarCelda'])->name('registro_horas_detalle.actualizar_celda');
-    Route::resource('importar-horas',  ImportarHoraObertiController::class);    
-
-    // :::::::::::::::::::::::::::::: COMBINAR TXT  ::::::::::::::::::::::::::::::
-   
-    Route::post('combinar-txt/guardar_txt', [CombinarTxtController::class, 'guardar_txt'])->name('combinar-txt.guardar'); // Ruta para guardar los archivos   
-    Route::get('combinar-txt/mostrar_lista', [CombinarTxtController::class, 'mostrar_lista'])->name('combinar-txt.mostrar'); // Ruta para mostrar la lista combinada    
-    Route::get('combinar-txt/descargar/{formato}', [CombinarTxtController::class, 'descargar_combinado'])->name('combinar-txt.descargar');// Ruta para descargar el archivo combinado
-    Route::resource('combinar-txt',  CombinarTxtController::class);    
-
-
-    // :::::::::::::::::::::::::::::: COMBINAR PLANILLA AFP EXCEL  ::::::::::::::::::::::::::::::
-
-    Route::post('planilla-afp/import', [CombinarExcelAfpController::class, 'import'])->name('planilla-afp.import');
-    Route::get('planilla-afp/mostrar_lista', [CombinarExcelAfpController::class, 'mostrar_lista'])->name('combinar-txt.mostrar'); // Ruta para mostrar la lista combinada    
-    Route::get('planilla-afp/descargar/excel', [CombinarExcelAfpController::class, 'descargar_excel']) ->name('planilla-afp.descargar_excel');    
-    Route::resource('combinar-planilla-afp', CombinarExcelAfpController::class);
-
-    // :::::::::::::::::::::::::::::: S E L E C T 2 ::::::::::::::::::::::::::::::
-    Route::get('/select2/select2tipoelementos', [RecursoController::class, 'getselect2TipoElementos']);
     
 });

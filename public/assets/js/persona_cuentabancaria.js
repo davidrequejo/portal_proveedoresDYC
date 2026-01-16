@@ -1,8 +1,10 @@
+const BASE_URLl = document.querySelector('meta[name="app-url"]').content;
+const CSRFF = document.querySelector('meta[name="csrf-token"]').content;
 
 $("#guardar_registro_cuenta_bank").on("click", function (e) { $("#submit-cuentabancaria").submit(); });   
 
 
-lista_select2('select2/bancos', '#idbanco');
+lista_select2(`${BASE_URLl}/select2/bancos`, '#idbanco');
 
 $("#idbanco").select2({ theme: "bootstrap4", placeholder: "Selec. Banco", allowClear: true, });
 
@@ -10,11 +12,6 @@ $("#tipocuenta").select2({ theme: "bootstrap4", placeholder: "Tipo Cuenta", allo
 
 $("#moneda").select2({ theme: "bootstrap4", placeholder: "Selec. moneda", allowClear: true, });
 $("#predeterminado").select2({ theme: "bootstrap4", placeholder: "Selec. si es predeterminado", allowClear: true, });
-
-
-
-
-
 
 function show_hide_escenario(flag) {
   if (flag == 1) {            // Tabla principal
@@ -48,7 +45,7 @@ const state = {
 // Cargar datos
 function tabla_principal_cnta_bank(){
   
-  $.getJSON("/persona-cuenta-bancaria/tabla_principal", state, function(res){
+  $.getJSON(`${BASE_URLl}/persona-cuenta-bancaria/tabla_principal`, state, function(res){
 
     console.log(res.data);
     
@@ -63,7 +60,7 @@ function renderFilas(rows){
   const $tb = $("#tbl_lista_cuentas_bancarias tbody").empty();
 
   if (!rows || rows.length === 0){
-    $tb.append('<tr><td colspan="6" class="text-center text-muted">Sin resultados</td></tr>');
+    $tb.append('<tr><td colspan="9" class="text-center text-muted">Sin resultados</td></tr>');
     return;
   }
 
@@ -190,7 +187,7 @@ function ver_editar_cuentabancaria(idpersona_CuentaBancaria){
   limpiar_form_banco();
   $('#modal-crear_cuentabancaria').modal('show');
 
-  $.getJSON(`/persona-cuenta-bancaria/${idpersona_CuentaBancaria}/ver-editar`, function (e) {
+  $.getJSON(`${BASE_URLl}/persona-cuenta-bancaria/${idpersona_CuentaBancaria}/ver-editar`, function (e) {
 
     if (e.status === true) {
       $("#idpersona_CuentaBancaria").val(e.data.idpersona_CuentaBancaria);
@@ -217,9 +214,9 @@ function guardar_y_editar_cuentabancaria(e){
   let url = '';
 
   if (id === '') {
-    url = '/persona-cuenta-bancaria/crear';
+    url = `${BASE_URLl}/persona-cuenta-bancaria/crear`;
   } else {
-    url = `/persona-cuenta-bancaria/editar/${id}`;
+    url = `${BASE_URLl}/persona-cuenta-bancaria/editar/${id}`;
     formData.append('_method', 'PUT');
   }
 
@@ -258,7 +255,7 @@ function eliminar_cuentabancaria(id, descripcion){
     if (result.isConfirmed) {
 
       $.ajax({
-        url: `/persona-cuenta-bancaria/eliminar/${id}`,
+        url: `${BASE_URLl}/persona-cuenta-bancaria/eliminar/${id}`,
         type: "PUT",
         data: { _token: $('meta[name="csrf-token"]').attr('content') },
         success: function (e) {

@@ -14,9 +14,9 @@
   <!--<link rel="stylesheet" href="{{ asset('assets/jstree-3.3.17/dist/themes/default/style.min.css') }}" />-->
 
   <style>
-    #tabla-proveedores_filter { width: calc(100% - 10px) !important; display: flex !important; justify-content: space-between !important; }
-    #tabla-proveedores_filter label { width: 100% !important;  }
-    #tabla-proveedores_filter label input { width: 100% !important;   }
+    #tabla-tipo_estandar_filter { width: calc(100% - 10px) !important; display: flex !important; justify-content: space-between !important; }
+    #tabla-tipo_estandar_filter label { width: 100% !important;  }
+    #tabla-tipo_estandar_filter label input { width: 100% !important;   }
 
     /* Indicadores de orden simple (opcional) */
     th.sortable { cursor:pointer; position:relative; }
@@ -81,39 +81,13 @@
     <!-- Main Sidebar Container -->
     @include('layouts.lte_aside')   
 
-    @if (auth()->user()->perm_tipo_estandar)
+    @if (auth()->user()->perm_proveedor_tipo)
 
       <!-- Content Wrapper. Contains page content -->
       <div class="content-wrapper">
         <!-- Content Header (Page header) -->
         <div class="content-header">
           <div class="container-fluid">
-            <div class="row mb-2">
-              <div class="col-3">
-                <h1 class="m-0">Tipo Estandar</h1>
-              </div><!-- /.col -->
-              <div class="col-3">
-                <div class="float-right">
-
-                  <div class="btn-group btn-agregar-persona">
-                    <button type="button" class="btn btn-success" style="border-color: #2e6da4 !important;" data-toggle="modal" data-target="#modal-agregar-tipoestandar" onclick="limpiar_form_tipoestandar();" ><i class="ti ti-users-plus"></i> Crear nuevo</button>
-                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" style="border-color: #2e6da4 !important;">
-                      <span class="sr-only">Toggle Dropdown</span>
-                    </button>
-                    <div class="dropdown-menu" role="menu">
-                      <a class="dropdown-item" href="#"><i class="ti ti-user-up"></i> Carga Masiva</a>
-                      <div class="dropdown-divider my-0"></div>
-                      <a class="dropdown-item" href="#"><i class="ti ti-user-x"></i> Baja masiva</a>                    
-                    </div>
-                  </div>
-
-                  <button type="button" class="btn btn-danger btn-cancelar m-r-10px" onclick="show_hide_escenario(1);" style="display: none;"><i class="ri-arrow-left-line"></i> Regresar</button>
-
-                </div>
-
-                
-              </div><!-- /.col -->
-            </div><!-- /.row -->
           </div><!-- /.container-fluid -->
         </div>
         <!-- /.content-header -->
@@ -126,16 +100,29 @@
 
               
               <!-- ./col -->
-              <div class="col-6" id="div-tabla-principal-persona">
+              <div class="col-12 col-sm-12 col-md-6 col-lg-6" >
                 <div class="card">
+                  <div class="card-header border-0" style="background-color: aliceblue;">
+                          
+                    <h3 class="card-title m-2 font-weight-bold text-info">Proveedor Tipo
+                    </h3>
+                    <div class="float-right">
+
+                      <div class="btn-group btn-agregar-proyecto">
+                       <button type="button" class="btn btn-success limpiar_form_tipoestandar" style="border-color: #2e6da4 !important;" data-toggle="modal" data-target="#modal-agregar-tipoestandar"  ><i class="ti ti-users-plus"></i> Crear nuevo</button>
+                      </div>
+                    </div>
+                    <div class="card-tools m-2"></div>
+
+                  </div>
                   
                   <div class="card-body pb-1">
                     <div class="row mb-2">                    
                       <div class="col">
-                        <input type="search" id="buscar" class="form-control form-control-sm" placeholder="Buscar proyecto...">
+                        <input type="search" id="buscar_ts" class="form-control form-control-sm" placeholder="Buscar Datos...">
                       </div>
                       <div class="col-auto">
-                        <select id="perPage" class="form-select form-select-sm">
+                        <select id="perPage_ts" class="form-select form-select-sm">
                           <option value="5">5</option>
                           <option value="10" selected>10</option>
                           <option value="25" >25</option>
@@ -144,13 +131,13 @@
                         </select>
                       </div>
                       <div class="col-auto">
-                        <button type="button" class="btn btn-sm btn-outline-info recargar-tabla-proyecto" data-toggle="tooltip" data-original-title="Recargar tabla" ><i class="ti ti-refresh"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-info recargar-tabla_tipo_estandar" data-toggle="tooltip" data-original-title="Recargar tabla" ><i class="ti ti-refresh"></i></button>
                       </div>
                     </div>
                     
                     <div class="table-responsive">
                     
-                      <table class="table table-bordered table-hover" id="tabla-proveedores">
+                      <table class="table table-bordered table-hover" id="tabla-tipo_estandar">
                         <thead>
                           <tr>                        
                             <th>Acciones</th>
@@ -169,12 +156,78 @@
                   </div>
                   <!-- /.card-body -->
                   <div class="card-footer clearfix">
-                    <ul class="pagination pagination-sm m-0 float-right" id="paginacion">
+                    <ul class="pagination pagination-sm m-0 float-right" id="paginacion_ts">
                       
                     </ul>
                   </div>
                 </div>
               </div>
+
+                            
+              <!-- ./col Documentos-->
+              <div class="col-12 col-sm-12 col-md-6 col-lg-6" >
+                <div class="card">
+                  <div class="card-header border-0" style="background-color: aliceblue;">
+                          
+                    <h3 class="card-title m-2 font-weight-bold text-info">Configuracion de Documentos
+                    </h3>
+                    <div class="float-right">
+
+                      <div class="btn-group btn-agregar-proyecto">
+                        <button type="button" class="btn btn-success limpiar_form_docs" style="border-color: #1a6b2c !important;" data-toggle="modal" data-target="#modal-agregar-docs" onclick=""><i class="nav-icon fas fa-file"></i> Crear nuevo</button>
+                      </div>
+                    </div>
+                    <div class="card-tools m-2"></div>
+
+                  </div>
+                  
+                  
+                  <div class="card-body pb-1">
+                    <div class="row mb-2">                    
+                      <div class="col">
+                        <input type="search" id="buscar_docs" class="form-control form-control-sm" placeholder="Buscar Datos...">
+                      </div>
+                      <div class="col-auto">
+                        <select id="perPage_docs" class="form-select form-select-sm">
+                          <option value="5">5</option>
+                          <option value="10" selected>10</option>
+                          <option value="25" >25</option>
+                          <option value="50">50</option>
+                          <option value="100">100</option>
+                        </select>
+                      </div>
+                      <div class="col-auto">
+                        <button type="button" class="btn btn-sm btn-outline-info recargar-tabla-documento" data-toggle="tooltip" data-original-title="Recargar tabla" ><i class="ti ti-refresh"></i></button>
+                      </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                    
+                      <table class="table table-bordered table-hover" id="tabladocumento-test">
+                        <thead>
+                          <tr>                        
+                            <th>Acciones</th>
+                            <th data-sort="codigo"      class="sortable">Código</th>
+                            <th data-sort="nombre_razonsocial" class="sortable">Descripcion</th>
+                            <th data-sort="estado" class="sortable">Estado</th>
+                            
+                          </tr>
+                        </thead>
+                        <tbody>                     
+                        </tbody>
+                      </table>
+                    </div>
+
+                  </div>
+                  <!-- /.card-body -->
+                  <div class="card-footer clearfix">
+                    <ul class="pagination pagination-sm m-0 float-right" id="paginacion_docs">
+                      
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
             </div>
             <!-- /.row -->
             
@@ -204,16 +257,31 @@
                           <input type="text" name="descripcion" class="form-control" id="descripcion"  />
                         </div>
                       </div>    
+
+
                       <!-- Nro Documentos -->
                       <div class="col-12 col-sm-12 col-md-3 col-lg-3">
                         <div class="form-group">
+                          <i class="fas fa-paint-brush"></i>
                           <label for="nroDocumentos">Nro Documentos</label>
                           <input type="number" name="nroDocumentos" id="nroDocumentos" class="form-control">
                         </div>
-                      </div>
+                      </div>             
 
+
+                      <div class="col-12">
+                        <div class="form-group">
+                          <label>Seleccionar Documentos</label>
+                          <div class="select2-purple">
+                            <select class="select2" name="selectiddocumento_tipo_estandar[]" id="selectiddocumento_tipo_estandar" multiple="multiple" data-placeholder="Seleccionar" data-dropdown-css-class="select2-purple" style="width: 100%;">
+                            </select>
+                          </div>
+                        </div>
+                        <!-- /.form-group -->
+                      </div>
+                      <!-- /.col -->
                       
-                      <div class="card border-info mb-3 col-12">
+                      <!--<div class="card border-info mb-3 col-12">
                           <div class="card-header bg-color-0202022e font-weight-bold">Detalle</div>
 
                           <div class="card-body text-secondary">
@@ -240,13 +308,13 @@
                                       </thead>
 
                                       <tbody>
-                                          <!-- Filas dinámicas aquí -->
+                                          
                                       </tbody>
                                   </table>
                               </div>
 
                           </div>
-                      </div>
+                      </div>-->
 
                       <!-- barprogress -->
                       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px;">
@@ -272,7 +340,7 @@
                   </form>
                 </div>
                 <div class="modal-footer justify-content-between py-1">
-                  <button type="button" class="btn btn-outline-danger " data-dismiss="modal"><i class="ti ti-circle-dashed-x"></i>Cerrar</button>
+                  <button type="button" class="btn btn-outline-danger limpiar_form_tipoestandar" data-dismiss="modal"><i class="ti ti-circle-dashed-x"></i>Cerrar</button>
                   <button type="button" class="btn btn-success" id="guardar_registro_tipoestandar" ><i class="ti ti-device-floppy"></i> Guardar</button>
                 </div>
               </div>
@@ -282,77 +350,66 @@
           </div>
           <!-- /.modal -->
 
-          <div class="modal fade" id="modal-agregar-persona">
+
+          
+          <div class="modal fade" id="modal-agregar-docs">
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
               <div class="modal-content">
                 <div class="modal-header py-2">
-                  <h4 class="modal-title">Presupuestos</h4>
+                  <h4 class="modal-title">Documento</h4>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span class="text-danger" aria-hidden="true">&times;</span>
                   </button>
                 </div>
                 <div class="modal-body">
-                  <div class="table-responsive">
-                    <table class="table table-bordered">
-                      <thead>
-                        <tr>
-                          <th style="width: 10px">#</th>
-                          <th>Task</th>
-                          <th>Progress</th>
-                          <th style="width: 40px">Label</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>1.</td>
-                          <td>Update software</td>
-                          <td>
-                            <div class="progress progress-xs">
-                              <div class="progress-bar progress-bar-danger" style="width: 55%"></div>
-                            </div>
-                          </td>
-                          <td><span class="badge bg-danger">55%</span></td>
-                        </tr>
-                        <tr>
-                          <td>2.</td>
-                          <td>Clean database</td>
-                          <td>
-                            <div class="progress progress-xs">
-                              <div class="progress-bar bg-warning" style="width: 70%"></div>
-                            </div>
-                          </td>
-                          <td><span class="badge bg-warning">70%</span></td>
-                        </tr>
-                        <tr>
-                          <td>3.</td>
-                          <td>Cron job running</td>
-                          <td>
-                            <div class="progress progress-xs progress-striped active">
-                              <div class="progress-bar bg-primary" style="width: 30%"></div>
-                            </div>
-                          </td>
-                          <td><span class="badge bg-primary">30%</span></td>
-                        </tr>
-                        <tr>
-                          <td>4.</td>
-                          <td>Fix and squish bugs</td>
-                          <td>
-                            <div class="progress progress-xs progress-striped active">
-                              <div class="progress-bar bg-success" style="width: 90%"></div>
-                            </div>
-                          </td>
-                          <td><span class="badge bg-success">90%</span></td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>              
+                  <form id="form-agregar-docs" name="form-agregar-docs" method="POST">
+                    @csrf
+                    <div class="row" id="cargando-3-formulario">
+                      <!-- tipo estandar -->
+                      <input type="hidden" name="iddocumento_tipo_estandar" id="iddocumento_tipo_estandar" /> 
+
+                      <!-- descripcion -->
+                      <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                        <div class="form-group">
+                          <label for="descripcion_docs">Descripción <sup class="text-danger">*</sup></label>
+                          <textarea name="descripcion_docs" id="descripcion_docs" class="form-control" rows="1"></textarea>
+                        </div>
+                      </div>    
+                      
+                      <!-- barprogress -->
+                      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px;">
+                        <div class="progress" id="barra_progress_docs_div">
+                          <div id="barra_progress_docs" class="progress-bar" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: 0%;">
+                            0%
+                          </div>
+                        </div>
+                      </div> 
+
+                    </div>
+
+                    <div class="row" id="cargando-4-formulario" style="display: none;">
+                      <div class="col-lg-12 text-center">
+                        <i class="fas fa-spinner fa-pulse fa-3x"></i><br />
+                        <br />
+                        <h4>Cargando...</h4>
+                      </div>
+                    </div>
+                    
+                    <!-- /.card-body -->
+                    <button type="submit" style="display: none;" id="submit-form-docs">Submit</button>
+                  </form>
+                </div>
+                <div class="modal-footer justify-content-between py-1">
+                  <button type="button" class="btn btn-outline-danger limpiar_form_docs" data-dismiss="modal"><i class="ti ti-circle-dashed-x"></i>Cerrar</button>
+                  <button type="button" class="btn btn-success" id="guardar_registro_docs" ><i class="ti ti-device-floppy"></i> Guardar</button>
+                </div>
               </div>
               <!-- /.modal-content -->
             </div>
             <!-- /.modal-dialog -->
           </div>
           <!-- /.modal -->
+
 
 
         </section>
@@ -376,7 +433,10 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/tipo_estandar.js') }}?version_erp=01.02"></script>
+  <script src="{{ asset('assets/js/tipo_estandar.js') }}?version_erp=01.03"></script>
+  <script src="{{ asset('assets/js/documentotipo_estandar.js') }}?version_erp=01.03"></script>
+
+
 
   <script>
     $(function() {

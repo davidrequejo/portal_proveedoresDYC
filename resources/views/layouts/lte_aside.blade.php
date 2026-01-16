@@ -3,7 +3,7 @@
     <!-- Brand Logo -->
     <a href="index3.html" class="brand-link">
       <img src="{{ asset('assets/images/brand-logos/ico-opt.png') }}" alt="Optimiza logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">ERP Optimiza</span>
+      <span class="brand-text font-weight-light">Portal Homologación</span>
     </a>
 
     <!-- Sidebar -->
@@ -38,7 +38,7 @@
 
 
 
-            @if (auth()->user()->perm_proveedor)
+            @if (auth()->user()->perm_proveedor_vista_adm)
             <li class="nav-item">
               <a href="{{ route('proveedor.index') }}" class="nav-link {{ request()->routeIs('proveedor.*') ? 'active' : '' }}">
                 <i class="nav-icon ti ti-user-cog"></i>
@@ -46,8 +46,17 @@
               </a>
             </li>
             @endif
+
+            @if (auth()->user()->perm_proveedor_vista_act_datos_client)
+            <li class="nav-item">
+              <a href="{{ route('actualizardatos.index') }}" class="nav-link {{ request()->routeIs('actualizardatos.*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-edit"></i>
+                <p> Actualizar Datos <span class="right badge badge-danger">New</span>  </p>
+              </a>
+            </li>
+            @endif
             
-            @if (auth()->user()->perm_proveedor)
+            @if (auth()->user()->perm_proveedor_vista_documentos_client)
             <li class="nav-item">
               <a href="{{ route('subir_docs.index') }}" class="nav-link {{ request()->routeIs('subir_docs.*') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-file"></i>
@@ -56,23 +65,27 @@
             </li>
             @endif
 
-            @if (auth()->user()->perm_proveedor)
-            <li class="nav-item">
-              <a href="{{ route('actualizardatos.index') }}" class="nav-link {{ request()->routeIs('actualizardatos.*') ? 'active' : '' }}">
-                <i class="nav-icon fas fa-edit"></i>
-                <p> Actualizar Datos <span class="right badge badge-danger">New</span>  </p>
-              </a>
-            </li>
-            @endif
 
-            @if (auth()->user()->perm_proveedor)
+
+
+
+          @if (auth()->user()->perm_client_vista_adm)
             <li class="nav-item">
               <a href="{{ route('prov_proveedor.index') }}" class="nav-link {{ request()->routeIs('prov_proveedor.*') ? 'active' : '' }}">
+                <i class="nav-icon ti ti-user-cog"></i>
+                <p> Cliente <span class="right badge badge-danger">New</span>  </p>
+              </a>
+            </li>
+          @endif
+
+          @if (auth()->user()->perm_client_vista_client)
+            <li class="nav-item">
+              <a href="{{ route('actualizardatoscliente.index') }}" class="nav-link {{ request()->routeIs('actualizardatoscliente.*') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-edit"></i>
                 <p> Cliente <span class="right badge badge-danger">New</span>  </p>
               </a>
             </li>
-            @endif
+          @endif
           
           <li class="nav-header">DATOS DE CONFIGURACIÓN</li>
           <li class="nav-item">
@@ -87,22 +100,30 @@
                   <a href="pages/tables/data.html" class="nav-link"><i class="ti ti-user-cog nav-icon"></i><p>Tipo socio Negocio</p></a>
                 </li>  
               @endif
-              @if (auth()->user()->perm_tipo_estandar)
+              @if (auth()->user()->perm_proveedor_tipo)
                 <li class="nav-item">
                   <a href="{{ route('tipo_estandar.index') }}" class="nav-link {{ request()->routeIs('tipo_estandar.*') ? 'active' : '' }}">
                     <i class="nav-icon fas fa-tenge"></i>
-                    <p>Tipo Estandar</p>
+                    <p>Proveedor Tipo</p>
                   </a>
                 </li>  
               @endif  
-              @if (auth()->user()->perm_tipo_estandar)
+              @if (auth()->user()->perm_bancos)
                 <li class="nav-item">
                   <a href="{{ route('banco.index') }}" class="nav-link {{ request()->routeIs('banco.*') ? 'active' : '' }}">
                     <i class="nav-icon fas fa-university"></i>
                     <p>Bancos</p>
                   </a>
                 </li>  
-              @endif         
+              @endif  
+              @if (auth()->user()->perm_periodo_homologacion)
+                <li class="nav-item">
+                  <a href="{{ route('fechahomologacion.index') }}" class="nav-link {{ request()->routeIs('fechahomologacion.*') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-university"></i>
+                    <p>Periodo Homologación</p>
+                  </a>
+                </li>  
+              @endif        
             </ul>
           </li>
           

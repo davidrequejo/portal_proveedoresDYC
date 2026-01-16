@@ -81,7 +81,7 @@
     <!-- Main Sidebar Container -->
     @include('layouts.lte_aside')   
 
-    @if (auth()->user()->perm_tipo_estandar)
+    @if (auth()->user()->perm_bancos)
 
       <!-- Content Wrapper. Contains page content -->
       <div class="content-wrapper">
@@ -268,7 +268,7 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/banco.js') }}?version_erp=01.02"></script>
+  <script src="{{ asset('assets/js/banco.js') }}?version_erp=01.03"></script>
 
   <script>
     $(function() {
