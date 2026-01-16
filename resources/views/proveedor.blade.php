@@ -92,8 +92,8 @@
                 <div class="float-right">
 
                   <div class="btn-group btn-agregar-proyecto">
-                    <button type="button" class="btn btn-success" style="border-color: #1a6b2c !important;" data-toggle="modal" data-target="#modal-agregar-proveedor" onclick="limpiar_form_proveedor();" ><i class="ti ti-users-plus"></i> Crear nuevo</button>
-                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" style="border-color: #1a6b2c !important;">
+                    <button type="button" class="btn btn-primary" style="border-color: #fcfcfc !important;" data-toggle="modal" data-target="#modal-agregar-proveedor" onclick="limpiar_form_proveedor();" ><i class="ti ti-users-plus"></i> Crear nuevo</button>
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="border-color: #fcfcfc !important;">
                       <span class="sr-only">Toggle Dropdown</span>
                     </button>
                     <div class="dropdown-menu" role="menu">
@@ -148,19 +148,16 @@
                     
                       <table class="table table-bordered table-hover" id="tabla-proveedores">
                         <thead>
-                          <tr>                        
-                            <th>Acciones</th>
-                            <th data-sort="codigo"      class="sortable">Código</th>
-                            <th data-sort="nombre_razonsocial" class="sortable">Razón social</th>
-                            <th data-sort="tipo_entidad_sunat"     class="sortable">Tipo Entidad Sunat </th>
-                            <th data-sort="abreviatura"     class="sortable">Tipo de Documento</th>
-                            <th data-sort="numero_documento"class="sortable">Nro de Documento</th>
-                            <th data-sort="celular"   class="sortable">Teléfono</th>
-                            <th data-sort="email"       class="sortable">Email</th>
-                            <th data-sort="direccion" class="sortable">Dirección</th>
-                            <th data-sort="estado" class="sortable">Estado Documentos</th>
-                            <th data-sort="estado" class="sortable">Documentos</th>
-                            
+                          <tr style=" font-size: small; background-color: #0202022e">                        
+                            <th style="padding: 8px 10px;">Acciones</th>
+                            <th data-sort="codigo"      class="sortable" style="padding: 8px 10px;">Código</th>
+                            <th data-sort="nombre_razonsocial" class="sortable" style="padding: 8px 10px;">Razón social</th>
+                            <th data-sort="tipo_entidad_sunat"     class="sortable" style="padding: 8px 10px;">Tipo Entidad Sunat </th>
+                            <th data-sort="abreviatura"     class="sortable" style="padding: 8px 10px;">Tipo de Documento</th>
+                            <th data-sort="numero_documento"class="sortable" style="padding: 8px 10px;">Nro de Documento</th>
+                            <th data-sort="celular"   class="sortable" style="padding: 8px 10px;">Teléfono</th>
+                            <th data-sort="email"       class="sortable" style="padding: 8px 10px;">Email</th>
+                            <th data-sort="direccion" class="sortable" style="padding: 8px 10px;">Dirección</th>
                           </tr>
                         </thead>
                         <tbody>                     
@@ -170,7 +167,7 @@
 
                   </div>
                   <!-- /.card-body -->
-                  <div class="card-footer clearfix">
+                  <div class="card-footer clearfix" style=" background-color: white; ">
                     <ul class="pagination pagination-sm m-0 float-right" id="paginacion">
                       
                     </ul>
@@ -260,10 +257,10 @@
           <div class="modal fade" id="modal-agregar-proveedor">
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
               <div class="modal-content">
-                <div class="modal-header py-2">
-                  <h4 class="modal-title">Proveedores</h4>
+                <div class="modal-header py-2" style=" background-color: #0e4366; " >
+                  <h5 class="modal-title text-white">Proveedor</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span class="text-danger" aria-hidden="true">&times;</span>
+                    <span class="text-white" aria-hidden="true">&times;</span>
                   </button>
                 </div>
                 <div class="modal-body">
@@ -275,43 +272,9 @@
                       <input type="hidden" name="idtipo_persona" id="idtipo_persona" value="3" /> 
 
 
-                      <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                        <div class="form-group">
-                          <label for="descripcion">Periodo Homologación </label>                          
-                          <select name="idfecha_homologacion" id="idfecha_homologacion" class="form-control is-valid select2" placeholder="Periodo" aria-invalid="false">
-                          </select>
-                        </div>
-                      </div>
-
-                      <div class="col-12 col-sm-6 col-md-5 col-lg-5" >
-                        <div class="form-group">
-                          <label for="descripcion">Periodo Inicio Homologación </label>                          
-                            <input type="date" name="fecha_inicio_periodo" class="form-control" id="fecha_inicio_periodo"  />
-                          </select>
-                        </div>
-                      </div>
-                      
-
-                      <div class="col-12 col-sm-6 col-md-5 col-lg-5" >
-                        <div class="form-group">
-                          <label for="descripcion"> Fin Homologación </label>         
-                            <input type="date" name="fecha_fin_periodo" class="form-control" id="fecha_fin_periodo"  />
-                          </select>
-                        </div>
-                      </div>
-                      
                       <div class="col-12 col-sm-6 col-md-4 col-lg-4">
                         <div class="form-group">
-                          <label for="descripcion">Tipo Estandar </label>                          
-                          <!--<textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
-                          <select name="idtipoestandarproveedor" id="idtipoestandarproveedor" class="form-control is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
-                          </select>
-                        </div>
-                      </div>
-
-                      <div class="col-12 col-sm-6 col-md-4 col-lg-4">
-                        <div class="form-group">
-                          <label for="descripcion">Tipo Entidad Sunat</label>                          
+                          <label for="descripcion" class="h6 text-muted">Tipo Entidad Sunat</label>                          
                           <!--<textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
                           <select name="tipo_entidad_sunat" id="tipo_entidad_sunat" class="form-control is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
                             <option value="NATURAL">NATURAL</option>
@@ -323,7 +286,7 @@
                       <!-- Tipo de documento -->
                       <div class="col-12 col-sm-6 col-md-4 col-lg-4">
                         <div class="form-group">
-                          <label for="descripcion">Tipo de documento</label>                          
+                          <label for="descripcion" class="h6 text-muted">Tipo de documento</label>                          
                           <!--<textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
                           <select name="tipo_documento" id="tipo_documento" class="form-control is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
                             <option value="1">DNI</option>
@@ -333,9 +296,9 @@
                       </div>
 
                       <!-- Nro de documento -->
-                      <div class="col-12 col-sm-6 col-md-5 col-lg-5">
+                      <div class="col-12 col-sm-6 col-md-4 col-lg-4">
                         <div class="form-group">
-                          <label for="descripcion">Nro de documento <sup class="text-danger">*</sup></label>                          
+                          <label for="descripcion" class="h6 text-muted">Nro de documento <sup class="text-danger">*</sup></label>                          
                            <div class="input-group">
                               <input type="number" name="numero_documento" class="form-control" id="numero_documento" placeholder="N° de documento">
                               <div class="input-group-append" data-toggle="tooltip" data-original-title="Buscar Reniec/SUNAT" onclick="buscar_sunat_reniec();">
@@ -349,16 +312,16 @@
                       </div>
 
                       <!-- Nombre y Apellidos -->
-                      <div class="col-12 col-sm-12 col-md-7 col-lg-7">
+                      <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                         <div class="form-group">
-                          <label for="Nombre_Apellidos">Nombre y Apellidos/Razon Social <sup class="text-danger">*</sup></label>
+                          <label for="Nombre_Apellidos" class="h6 text-muted">Nombre y Apellidos/Razon Social <sup class="text-danger">*</sup></label>
                           <input type="text" name="nombre_razonsocial" class="form-control" id="nombre_razonsocial"  />
                         </div>
                       </div> 
                        <!-- Nombre apellidos maternos paternos  -->
                       <div class="col-12 col-sm-12 col-md-7 col-lg-7" style="display: none">
                         <div class="form-group">
-                          <label for="Nombre_Apellidos">Nombre <sup class="text-danger">*</sup></label>
+                          <label for="Nombre_Apellidos" class="h6 text-muted">Nombre <sup class="text-danger">*</sup></label>
                           <input type="text" name="nombre_persona_natural" class="form-control" id="nombre_persona_natural"  />
                           <input type="text" name="apellido_paterno_per_natural" class="form-control" id="apellido_paterno_per_natural"  />
                           <input type="text" name="apellido_materno_per_natural" class="form-control" id="apellido_materno_per_natural"  />
@@ -367,23 +330,30 @@
                       <!-- Teléfono -->
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
-                          <label for="celular">Teléfono</label>
+                          <label class="h6 text-muted">Teléfono</label>
                           <input type="text" name="celular" id="celular" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text">
                         </div>
                       </div>
 
                       <!-- email -->
-                      <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                      <div class="col-12 col-sm-12 col-md-7 col-lg-7">
                         <div class="form-group">
-                          <label for="email">Email</label>
+                          <label for="email" class="h6 text-muted">Email</label>
                            <input type="email" name="email" class="form-control" id="email" placeholder="Correo electrónico" onkeyup="convert_minuscula(this);">
+                        </div>
+                      </div>   
+                      <!-- email -->
+                      <div class="col-12 col-sm-12 col-md-5 col-lg-5">
+                        <div class="form-group">
+                          <label for="sitio_web" class="h6 text-muted">Sitio web</label>
+                           <input type="url" name="sitio_web" class="form-control" id="sitio_web" placeholder="www.tusitioweb.com">
                         </div>
                       </div>   
 
                       <!-- Dirección -->
                       <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                         <div class="form-group">
-                          <label for="direccion">Dirección </label> <br>
+                          <label for="direccion" class="h6 text-muted">Dirección </label> <br>
                           <textarea name="direccion" id="direccion" class="form-control" rows="1"></textarea>
                         </div>
                       </div>
@@ -391,7 +361,7 @@
                       <!-- Distrito -->
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
-                          <label for="distrito">Distrito</label>
+                          <label for="distrito" class="h6 text-muted">Distrito</label>
                           <select name="distrito" id="distrito" class="form-control select2" style="width: 100%;"  > </select>   
                         </div>
                       </div> 
@@ -399,7 +369,7 @@
                       <!-- Provincia -->
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
-                          <label for="provincia">Provincia</label>
+                          <label for="provincia" class="h6 text-muted">Provincia</label>
                           <input type="text" name="provincia" class="form-control" id="provincia"  readonly/>
                         </div>
                       </div> 
@@ -407,13 +377,14 @@
                       <!-- Departamento -->
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
-                          <label for="departamento">Departamento</label>
+                          <label for="departamento" class="h6 text-muted">Departamento</label>
                           <input type="text" name="departamento" class="form-control" id="departamento"  readonly />
                         </div>
                       </div> 
 
-                      <div class="card border-info mb-3 col-12">
-                        <div class="card-header bg-color-0202022e font-weight-bold">Creación de Acceso al Portal <span class="text-center badge badge-info cursor-pointer" style=" font-size: 14px; pont" id="btn_generar_credenciales" >Generar credenciales</span></div>
+                      <div class=" mb-3 col-12">
+                        <div class="card-header font-weight-bold"  style="background-color: #e9ecef">Creación de Acceso al Portal <span class="text-center badge badge-info cursor-pointer" style=" font-size: 13px; pont" id="btn_generar_credenciales" >Generar credenciales</span></div>
+                        
                         <div class="card-body text-secondary">
                           <p class="card-text">Genera automáticamente el usuario y contraseña a partir de los datos del proveedor.</p>
 
@@ -421,13 +392,13 @@
                                <input type="hidden" name="id" id="id" />
                         
                               <div class="form-group col-md-6">
-                                  <label>Usuario</label>
+                                  <label class="h6 text-muted">Usuario</label>
                                   <input type="text" id="usuario_portal" name="usuario_portal" class="form-control"
                                       placeholder="Usuario automático">
                               </div>
 
                               <div class="form-group col-md-6">
-                                  <label>Contraseña</label>
+                                  <label class="h6 text-muted">Contraseña</label>
                                   <input type="text" id="clave_portal" name="clave_portal" class="form-control"
                                       placeholder="Contraseña automática">
                               </div>
@@ -459,8 +430,8 @@
                   </form>
                 </div>
                 <div class="modal-footer justify-content-between py-1">
-                  <button type="button" class="btn btn-outline-danger " data-dismiss="modal"><i class="ti ti-circle-dashed-x"></i>Cerrar</button>
-                  <button type="button" class="btn btn-success" id="guardar_registro_proveedor" ><i class="ti ti-device-floppy"></i> Guardar</button>
+                  <button type="button" class="btn btn-outline-secondary " data-dismiss="modal"><i class="ti ti-circle-dashed-x"></i>Cerrar</button>
+                  <button type="button" class="btn btn-primary" id="guardar_registro_proveedor" ><i class="ti ti-device-floppy"></i> Guardar</button>
                 </div>
               </div>
               <!-- /.modal-content -->

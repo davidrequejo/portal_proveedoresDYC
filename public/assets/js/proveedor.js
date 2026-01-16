@@ -112,6 +112,7 @@ const state = {
 
 // Cargar datos
 function tabla_principal_cargar(){
+  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');
   
   $.getJSON(`${BASE_URL}/proveedor/tabla_principal`, state, function(res){
 
@@ -142,33 +143,22 @@ function renderFilas(rows){
     const progressColor = porcentaje < 50 ? 'bg-warning' : 'bg-success';
 
     $tb.append(`
-      <tr class="fila-proyecto" data-id="${r.idpersona}">          
+      <tr class="fila-proyecto" data-id="${r.idpersona}" style=" font-size: small; ">          
         <td class="py-1"> 
           <div class="btn-group btn-group-sm">
-            <button class="btn btn-warning text-nowrap bnt-editar-proyecto" onclick="ver_editar_proveedor(${r.idpersona})" data-toggle="tooltip" data-original-title="Editar"><i class="ti ti-edit"></i></button>
-            <button class="btn btn-info text-nowrap bn-ver-proyecto" onclick="ver_estados_docs_proveedor(${r.idpersona}, ${r.idtipoestandarproveedor}, '${r.nombre_razonsocial ?? ''}','${r.email ?? ''}')" data-toggle="tooltip" data-original-title="Ver Documentos"><i class="fas fa-folder"></i></button>
-            <button class="btn btn-danger text-nowrap bn-ver-proyecto" onclick="eliminar_proveedor(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')" data-toggle="tooltip" data-original-title="Eliminar"><i class="fas fa-trash"></i></button>
+            <button class="btn btn-xs text-nowrap bnt-editar-proyecto" onclick="ver_editar_proveedor(${r.idpersona})" data-toggle="tooltip" data-original-title="Editar"><i class="ti ti-edit" style=" color: #246ea2;"></i></button>
+            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="ver_estados_docs_proveedor(${r.idpersona}, ${r.idtipoestandarproveedor}, '${r.nombre_razonsocial ?? ''}','${r.email ?? ''}')" data-toggle="tooltip" data-original-title="Ver Documentos"><i class="fas fa-folder fa-0" style=" color: #246ea2;"></i></button>
+            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="eliminar_proveedor(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')" data-toggle="tooltip" data-original-title="Eliminar"><i class="fas fa-trash" style=" color: #246ea2;"></i></button>
           </div>
         </td>
-        <td class="py-1 text-center" > ${String(r.idpersona).padStart(3, '0')} </td>
-        <td class="py-1 text-nowrap" >${r.nombre_razonsocial ?? ''}</td>
+        <td class="py-1 text-center"> ${String(r.idpersona).padStart(3, '0')} </td>
+        <td class="py-1 text-nowrap">${r.nombre_razonsocial ?? ''}</td>
         <td class="py-1" >${r.tipo_entidad_sunat ?? ''}</td>
         <td class="py-1" >${r.abreviatura ?? ''}</td>
-        <td class="py-1 text-nowrap" >${r.numero_documento ?? ''}</td>
-        <td class="py-1 text-nowrap" >${r.celular ?? ''}</td>
+        <td class="py-1 text-nowrap">${r.numero_documento ?? ''}</td>
+        <td class="py-1 text-nowrap">${r.celular ?? ''}</td>
         <td class="py-1 text-nowrap">${r.email ?? ''}</td>
         <td class="py-1">${ r.direccion } </td>
-        <td class="py-1 text-nowrap">${ r.tipo_estandar } (${r.nroDocumentos})</td>
-        <td class="py-1 text-nowrap">
-        <div class="progress-group">
-                      <span class="progress-text">Docs Aprobados</span>
-                      <span class="float-right"><b>${r.total_docs_registrados}</b>/<b>${r.nroDocumentos}</b></span>
-                      <div class="progress progress-sm">
-                        <div class="progress-bar ${progressColor}" style="width: ${porcentaje}%"></div>
-                      </div>
-                    </div>
-        </td>
-
       </tr>
     `);
     $('[data-toggle="tooltip"]').tooltip(); 

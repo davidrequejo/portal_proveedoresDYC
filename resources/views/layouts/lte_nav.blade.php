@@ -1,12 +1,12 @@
 <!-- Navbar -->
-  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light text-white" style=" background-color: #0e4366; ">
     <!-- Left navbar links -->
     <ul class="navbar-nav">
       <li class="nav-item">
-        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars text-white"></i></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="index3.html" class="nav-link"><i class="ti ti-home"></i></a>
+        <a href="index3.html" class="nav-link"><i class="ti ti-home text-white" ></i></a>
       </li>
     </ul>
 
@@ -16,7 +16,7 @@
       <!-- Messages Dropdown Menu -->
       <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">
-          <i class="far fa-comments"></i>
+          <i class="far fa-comments text-white" ></i>
           <span class="badge badge-danger navbar-badge">3</span>
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
@@ -74,7 +74,7 @@
       <!-- Notifications Dropdown Menu -->
       <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">
-          <i class="far fa-bell"></i>
+          <i class="far fa-bell text-white"></i>
           <span class="badge badge-warning navbar-badge">15</span>
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
@@ -102,7 +102,7 @@
       {{-- Full Scren --}}
       <li class="nav-item">
         <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-          <i class="fas fa-expand-arrows-alt"></i>
+          <i class="fas fa-expand-arrows-alt text-white"></i>
         </a>
       </li>
 
@@ -111,15 +111,15 @@
         <a class="nav-link" data-toggle="dropdown" href="#">
           <img src="../dist/docs/all_trabajador/perfil/" class="user-image img-circle" alt="User Image" width="30" onerror="this.src='{{ asset('adminlte3/dist/svg/user_default.svg') }}';"> 
               
-          <span class="hidden-xs d-none show-min-width-1200px">{{ Auth::user()->name }}</span>
+          <span class="hidden-xs d-none show-min-width-1200px text-white" >{{ Auth::user()->name }}</span>
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
           <!-- Widget: user widget style 1 -->
           <div class="card card-widget widget-user mb-0">
             <!-- Add the bg color to the header using any of the bg-* classes -->
-            <div class="widget-user-header bg-info">
-              <h3 class="widget-user-username">{{ Auth::user()->name }}</h3>
-              <h5 class="widget-user-desc">ADM</h5>
+            <div class="widget-user-header" style="background-color: #231f20">
+              <h3 class="widget-user-username text-white">{{ Auth::user()->name }}</h3>
+              <h5 class="widget-user-desc text-white">ADM</h5>
             </div>
             <div class="widget-user-image">
               <img class="img-circle elevation-2" src="../dist/docs/all_trabajador/perfil/" alt="User Avatar" onerror="this.src='{{ asset('adminlte3/dist/svg/user_default.svg') }}';" />
@@ -164,7 +164,7 @@
       {{-- Config --}}
       <li class="nav-item">
         <a class="nav-link" role="button">
-          <i class="fas fa-th-large"></i>
+          <i class="fas fa-th-large text-white"></i>
         </a>
       </li>
 
