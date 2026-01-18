@@ -1,3 +1,6 @@
+.color_icon_opt { color: #246ea2 !important; } 
+.text-principal { color: #0e4366 !important; }
+
 .text-white { color: #fff !important; }
 
 .text-primary { color: #007bff !important; }
@@ -66,6 +69,12 @@
 .hove-negrita:hover{ font-weight: bold; color: #000000; }
 
 /*  ══════════════════════════════════════════ - B A C K G R O U N D   P E R S O N A L I Z A D O - ══════════════════════════════════════════ */
+/*color principal*/
+.bg-color-principal{ background-color: #0e4366; }
+/* blanco */
+.bg-color-white{background-color: rgb(255, 255, 255) !important;}
+
+
 /* celeste */
 .bg-color-408c98{ background-color: #408c98; }
 .bg-color-48acc6{ background-color: #48acc6; }
@@ -100,8 +109,7 @@
 .bg-color-71798133{background-color: #71798133;}
 .bg-color-e9e9e9{ background-color:#e9e9e9!important} 
 
-/* blanco */
-.bg-color-242244245{background-color: rgb(242 244 245);}
+
 
 /* negro */
 .bg-color-fff0{background-color: #fff0 !important;}
@@ -109,9 +117,27 @@
 .bg-color-02020263{background-color: #02020263 !important;} /* 39% */
 .bg-color-02020280{background-color: #02020280 !important;} /* 50% */
 
+/*Estylos para label*/
+  label {
+    /* "h6" aproximado */
+    font-size: 1rem;
+    font-weight: 500;
+    /* "text-muted" */
+    color: #6c757d;
+  }
+
+/*badge-personalizado*/
+  .badge-new {
+      color: #fff;
+      background-color: #246ea2;
+  }
+
 /*  ══════════════════════════════════════════ - E S T Y L O   P A R A   T A B L A - ══════════════════════════════════════════ */
 
-.styletabla thead th { border-bottom: 1px solid #000000 !important;  border-top: 1px solid #000000 !important; }
+.styletabla thead th { font-size: small !important; background-color: #0202022e !important }
+.styletabla tbody tr { font-size: small !important }
+
+
 
 table th { vertical-align: top !important; }
 

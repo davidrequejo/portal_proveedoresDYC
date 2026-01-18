@@ -40,13 +40,13 @@
       return;
     }
     rows.forEach(r => {
-      estado = r.estado_trash == '1'?' <span class="text-center badge badge-success">Activado</span>':'Deshabilitado';
+      estado = r.estado_trash == '1'?' <span class="text-center badge badge-new">Activado</span>':'Deshabilitado';
       $tbl.append(`
         <tr class="fila_docs" data-id="${r.iddocumento_tipo_estandar}">          
           <td class="py-1"> 
             <div class="btn-group btn-group-sm">
-              <button class="btn btn-warning text-nowrap btn-editar-doc " data-id="${r.iddocumento_tipo_estandar}" data-toggle="tooltip" data-original-title="Editar"><i class="ti ti-edit"></i></button>
-              <button class="btn btn-danger text-nowrap btn-eliminar-doc" data-id="${r.iddocumento_tipo_estandar}" data-name="${r.descripcion}" data-toggle="tooltip" data-original-title="Ver"><i class="ti ti-trash"></i></button>
+              <button class="btn text-nowrap btn-editar-doc " data-id="${r.iddocumento_tipo_estandar}" data-toggle="tooltip" data-original-title="Editar"><i class="fas fa-pencil-alt color_icon_opt"></i></button>
+              <button class="btn text-nowrap btn-eliminar-doc" data-id="${r.iddocumento_tipo_estandar}" data-name="${r.descripcion}" data-toggle="tooltip" data-original-title="Ver"><i class="fas fa-trash color_icon_opt"></i></button>
             </div>
           </td>
           <td class="py-1 text-center" >${String(r.iddocumento_tipo_estandar).padStart(3, '0')}</td>

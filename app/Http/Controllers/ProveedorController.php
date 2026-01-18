@@ -26,11 +26,10 @@ class ProveedorController extends Controller
     {
        try {
           // Validar los datos del formulario
+          //              'fecha_inicio_periodo'    => 'required|date',
+          //    'fecha_fin_periodo'       => 'required|date|after:fecha_inicio_periodo',
           $data = $r->validate([
-              'fecha_inicio_periodo'    => 'required|date',
-              'fecha_fin_periodo'       => 'required|date|after:fecha_inicio_periodo',
               'idtipo_persona'          => 'required|string',
-              'idtipoestandarproveedor' => 'required|string',
               'tipo_entidad_sunat'      => 'required|string',
               'tipo_documento'          => 'required|string',
               'numero_documento'        => 'required|string',
@@ -127,10 +126,7 @@ class ProveedorController extends Controller
 
             // 1. Validación
             $data = $r->validate([
-                'fecha_inicio_periodo'        => 'required|date',
-                'fecha_fin_periodo'           => 'required|date|after:fecha_inicio_periodo',
                 'idtipo_persona'              => 'required|string',
-                'idtipoestandarproveedor'     => 'required|string',
                 'tipo_entidad_sunat'          => 'required|string',
                 'tipo_documento'              => 'required|string',
                 'numero_documento'            => 'required|string',

@@ -102,14 +102,14 @@
               <!-- ./col -->
               <div class="col-12 col-sm-12 col-md-6 col-lg-6" >
                 <div class="card">
-                  <div class="card-header border-0" style="background-color: aliceblue;">
+                  <div class="card-header border-0 ">
                           
-                    <h3 class="card-title m-2 font-weight-bold text-info">Proveedor Tipo
+                    <h3 class="card-title m-2 font-weight-bold text-principal"> Categoria Proveedor
                     </h3>
                     <div class="float-right">
 
                       <div class="btn-group btn-agregar-proyecto">
-                       <button type="button" class="btn btn-success limpiar_form_tipoestandar" style="border-color: #2e6da4 !important;" data-toggle="modal" data-target="#modal-agregar-tipoestandar"  ><i class="ti ti-users-plus"></i> Crear nuevo</button>
+                       <button type="button" class="btn btn-primary limpiar_form_tipoestandar" style="border-color: #ffffff !important;" data-toggle="modal" data-target="#modal-agregar-tipoestandar"  ><i class="ti ti-users-plus"></i> Crear nuevo</button>
                       </div>
                     </div>
                     <div class="card-tools m-2"></div>
@@ -137,7 +137,7 @@
                     
                     <div class="table-responsive">
                     
-                      <table class="table table-bordered table-hover" id="tabla-tipo_estandar">
+                      <table class="table table-bordered table-hover styletabla" id="tabla-tipo_estandar">
                         <thead>
                           <tr>                        
                             <th>Acciones</th>
@@ -155,7 +155,7 @@
 
                   </div>
                   <!-- /.card-body -->
-                  <div class="card-footer clearfix">
+                  <div class="card-footer clearfix bg-color-white">
                     <ul class="pagination pagination-sm m-0 float-right" id="paginacion_ts">
                       
                     </ul>
@@ -203,7 +203,7 @@
                     
                     <div class="table-responsive">
                     
-                      <table class="table table-bordered table-hover" id="tabladocumento-test">
+                      <table class="table table-bordered table-hover styletabla" id="tabladocumento-test">
                         <thead>
                           <tr>                        
                             <th>Acciones</th>
@@ -220,7 +220,7 @@
 
                   </div>
                   <!-- /.card-body -->
-                  <div class="card-footer clearfix">
+                  <div class="card-footer clearfix bg-color-white">
                     <ul class="pagination pagination-sm m-0 float-right" id="paginacion_docs">
                       
                     </ul>
@@ -237,10 +237,10 @@
           <div class="modal fade" id="modal-agregar-tipoestandar">
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
               <div class="modal-content">
-                <div class="modal-header py-2">
-                  <h4 class="modal-title">Tipo Estandar</h4>
+                <div class="modal-header py-2 bg-color-principal">
+                  <h4 class="modal-title text-white">Tipo Estandar</h4>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span class="text-danger" aria-hidden="true">&times;</span>
+                    <span class="text-white" aria-hidden="true">&times;</span>
                   </button>
                 </div>
                 <div class="modal-body">
@@ -340,8 +340,8 @@
                   </form>
                 </div>
                 <div class="modal-footer justify-content-between py-1">
-                  <button type="button" class="btn btn-outline-danger limpiar_form_tipoestandar" data-dismiss="modal"><i class="ti ti-circle-dashed-x"></i>Cerrar</button>
-                  <button type="button" class="btn btn-success" id="guardar_registro_tipoestandar" ><i class="ti ti-device-floppy"></i> Guardar</button>
+                  <button type="button" class="btn btn-outline-secondary  limpiar_form_tipoestandar" data-dismiss="modal"><i class="ti ti-circle-dashed-x"></i>Cerrar</button>
+                  <button type="button" class="btn btn-primary" id="guardar_registro_tipoestandar" ><i class="ti ti-device-floppy"></i> Guardar</button>
                 </div>
               </div>
               <!-- /.modal-content -->

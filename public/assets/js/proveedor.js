@@ -133,22 +133,13 @@ function renderFilas(rows){
   }
   rows.forEach(r => {
 
-    const total = Number(r.total_docs_registrados) || 0;
-    const max = Number(r.nroDocumentos) || 0;
-
-    // Evitar división entre 0
-    const porcentaje = max > 0 ? Math.round((total / max) * 100) : 0;
-
-    // Color según porcentaje
-    const progressColor = porcentaje < 50 ? 'bg-warning' : 'bg-success';
-
     $tb.append(`
-      <tr class="fila-proyecto" data-id="${r.idpersona}" style=" font-size: small; ">          
+      <tr class="fila-proyecto" data-id="${r.idpersona}">          
         <td class="py-1"> 
           <div class="btn-group btn-group-sm">
-            <button class="btn btn-xs text-nowrap bnt-editar-proyecto" onclick="ver_editar_proveedor(${r.idpersona})" data-toggle="tooltip" data-original-title="Editar"><i class="ti ti-edit" style=" color: #246ea2;"></i></button>
-            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="ver_estados_docs_proveedor(${r.idpersona}, ${r.idtipoestandarproveedor}, '${r.nombre_razonsocial ?? ''}','${r.email ?? ''}')" data-toggle="tooltip" data-original-title="Ver Documentos"><i class="fas fa-folder fa-0" style=" color: #246ea2;"></i></button>
-            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="eliminar_proveedor(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')" data-toggle="tooltip" data-original-title="Eliminar"><i class="fas fa-trash" style=" color: #246ea2;"></i></button>
+            <button class="btn btn-xs text-nowrap bnt-editar-proyecto" onclick="ver_editar_proveedor(${r.idpersona})" data-toggle="tooltip" data-original-title="Editar"> <i class="fas fa-pencil-alt color_icon_opt"></i></button>
+            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="ver_estados_docs_proveedor(${r.idpersona}, ${r.idtipoestandarproveedor}, '${r.nombre_razonsocial ?? ''}','${r.email ?? ''}')" data-toggle="tooltip" data-original-title="Homologaciones"><i class="fas fa-folder fa-0 color_icon_opt"></i></button>
+            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="eliminar_proveedor(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')" data-toggle="tooltip" data-original-title="Eliminar"><i class="fas fa-trash color_icon_opt"></i></button>
           </div>
         </td>
         <td class="py-1 text-center"> ${String(r.idpersona).padStart(3, '0')} </td>
@@ -158,7 +149,7 @@ function renderFilas(rows){
         <td class="py-1 text-nowrap">${r.numero_documento ?? ''}</td>
         <td class="py-1 text-nowrap">${r.celular ?? ''}</td>
         <td class="py-1 text-nowrap">${r.email ?? ''}</td>
-        <td class="py-1">${ r.direccion } </td>
+        <td class="py-1" style="max-width: 220px; white-space: normal; overflow-wrap: anywhere; word-break: break-word;">${ r.direccion } </td>
       </tr>
     `);
     $('[data-toggle="tooltip"]').tooltip(); 
@@ -267,7 +258,6 @@ function ver_editar_proveedor(idpersona) {
       $("#idpersona").val(e.data.proveedor.idpersona);
 
       $("#idtipo_persona").val(e.data.proveedor.idtipo_persona);
-      $("#idtipoestandarproveedor").val(e.data.proveedor.idtipoestandarproveedor).trigger('change');
       $("#tipo_entidad_sunat").val(e.data.proveedor.tipo_entidad_sunat).trigger('change');
       $("#tipo_documento").val(e.data.proveedor.tipo_documento).trigger('change');
       $("#numero_documento").val(e.data.proveedor.numero_documento);
@@ -665,8 +655,6 @@ $("#opcion-ap-eliminar").on("click", function (e) {
 $(function () {    
 
   // validamos el formulario  
-
-  $('#idfecha_homologacion').on('change', function() { $(this).trigger('blur'); });
   $('#tipo_entidad_sunat').on('change', function() { $(this).trigger('blur'); });
   $('#tipo_documento').on('change', function() { $(this).trigger('blur'); });
   $('#estado_documentos_update').on('change', function() { $(this).trigger('blur'); });
@@ -674,7 +662,6 @@ $(function () {
   $("#form-agregar-proveedor").validate({
     //ignore: '.select2-input, .select2-focusser',
     rules: {
-      idfecha_homologacion:    { required: true, },
       tipo_entidad_sunat:    { required: true, },
       tipo_documento:  { required: true, },
       numero_documento:   { required: true, },
@@ -684,7 +671,6 @@ $(function () {
       email:           { required: true, },      
     },
     messages: {
-      idfecha_homologacion:    { required: "Campo requerido.", },
       tipo_entidad_sunat:    { required: "Campo requerido.", },
       tipo_documento:  { required: "Campo requerido.", },
       numero_documento:   { required: "Campo requerido.", },
@@ -745,8 +731,6 @@ $(function () {
       guardar_y_editar_act_estado(e);       
     },
   });
-
-  $('#idfecha_homologacion').rules('add', { required: true, messages: {  required: "Campo requerido" } });
   $('#tipo_entidad_sunat').rules('add', { required: true, messages: {  required: "Campo requerido" } });
   $('#tipo_documento').rules('add', { required: true, messages: {  required: "Campo requerido" } });
   $('#estado_documentos_update').rules('add', { required: true, messages: {  required: "Campo requerido" } });

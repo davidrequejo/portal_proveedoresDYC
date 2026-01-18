@@ -144,17 +144,17 @@
                       </div>
                     </div>
                     
-                    <div class="table-responsive">
+                    <div class="table-responsive ">
                     
-                      <table class="table table-bordered table-hover" id="tabla-proveedores">
+                      <table class="table table-bordered table-hover styletabla" id="tabla-proveedores">
                         <thead>
-                          <tr style=" font-size: small; background-color: #0202022e">                        
+                          <tr>                        
                             <th style="padding: 8px 10px;">Acciones</th>
-                            <th data-sort="codigo"      class="sortable" style="padding: 8px 10px;">Código</th>
+                            <th data-sort="codigo"      class="sortable" style="padding: 8px 10px;">Código S10</th>
                             <th data-sort="nombre_razonsocial" class="sortable" style="padding: 8px 10px;">Razón social</th>
-                            <th data-sort="tipo_entidad_sunat"     class="sortable" style="padding: 8px 10px;">Tipo Entidad Sunat </th>
-                            <th data-sort="abreviatura"     class="sortable" style="padding: 8px 10px;">Tipo de Documento</th>
-                            <th data-sort="numero_documento"class="sortable" style="padding: 8px 10px;">Nro de Documento</th>
+                            <th data-sort="tipo_entidad_sunat"     class="sortable" style="padding: 8px 10px;">Tipo Entidad </th>
+                            <th data-sort="abreviatura"     class="sortable" style="padding: 8px 10px;">Tipo de Doc.</th>
+                            <th data-sort="numero_documento"class="sortable" style="padding: 8px 10px;">Nro de Doc.</th>
                             <th data-sort="celular"   class="sortable" style="padding: 8px 10px;">Teléfono</th>
                             <th data-sort="email"       class="sortable" style="padding: 8px 10px;">Email</th>
                             <th data-sort="direccion" class="sortable" style="padding: 8px 10px;">Dirección</th>
@@ -167,7 +167,7 @@
 
                   </div>
                   <!-- /.card-body -->
-                  <div class="card-footer clearfix" style=" background-color: white; ">
+                  <div class="card-footer clearfix bg-color-white"  >
                     <ul class="pagination pagination-sm m-0 float-right" id="paginacion">
                       
                     </ul>
@@ -181,11 +181,11 @@
                   <div class="col-lg-6">
                     <div class="card">
                       <div class="card-header border-0">
-                        <h3 class="card-title m-2 font-weight-bold text-info">Validación de Documentos</h3>
+                        <h3 class="card-title m-2 font-weight-bold text-principal">Validación de Documentos</h3>
                         <div class="card-tools m-2"></div>
                       </div>
                       <div class="card-body table-responsive ">
-                        <table class="table table-striped table-valign-middle">
+                        <table class="table table-striped styletabla table-valign-middle">
                           <thead>
                           <tr>
                             <th>#</th>
@@ -227,12 +227,12 @@
                   <div class="col-lg-6">
                     <div class="card">
                       <div class="card-header border-0">
-                        <h3 class="card-title m-2 font-weight-bold text-info nombre_documento_pdf">Documento PDF</h3>
+                        <h3 class="card-title m-2 font-weight-bold text-principal nombre_documento_pdf">Documento PDF</h3>
                       </div>
 
                       <div class="card-body">
                         <div class="card-body p-0 mostrar_documento_pdf" style="height: 650px;">
-                          <div class="alert alert-info alert-dismissible">
+                          <div class="alert alert-dismissible bg-color-principal text-white">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true" disabled></button>
                             <h5><i class="icon fas fa-info"></i> Sin vista previa!</h5>
                             Para visualizar un documento, haga clic en el ícono <i class="fas fa-search"></i> ubicado en la fila correspondiente de la tabla del lado izquierdo
@@ -257,7 +257,7 @@
           <div class="modal fade" id="modal-agregar-proveedor">
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
               <div class="modal-content">
-                <div class="modal-header py-2" style=" background-color: #0e4366; " >
+                <div class="modal-header py-2 bg-color-principal" >
                   <h5 class="modal-title text-white">Proveedor</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span class="text-white" aria-hidden="true">&times;</span>
@@ -274,7 +274,7 @@
 
                       <div class="col-12 col-sm-6 col-md-4 col-lg-4">
                         <div class="form-group">
-                          <label for="descripcion" class="h6 text-muted">Tipo Entidad Sunat</label>                          
+                          <label for="descripcion">Tipo Entidad Sunat</label>                          
                           <!--<textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
                           <select name="tipo_entidad_sunat" id="tipo_entidad_sunat" class="form-control is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
                             <option value="NATURAL">NATURAL</option>
@@ -286,7 +286,7 @@
                       <!-- Tipo de documento -->
                       <div class="col-12 col-sm-6 col-md-4 col-lg-4">
                         <div class="form-group">
-                          <label for="descripcion" class="h6 text-muted">Tipo de documento</label>                          
+                          <label for="descripcion">Tipo de documento</label>                          
                           <!--<textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
                           <select name="tipo_documento" id="tipo_documento" class="form-control is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
                             <option value="1">DNI</option>
@@ -298,7 +298,7 @@
                       <!-- Nro de documento -->
                       <div class="col-12 col-sm-6 col-md-4 col-lg-4">
                         <div class="form-group">
-                          <label for="descripcion" class="h6 text-muted">Nro de documento <sup class="text-danger">*</sup></label>                          
+                          <label for="descripcion">Nro de documento <sup class="text-danger">*</sup></label>                          
                            <div class="input-group">
                               <input type="number" name="numero_documento" class="form-control" id="numero_documento" placeholder="N° de documento">
                               <div class="input-group-append" data-toggle="tooltip" data-original-title="Buscar Reniec/SUNAT" onclick="buscar_sunat_reniec();">
@@ -314,14 +314,14 @@
                       <!-- Nombre y Apellidos -->
                       <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                         <div class="form-group">
-                          <label for="Nombre_Apellidos" class="h6 text-muted">Nombre y Apellidos/Razon Social <sup class="text-danger">*</sup></label>
+                          <label for="Nombre_Apellidos">Nombre y Apellidos/Razon Social <sup class="text-danger">*</sup></label>
                           <input type="text" name="nombre_razonsocial" class="form-control" id="nombre_razonsocial"  />
                         </div>
                       </div> 
                        <!-- Nombre apellidos maternos paternos  -->
                       <div class="col-12 col-sm-12 col-md-7 col-lg-7" style="display: none">
                         <div class="form-group">
-                          <label for="Nombre_Apellidos" class="h6 text-muted">Nombre <sup class="text-danger">*</sup></label>
+                          <label for="Nombre_Apellidos">Nombre <sup class="text-danger">*</sup></label>
                           <input type="text" name="nombre_persona_natural" class="form-control" id="nombre_persona_natural"  />
                           <input type="text" name="apellido_paterno_per_natural" class="form-control" id="apellido_paterno_per_natural"  />
                           <input type="text" name="apellido_materno_per_natural" class="form-control" id="apellido_materno_per_natural"  />
@@ -330,7 +330,7 @@
                       <!-- Teléfono -->
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
-                          <label class="h6 text-muted">Teléfono</label>
+                          <label>Teléfono</label>
                           <input type="text" name="celular" id="celular" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text">
                         </div>
                       </div>
@@ -338,14 +338,14 @@
                       <!-- email -->
                       <div class="col-12 col-sm-12 col-md-7 col-lg-7">
                         <div class="form-group">
-                          <label for="email" class="h6 text-muted">Email</label>
+                          <label for="email">Email</label>
                            <input type="email" name="email" class="form-control" id="email" placeholder="Correo electrónico" onkeyup="convert_minuscula(this);">
                         </div>
                       </div>   
                       <!-- email -->
                       <div class="col-12 col-sm-12 col-md-5 col-lg-5">
                         <div class="form-group">
-                          <label for="sitio_web" class="h6 text-muted">Sitio web</label>
+                          <label for="sitio_web">Sitio web</label>
                            <input type="url" name="sitio_web" class="form-control" id="sitio_web" placeholder="www.tusitioweb.com">
                         </div>
                       </div>   
@@ -353,7 +353,7 @@
                       <!-- Dirección -->
                       <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                         <div class="form-group">
-                          <label for="direccion" class="h6 text-muted">Dirección </label> <br>
+                          <label for="direccion">Dirección </label> <br>
                           <textarea name="direccion" id="direccion" class="form-control" rows="1"></textarea>
                         </div>
                       </div>
@@ -361,7 +361,7 @@
                       <!-- Distrito -->
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
-                          <label for="distrito" class="h6 text-muted">Distrito</label>
+                          <label for="distrito">Distrito</label>
                           <select name="distrito" id="distrito" class="form-control select2" style="width: 100%;"  > </select>   
                         </div>
                       </div> 
@@ -369,7 +369,7 @@
                       <!-- Provincia -->
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
-                          <label for="provincia" class="h6 text-muted">Provincia</label>
+                          <label for="provincia">Provincia</label>
                           <input type="text" name="provincia" class="form-control" id="provincia"  readonly/>
                         </div>
                       </div> 
@@ -377,7 +377,7 @@
                       <!-- Departamento -->
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
-                          <label for="departamento" class="h6 text-muted">Departamento</label>
+                          <label for="departamento">Departamento</label>
                           <input type="text" name="departamento" class="form-control" id="departamento"  readonly />
                         </div>
                       </div> 
@@ -392,13 +392,13 @@
                                <input type="hidden" name="id" id="id" />
                         
                               <div class="form-group col-md-6">
-                                  <label class="h6 text-muted">Usuario</label>
+                                  <label>Usuario</label>
                                   <input type="text" id="usuario_portal" name="usuario_portal" class="form-control"
                                       placeholder="Usuario automático">
                               </div>
 
                               <div class="form-group col-md-6">
-                                  <label class="h6 text-muted">Contraseña</label>
+                                  <label>Contraseña</label>
                                   <input type="text" id="clave_portal" name="clave_portal" class="form-control"
                                       placeholder="Contraseña automática">
                               </div>

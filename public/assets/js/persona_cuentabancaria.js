@@ -83,11 +83,11 @@ function renderFilas(rows){
       <tr class="fila-banco" data-id="${r.idpersona_CuentaBancaria}">
         <td>
           <div class="btn-group btn-group-sm">
-            <button class="btn btn-warning" onclick="ver_editar_cuentabancaria(${r.idpersona_CuentaBancaria})">
-              <i class="ti ti-edit"></i>
+            <button class="btn" onclick="ver_editar_cuentabancaria(${r.idpersona_CuentaBancaria})">
+              <i class="fas fa-pencil-alt color_icon_opt"></i>
             </button>
-            <button class="btn btn-danger" onclick="eliminar_cuentabancaria(${r.idpersona_CuentaBancaria}, '${r.banco}')">
-              <i class="ti ti-trash"></i>
+            <button class="btn" onclick="eliminar_cuentabancaria(${r.idpersona_CuentaBancaria}, '${r.banco}')">
+              <i class="fas fa-trash color_icon_opt"></i>
             </button>
           </div>
         </td>

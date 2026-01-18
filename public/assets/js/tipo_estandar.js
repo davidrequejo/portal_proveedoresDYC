@@ -66,13 +66,13 @@
       return;
     }
     rows.forEach(r => {
-      estado = r.estado_trash == '1'?' <span class="text-center badge badge-success">Activado</span>':'Deshabilitado';
+      estado = r.estado_trash == '1'?' <span class="text-center badge badge-new">Activado</span>':'Deshabilitado';
       $tb.append(`
         <tr class="fila-proyecto" data-id="${r.idtipoestandarproveedor}">          
           <td class="py-1"> 
             <div class="btn-group btn-group-sm">
-              <button class="btn btn-warning text-nowrap btn-editar-tipoestand" data-id="${r.idtipoestandarproveedor}" data-toggle="tooltip" data-original-title="Editar"><i class="ti ti-edit"></i></button>
-              <button class="btn btn-danger text-nowrap btn-eliminar-tipoestand"  data-id="${r.idtipoestandarproveedor}" data-name="${r.descripcion}"  data-toggle="tooltip" data-original-title="Ver"><i class="ti ti-trash"></i></button>
+              <button class="btn text-nowrap btn-editar-tipoestand" data-id="${r.idtipoestandarproveedor}" data-toggle="tooltip" data-original-title="Editar"><i class="fas fa-pencil-alt color_icon_opt"></i></button>
+              <button class="btn text-nowrap btn-eliminar-tipoestand"  data-id="${r.idtipoestandarproveedor}" data-name="${r.descripcion}"  data-toggle="tooltip" data-original-title="Ver"><i class="fas fa-trash color_icon_opt"></i></button>
             </div>
           </td>
           <td class="py-1 text-center" >${String(r.idtipoestandarproveedor).padStart(3, '0')}</td>

@@ -421,17 +421,17 @@
                         <div class="card-body p-0">
 
                           <div class="card-body table-responsive ">
-                            <table class="table table-striped table-valign-middle" id="tbl_lista_cuentas_bancarias">
+                            <table class="table table-striped table-valign-middle styletabla" id="tbl_lista_cuentas_bancarias">
                               <thead>
                                 <tr>
                                   <th>#</th>
                                   <th>Banco.</th>
-                                  <th>Tipo Cuenta</th>
+                                  <th>T. Cuenta</th>
                                   <th>N° Cuenta</th>
-                                  <th>Predeterminado</th>
+                                  <th>Pred.</th>
                                   <th>Moneda</th>
                                   <th>InterBancario</th>
-                                  <th>N° Cuenta Abono</th>
+                                  <th>N° C. Abono</th>
                                   <th class="text-center">Estado</th>
                                 </tr>
                               </thead>

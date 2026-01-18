@@ -150,7 +150,7 @@
                     
                     <div class="table-responsive">
                     
-                      <table class="table table-bordered table-hover" id="tabla-banco">
+                      <table class="table table-bordered table-hover styletabla" id="tabla-banco">
                         <thead>
                           <tr>                        
                             <th>Acciones</th>
@@ -169,7 +169,7 @@
 
                   </div>
                   <!-- /.card-body -->
-                  <div class="card-footer clearfix">
+                  <div class="card-footer clearfix bg-color-white">
                     <ul class="pagination pagination-sm m-0 float-right" id="paginacion">
                       
                     </ul>
