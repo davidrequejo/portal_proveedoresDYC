@@ -14,6 +14,7 @@ class Cliente extends Model
     protected $fillable = [
 
 
+
         /* ================== CLAVES ================== */
         'idtipo_persona',
         'idtipoestandarproveedor',
@@ -47,6 +48,7 @@ class Cliente extends Model
         'nombres_contacto_comercial',
         'cargo_contacto_comercial',
         'telefono_contacto_comercial',
+        'correo_contacto_comercial',
 
         /* ================== CONTACTO GENERAL ================== */
         'celular',

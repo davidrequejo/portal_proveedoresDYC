@@ -2,11 +2,10 @@
 const BASE_URL = document.querySelector('meta[name="app-url"]').content;
 const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 
+local_idpersona_facha_homologacion = null;
+
 $("#guardar_registro_docs_prov").on("click", function (e) { $("#submit-form-docs_prov").submit(); });   
 
-//lista_select2('/select2/lista_sin_docs_user', '#listar_docs_sin_subir'); 
-
-$("#listar_docs_sin_subir").select2({ theme: "bootstrap4", placeholder: "Seleccionar tipo de documento", allowClear: true, });
 
 lista_periodos_homologacion();
 // ══════════════════════════════════════════════════════════════════════
@@ -42,13 +41,6 @@ function show_hide_escenario(flag) {
   }
 }
 
-function cargarselecttipoDocs() {  
-  lista_select2(`${BASE_URL}/select2/lista_sin_docs_user`, '#listar_docs_sin_subir'); 
-}
-
-// capturamos el nombre del select y lo enviamos al input hidden
-$('#listar_docs_sin_subir').change(function() { var nombre = $(this).find('option:selected').text().trim(); $('#nombre_seleccion_tipo').val(nombre);  });
-
 function lista_periodos_homologacion() {
   show_hide_escenario(1);
   //$("#titulo-detalle-proyecto").html(`Documentos del Proveedor: <b class="text-info">${nombre_razonsocial}</b>`);
@@ -67,13 +59,13 @@ function lista_periodos_homologacion() {
             <td class="py-1"> ${String(cont++).padStart(3, '0')} </td>
             <td class="py-1 text-center" >
               <div class="btn-group btn-group-sm">
-                <button class="btn btn-info text-nowrap bnt-editar-proyecto" onclick="verdocumentos(${r.idpersona_facha_homologacion}, '${r.idpersona}', '${r.idfecha_homologacion}', '${r.descripcion}')" data-toggle="tooltip" data-original-title="Ver Documentos">Ver Documentos <i class="far fa-eye"></i></button>
+                <button class="btn btn-secondary text-nowrap " onclick="verdocumentos(${r.idpersona_facha_homologacion}, '${r.descripcion}')" data-toggle="tooltip" data-original-title="Ver Documentos">Ver Documentos <i class="far fa-eye"></i></button>
               </div>            
             </td>
             <td class="py-1 text-nowrap" >${r.descripcion}</td>
             <td class="py-1 text-nowrap" >${r.fecha_inicio}</td>
             <td class="py-1 text-nowrap" >${r.fecha_fin}</td>
-            <td class="py-1 text-center" ><span class="badge bg-success">${r.estado_trash ?? ''} Activo</span> </td>
+            <td class="py-1 text-center" ><span class="badge badge-new">${r.estado_trash ?? ''} Activo</span> </td>
 
           </tr>
         `);
@@ -94,8 +86,6 @@ function limpiar_form_subir_doc(){
   
   //Mostramos los Materiales
   $("#iddocsproveedortipoestandar").val("");
-  $("#nombre_seleccion_tipo").val("");
-  $("#listar_docs_sin_subir").val("").trigger('change');
   doc1_eliminar();
   // Limpiamos las validaciones
   $(".form-control").removeClass('is-valid');
@@ -149,10 +139,9 @@ function guardar_y_editar_docs_prov(e) {
     success: function (e) {
       try {        
         if (e.status == true) {          
-         ver_estados_docs_proveedor()
+          ver_estados_docs_proveedor(local_idpersona_facha_homologacion); //refrescamos la tabla
           limpiar_form_subir_doc();
-          Swal.fire("Correcto!", "Documento guardado correctamente", "success");  
-          lista_select2(`${BASE_URL}/select2/lista_sin_docs_user`, '#listar_docs_sin_subir');      
+          Swal.fire("Correcto!", "Documento guardado correctamente", "success");    
           
           document.activeElement?.blur();
           $("#modal-crear_documento").modal("hide");           
@@ -185,33 +174,55 @@ function guardar_y_editar_docs_prov(e) {
   });
 }
 
-function verdocumentos(idpersona_facha_homologacion,idpersona,idfecha_homologacion,descripcion){ 
+function verdocumentos(idpersona_facha_homologacion,descripcion){ 
+  local_idpersona_facha_homologacion = idpersona_facha_homologacion;
   show_hide_escenario(2);
   $(".nombre_periodo_homologacion").html(`<strong>Perido Homologación : </strong>` +descripcion);
-  ver_estados_docs_proveedor();
+  ver_estados_docs_proveedor(idpersona_facha_homologacion);
+  
 }
 
-function ver_estados_docs_proveedor() {
+function ver_estados_docs_proveedor(idpersona_facha_homologacion) {
   show_hide_escenario(2);
   //$("#titulo-detalle-proyecto").html(`Documentos del Proveedor: <b class="text-info">${nombre_razonsocial}</b>`);
    $(".tbl_lista_documentos").html('<tr><td colspan="10" class="text-center text-muted">Ninguno</td></tr>');
 
    var cont =1;
 
-  $.getJSON(`${BASE_URL}/subir_docs/listar_docs_tipos_est_xuser`,{}, function (e) {
+  $.getJSON(`${BASE_URL}/subir_docs/listar_docs_tipos_est_xuser`,{idPeriodo: idpersona_facha_homologacion}, function (e) {
     if (e.status == true) {
+      console.log(e);
+      
       $(".tbl_lista_documentos").empty('');
       e.data.forEach(r => {
+
+          let estadoHtml = '';
+          const isPendiente = (r.estado_revision == 'Pendiente');
+
+          switch (r.estado_revision) {
+              case 'Actualizado': estadoHtml = `<span class="badge bg-warning text-dark">Actualizado</span>`; break;
+
+              case 'Observado': estadoHtml = `<span class="badge bg-orange text-white">Observado</span>`; break;
+
+              case 'Aprobado': estadoHtml = `<span class="badge bg-success">Aprobado</span>`; break;
+
+              case 'Rechazado': estadoHtml = `<span class="badge bg-dark">Rechazado</span>`; break;
+
+              default: estadoHtml = `<span class="badge bg-danger">Pendiente.</span>`; 
+          }
+
+
+
         $(".tbl_lista_documentos").append(`
           <tr>
             <td class="py-1"> ${String(cont++).padStart(3, '0')} </td>
-            <td class="py-1 text-nowrap" ><img src="/assets/images/default/pdf_icon.png" alt="Product 1" class="img-circle img-size-32 mr-2"> ${r.detalle ?? ''}</td>
-            <td class="py-1 text-nowrap" ><span class="badge bg-warning">${r.estado_revision ?? ''}</span> </td>
-            <td class="py-1 text-nowrap" ><a  class="text-muted" onclick="ver_documento_proveedor('${r.archivo ?? ''}','${r.detalle ?? ''}')"><i class="fas fa-search text-warning"></i></a></td>
+            <td class="py-1 text-nowrap" ><i class="fas fa-file-pdf fa-lg text-principal"></i> ${r.descripcion ?? ''}</td>
+            <td class="py-1 text-nowrap" >${estadoHtml} </td>
+            <td class="py-1 text-nowrap" ><a  class="text-muted" onclick="ver_documento_proveedor('${r.archivo ?? ''}','${r.descripcion ?? ''}')"><i class="fas fa-search text-warning"></i></a></td>
             <td class="py-1 text-center" >
               <div class="btn-group btn-group-sm">
-                <button class="btn btn-warning text-nowrap bnt-editar-proyecto" onclick="ver_editar_documento(${r.iddocsproveedortipoestandar}, '${r.nombreDocumento}')" data-toggle="tooltip" data-original-title="Editar"><i class="ti ti-edit"></i></button>
-                <button class="btn btn-danger text-nowrap bn-ver-proyecto" onclick="eliminar_documento(${r.iddocsproveedortipoestandar}, '${r.nombreDocumento}')" data-toggle="tooltip" data-original-title="Eliminar"><i class="ti ti-trash"></i></button>
+                <button class="btn text-nowrap bnt-editar-proyecto" onclick="ver_editar_documento(${r.iddocsproveedortipoestandar}, '${r.descripcion}')" data-toggle="tooltip" data-original-title="Editar"><i class="fas fa-pencil-alt color_icon_opt"></i></button>
+              
               </div>            
             </td>
           </tr>
@@ -242,26 +253,28 @@ function ver_documento_proveedor(ruta_documento, nombre_documento) {
 function ver_editar_documento(id, nombre_documento) { 
 
   $("#modal-crear_documento").modal("show");
+  $(".nombre_tipo_documento").val(nombre_documento);
 
   $.getJSON(`${BASE_URL}/subir_docs/ver_doc_estandar/${id}`, function (e) {
-
-    console.log(e.data.nombreDocumento);
     
     if (e.status == true) {
 
+      console.log('editar');
+      console.log(e);
+      
+      
+
       $("#iddocsproveedortipoestandar").val(e.data.iddocsproveedortipoestandar);
-      lista_select2(`/select2/lista_sin_docs_user?iddetalle=${e.data.iddetalletipoestandarproveedor}`, '#listar_docs_sin_subir',`${e.data.iddetalletipoestandarproveedor}`);
 
       //validamoos DOC-1
-      if (e.data.archivo != "" ) {
+      if (e.data.archivo && e.data.archivo.trim() !== "") {
         $("#doc_old_1").val(e.data.archivo);
-        $("#doc1_nombre").html(`${e.data.nombreDocumento}.` + extrae_extencion(e.data.archivo));
-        var doc_html = doc_view_extencion(e.data.archivo, '', '', '100%', '210' );
-        $("#doc1_ver").html(doc_html);         
+        $("#doc1_nombre").html(`` + extrae_extencion(`${BASE_URL}/${e.data.archivo}`) );
+        $("#doc1_ver").html( doc_view_extencion(`${BASE_URL}/${e.data.archivo}`, '', '', '100%', '210') );
       } else {
-        $("#doc1_ver").html('<img src="/assets/svg/pdf.svg" alt="" width="50%" >');
+        $("#doc1_ver").html('<img src="/assets/svg/pdf.svg" alt="" width="50%">');
         $("#doc1_nombre").html('');
-        $("#doc_old_1").val("");
+        $("#doc_old_1").val('');
       }
 
 
@@ -274,47 +287,6 @@ function ver_editar_documento(id, nombre_documento) {
   
 }
 
-
-function eliminar_documento(id, nombres) {
-
-  Swal.fire({
-    title: "¿Está Seguro de eliminar el registro?",
-    html: `<b class="text-danger"><del>${nombres}</del></b>`,
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#28a745",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Sí, eliminar!",
-  }).then((result) => {
-
-    if (result.isConfirmed) {
-
-      $.ajax({
-        url: `${BASE_URL}/subir_docs/eliminar_doc_estandar_proveedor/${id}`,
-        type: "PUT",
-        data: {
-          _token: $('meta[name="csrf-token"]').attr('content') // necesario para PUT
-        },
-        success: function (e) {
-          console.log(e);
-
-          if (e.status === true) {
-            Swal.fire("Eliminado!", "El registro ha sido eliminado.", "success");
-            ver_estados_docs_proveedor();
-          } else {
-            Swal.fire("Error!", e.message, "error");
-          }
-        },
-        error: function (xhr) {
-          Swal.fire("Error!", "Ocurrió un error en el servidor.", "error");
-          console.log(xhr.responseText);
-        }
-      });
-
-    }
-  });
-}
-
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 // ═══════                                       J Q   F O R M   V A L I D A T I O N S                                                              ═══════
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -322,15 +294,13 @@ $(function () {
 
   // validamos el formulario  
 
-  $('#listar_docs_sin_subir').on('change', function() { $(this).trigger('blur'); });
-
   $("#form-documentos-proveedor").validate({
     //ignore: '.select2-input, .select2-focusser',
     rules: {
-      listar_docs_sin_subir:    { required: true, }, 
+      //listar_docs_sin_subir:    { required: true, }, 
     },
     messages: {
-      listar_docs_sin_subir:    { required: "Campo requerido.", },
+      //listar_docs_sin_subir:    { required: "Campo requerido.", },
     },
     
     errorElement: "span",
@@ -354,6 +324,5 @@ $(function () {
     },
   });
 
-  $('#listar_docs_sin_subir').rules('add', { required: true, messages: {  required: "Campo requerido" } });
 
 });

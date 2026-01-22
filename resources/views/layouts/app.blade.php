@@ -7,7 +7,7 @@
 
         <title>{{ config('app.name', 'ERP Optimiza') }}</title>
 
-        <link rel="icon" href="{{ asset('assets/images/brand-logos/ico-opt.png') }}" type="image/png">
+        <link rel="icon" href="{{ asset('assets/images/brand-logos/dc-logo_cirsulo_white.png') }}" type="image/png">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

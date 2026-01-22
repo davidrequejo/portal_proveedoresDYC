@@ -2,7 +2,7 @@
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="index3.html" class="brand-link">
-      <img src="{{ asset('assets/images/brand-logos/ico-opt.png') }}" alt="Optimiza logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+      <img src="{{ asset('assets/images/brand-logos/dc-logo_cirsulo_white.png') }}" alt="Optimiza logo" class="brand-image img-circle elevation-3" style="opacity: .8">
       <span class="brand-text font-weight-light">Portal Homologación</span>
     </a>
 
@@ -33,16 +33,18 @@
       <!-- Sidebar Menu -->
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <li class="nav-item">
+              <a href="{{ route('inicio.index') }}" class="nav-link {{ request()->routeIs('inicio.*') ? 'active' : '' }}">
+                <i class=" nav-icon fas fa-home"></i>
+                <p> Inicio</p>
+              </a>
+            </li>
           <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
-
-
-
-
             @if (auth()->user()->perm_proveedor_vista_adm)
             <li class="nav-item">
               <a href="{{ route('proveedor.index') }}" class="nav-link {{ request()->routeIs('proveedor.*') ? 'active' : '' }}">
                 <i class="nav-icon ti ti-user-cog"></i>
-                <p> Proveedores <span class="right badge badge-danger">New</span>  </p>
+                <p> Proveedores</p>
               </a>
             </li>
             @endif
@@ -51,7 +53,7 @@
             <li class="nav-item">
               <a href="{{ route('actualizardatos.index') }}" class="nav-link {{ request()->routeIs('actualizardatos.*') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-edit"></i>
-                <p> Actualizar Datos <span class="right badge badge-danger">New</span>  </p>
+                <p> Actualizar Datos</p>
               </a>
             </li>
             @endif
@@ -60,20 +62,16 @@
             <li class="nav-item">
               <a href="{{ route('subir_docs.index') }}" class="nav-link {{ request()->routeIs('subir_docs.*') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-file"></i>
-                <p> Documentación <span class="right badge badge-danger">New</span>  </p>
+                <p> Documentación</p>
               </a>
             </li>
             @endif
 
-
-
-
-
           @if (auth()->user()->perm_client_vista_adm)
             <li class="nav-item">
-              <a href="{{ route('prov_proveedor.index') }}" class="nav-link {{ request()->routeIs('prov_proveedor.*') ? 'active' : '' }}">
+              <a href="{{ route('cliente.index') }}" class="nav-link {{ request()->routeIs('cliente.*') ? 'active' : '' }}">
                 <i class="nav-icon ti ti-user-cog"></i>
-                <p> Cliente <span class="right badge badge-danger">New</span>  </p>
+                <p> Cliente</p>
               </a>
             </li>
           @endif
@@ -82,7 +80,7 @@
             <li class="nav-item">
               <a href="{{ route('actualizardatoscliente.index') }}" class="nav-link {{ request()->routeIs('actualizardatoscliente.*') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-edit"></i>
-                <p> Cliente <span class="right badge badge-danger">New</span>  </p>
+                <p> Cliente</p>
               </a>
             </li>
           @endif
@@ -116,14 +114,7 @@
                   </a>
                 </li>  
               @endif  
-              @if (auth()->user()->perm_periodo_homologacion)
-                <li class="nav-item">
-                  <a href="{{ route('fechahomologacion.index') }}" class="nav-link {{ request()->routeIs('fechahomologacion.*') ? 'active' : '' }}">
-                    <i class="nav-icon fas fa-university"></i>
-                    <p>Periodo Homologación</p>
-                  </a>
-                </li>  
-              @endif        
+       
             </ul>
           </li>
           

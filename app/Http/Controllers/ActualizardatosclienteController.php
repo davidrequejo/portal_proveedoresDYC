@@ -21,7 +21,7 @@ class ActualizardatosclienteController extends Controller
             // 1. Buscar cliente por idpersona
             $cliente = Cliente::where('idpersona', $idpersona)->firstOrFail();
 
-            return ApiResponse::success([ 'cliente' => $cliente, ], 'cliente encontrado');
+            return ApiResponse::success([ 'cliente' => $cliente, ], 'Cliente encontrado');
 
         } catch (\Throwable $e) {
             return ApiResponse::error($e);
@@ -30,7 +30,7 @@ class ActualizardatosclienteController extends Controller
 
     public function editarcliente(Request $request)
     {
-        $cliente = Cliente::findOrFail($request->idpersonaUpdate);
+       $cliente = Cliente::findOrFail($request->idpersonaUpdate);
 
         $data = [
 
@@ -59,6 +59,7 @@ class ActualizardatosclienteController extends Controller
             'nombres_contacto_comercial' => $request->nombre_apellidos_contacto_comercial,
             'cargo_contacto_comercial'   => $request->cargo_contacto_comercial,
             'telefono_contacto_comercial'=> $request->telefono_contacto_comercial,
+            'correo_contacto_comercial'  => $request->email_contacto_comercial,
 
             /* ================== CONTACTO GENERAL ================== */
             'celular' => $request->celular,
@@ -82,7 +83,7 @@ class ActualizardatosclienteController extends Controller
 
         return ApiResponse::success([
             'e' =>'Registro actualizado',
-        ], 'Cliente actualizado correctamente');
+        ], 'Proveedor actualizado correctamente');
     }
 
     

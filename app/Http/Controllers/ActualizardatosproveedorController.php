@@ -59,6 +59,7 @@ class ActualizardatosproveedorController extends Controller
             'nombres_contacto_comercial' => $request->nombre_apellidos_contacto_comercial,
             'cargo_contacto_comercial'   => $request->cargo_contacto_comercial,
             'telefono_contacto_comercial'=> $request->telefono_contacto_comercial,
+            'correo_contacto_comercial'  => $request->email_contacto_comercial,
 
             /* ================== CONTACTO GENERAL ================== */
             'celular' => $request->celular,

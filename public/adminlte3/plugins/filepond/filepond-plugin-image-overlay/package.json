@@ -1,0 +1,55 @@
+{
+    "name": "filepond-plugin-image-overlay",
+    "version": "1.0.9",
+    "description": "Image overlay Plugin for FilePond",
+    "license": "MIT",
+    "author": {
+        "name": "Niels Boogaard"
+    },
+    "repository": "nielsboogaard/filepond-plugin-image-overlay",
+    "main": "dist/filepond-plugin-image-overlay.js",
+    "browser": "dist/filepond-plugin-image-overlay.js",
+    "module": "dist/filepond-plugin-image-overlay.esm.js",
+    "browserslist": [
+        "last 1 version and not Explorer 10",
+        "Explorer 11",
+        "iOS >= 9",
+        "Android >= 4.4"
+    ],
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "start": "npx rollup -c -w",
+        "build": "npm run scripts | npm run styles | npm run copy",
+        "scripts": "npx rollup -c",
+        "styles": "npm run styles:pretty && npm run styles:nano",
+        "styles:pretty": "cat src/css/* | npx node-sass | npx postcss --no-map --use autoprefixer | npx prettier --single-quote --parser css | node banner-cli.js FilePondPluginmediaPreview > dist/filepond-plugin-image-overlay.css",
+        "styles:nano": "cat src/css/* | npx node-sass | npx postcss --no-map --use autoprefixer --use cssnano | node banner-cli.js FilePondPluginmediaPreview > dist/filepond-plugin-image-overlay.min.css",
+        "copy": "cp -r src/images/ dist/images"
+    },
+    "peerDependencies": {
+        "filepond": ">=4.x <5.x"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.14.6",
+        "@babel/preset-env": "^7.14.5",
+        "autoprefixer": "^10.2.6",
+        "cssnano": "^5.0.6",
+        "css-what": ">=5.0.1",
+        "dot-prop": ">=6.0.1",
+        "node-sass": "^7.0.0",
+        "postcss": "^8.3.5",
+        "postcss-cli": "8.3.1",
+        "prettier": "^2.3.1",
+        "rollup": "^2.52.1",
+        "rollup-plugin-babel": "^4.4.0",
+        "rollup-plugin-commonjs": "^10.1.0",
+        "rollup-plugin-license": "^2.5.0",
+        "rollup-plugin-node-resolve": "^5.2.0",
+        "rollup-plugin-prettier": "^2.1.0",
+        "rollup-plugin-terser": "^7.0.2",
+        "trim-newlines": ">=4.0.2",
+        "serialize-javascript": ">=5.0.1"
+    }
+}

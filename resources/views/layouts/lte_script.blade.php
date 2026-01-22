@@ -44,6 +44,9 @@
 <!-- sweetalert2 -->
 <script src="{{ asset('adminlte3/plugins/sweetalert2/sweetalert2.all.min.js') }}"></script>
 
+<!-- pace-progress -->
+<script src="{{ asset('adminlte3/plugins/pace-progress/pace.min.js') }}"></script>
+
 <script>
   // Foco en el buscador de Select2
   $(document).on('select2:open', () => {  document.querySelector('.select2-search__field').focus(); });
@@ -64,5 +67,5 @@
 <script src="{{ asset('adminlte3/plugins/datatables2/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script> --}}
 
 <!-- Funciones generales -->
-<script src="{{ asset('assets/js/funcion_crud.js') }}?version_erp=01.03"></script>
+<script src="{{ asset('assets/js/funcion_crud.js') }}?version_erp=01.05"></script>
 <script src="{{ asset('assets/js/funcion_general.js') }}?version_erp=01.03"></script>

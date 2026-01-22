@@ -26,6 +26,10 @@
   <!-- summernote -->
   <link rel="stylesheet" href="{{ asset('adminlte3/plugins/summernote/summernote-bs4.min.css') }}">
 
+  <!-- pace-progress -->
+<link rel="stylesheet" href="{{ asset('adminlte3/plugins/pace-progress/themes/black/pace-theme-flat-top.css') }}">
+
+
 
 
   <!-- DataTables -->  

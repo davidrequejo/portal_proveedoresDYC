@@ -119,8 +119,8 @@
 
 /*Estylos para label*/
   label {
-    /* "h6" aproximado */
-    font-size: 1rem;
+    /* "" aproximado */
+    font-size: small;
     font-weight: 500;
     /* "text-muted" */
     color: #6c757d;
@@ -131,6 +131,12 @@
       color: #fff;
       background-color: #246ea2;
   }
+  .btn-principal {
+    color: #fff;
+    background-color: #246ea2;
+    border-color: #246ea2;
+    box-shadow: none;
+}
 
 /*  ══════════════════════════════════════════ - E S T Y L O   P A R A   T A B L A - ══════════════════════════════════════════ */
 

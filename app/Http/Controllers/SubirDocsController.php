@@ -111,6 +111,7 @@ class SubirDocsController extends Controller
 
 								// guardar ruta relativa nueva
 								$doc->archivo = 'uploads/docs_proveedor_estandar/' . $filename;
+								$doc->estado_revision = 'Actualizado';
 						}
 
 						// 4) Guardar cambios
@@ -121,35 +122,6 @@ class SubirDocsController extends Controller
 				} catch (\Throwable $e) {
 						return ApiResponse::error($e);
 				}
-		}
-
-		// eliminar documento estandar
-		public function eliminar_doc_estandar_proveedor(Request $r, $iddocsproveedortipoestandar)
-		{
-			try {
-				$userId = $r->user()->idpersona;
-
-				// 1) Buscar documento y validar que pertenezca al usuario
-				$doc = DocsProveedorTipoEstandar::where('iddocsproveedortipoestandar', $iddocsproveedortipoestandar)
-					->where('idpersona', $userId)
-					->firstOrFail();
-
-				// 2) Eliminar archivo físico si existe
-				if (!empty($doc->archivo)) {
-					$path = public_path($doc->archivo); // ruta relativa almacenada en BD
-					if (is_file($path)) {
-						@unlink($path);
-					}
-				}
-
-				// 3) Eliminar registro de BD
-				$doc->delete();
-
-				return ApiResponse::success('Eliminado', 'Documento estándar eliminado correctamente');
-
-			} catch (\Throwable $e) {
-				return ApiResponse::error($e);
-			}
 		}
 		
 		// Mostrar para editar documento estandar
@@ -173,123 +145,63 @@ class SubirDocsController extends Controller
 	  // listar para tabla tipos de estandar y documentos asociados
     public function listar_docs_tipos_est_xuser(Request $r)
     {
-        $userId = $r->user()->idpersona; // usuario logueado
+        $idPeriodo = $r->input('idPeriodo');
+        $idpersona = $r->user()->idpersona; // usuario logueado
 
         try {
-            $data = DB::table('tipoestandarproveedor as est')
-                ->join(
-                    'detalletipoestandarproveedor as det',
-                    'est.idtipoestandarproveedor',
-                    '=',
-                    'det.idtipoestandarproveedor'
-                )
-                ->join(
-                    'docsproveedortipoestandar as doc',
-                    'det.iddetalletipoestandarproveedor',
-                    '=',
-                    'doc.iddetalletipoestandarproveedor'
-                )
+
+            $data = DB::table('docsproveedortipoestandar as docs')
+                ->join( 'persona_facha_homologacion as pfh', 'docs.idpersona_facha_homologacion', '=', 'pfh.idpersona_facha_homologacion' )
+                ->join( 'detalletipoestandarproveedor as dtp', 'docs.iddetalletipoestandarproveedor', '=', 'dtp.iddetalletipoestandarproveedor' )
+                ->join( 'documento_tipo_estandar as destts', 'destts.iddocumento_tipo_estandar', '=', 'dtp.iddocumento_tipo_estandar' )
                 ->select(
-                    'doc.iddocsproveedortipoestandar',
-                    'det.iddetalletipoestandarproveedor',
-                    'det.idtipoestandarproveedor',
-                    'det.detalle',
-                    'doc.archivo',
-                    'doc.estado_revision',
-                    'doc.nombreDocumento',
-                    'det.estado_trash',
-                    'det.estado_delete',
-                    'doc.idpersona'
+                    'destts.descripcion',
+                    'docs.iddocsproveedortipoestandar',
+                    'docs.idpersona',
+                    'docs.nombreDocumento',
+                    'docs.archivo',
+                    'docs.estado_revision',
+                    'docs.estado_trash',
+                    'docs.estado_delete'
                 )
-                ->where('doc.idpersona', $userId)   // 🔥 FILTRO REAL
+                ->where('pfh.idpersona_facha_homologacion', $idPeriodo)
+                ->where('pfh.estado_trash', '1')
+                ->where('pfh.estado_delete', '1')
+
+                // 👇 FILTRO CONDICIONAL
+                ->when($idpersona, function ($q) use ($idpersona) {
+                    $q->where('docs.idpersona', $idpersona);
+                })
+
                 ->get();
 
-            return ApiResponse::success($data, 'Tipos de estandar y documentos obtenidos');
+            return ApiResponse::success($data, 'Documentos obtenidos correctamente');
 
         } catch (\Throwable $e) {
             return ApiResponse::error($e);
         }
     }
 
-	  // listar tipos de estandar y documentos asociados
-		public function select2_lista_sin_docs(Request $r, $iddetalle = null)
-		{
-
-			$userId = $r->user()->idpersona;
-
-			// si viene por query string ?iddetalle=...
-			$iddetalle = $r->input('iddetalle', $iddetalle);
-
-      try {
-
-        // Query base
-        $query = DB::table('tipoestandarproveedor as est')
-            ->join('detalletipoestandarproveedor as det', 'est.idtipoestandarproveedor', '=', 'det.idtipoestandarproveedor')
-            ->join('persona as p', 'p.idtipoestandarproveedor', '=', 'est.idtipoestandarproveedor')
-            ->leftJoin('docsproveedortipoestandar as doc', function ($join) use ($userId) {
-                $join->on('doc.iddetalletipoestandarproveedor', '=', 'det.iddetalletipoestandarproveedor')
-                     ->where('doc.idpersona', '=', $userId);
-            })
-            ->select(
-                'det.iddetalletipoestandarproveedor',
-                'det.detalle'
-            )
-            ->where('p.idpersona', $userId);
-
-        if (filled($iddetalle)) {
-            // ✅ Caso 2: llega iddetalle -> filtrar por ese id, aunque tenga doc
-            $query->where('det.iddetalletipoestandarproveedor', (int)$iddetalle);
-        } else {
-            // ✅ Caso 1: NO llega iddetalle -> solo los que NO tienen doc
-            $query->whereNull('doc.iddocsproveedortipoestandar');
-        }
-
-        $data = $query->distinct()
-            ->orderBy('det.detalle')
-            ->get();
-
-        // Opciones HTML
-        $options = '';
-        foreach ($data as $t) {
-            $options .= '<option value="'.$t->iddetalletipoestandarproveedor.'">'.e($t->detalle).'</option>';
-        }
-
-				return ApiResponse::success($options, 'Tipos estándar sin documentos obtenidos');
-
-			} catch (\Throwable $e) {
-					return ApiResponse::error($e);
-			}
-		}
-
 
     public function periodo_homologacion_xpersona(Request $r)
-    {
-        $Id = $r->user()->idpersona; // usuario logueado
-
+    {        
         try {
+            $idpersona = $r->user()->idpersona;
 
-
-                  // Query base
-           $query = DB::table('fecha_homologacion AS fh')
-                ->join('persona_facha_homologacion as pfh', 'fh.idfecha_homologacion', '=', 'pfh.idfecha_homologacion')
-                ->select(
-                'pfh.idpersona_facha_homologacion',
-                'pfh.idpersona',
-                'pfh.idfecha_homologacion',
-                'fh.descripcion',
-                'fh.fecha_inicio',
-                'fh.fecha_fin',
-                'pfh.estado_trash',
-                'pfh.estado_delete'
+            $data =  DB::table('persona_facha_homologacion')
+            ->select(
+                'idpersona_facha_homologacion',
+                'descripcion',
+                'fecha_inicio',
+                'fecha_fin',
+                'estado_trash'
             )
-            ->where('pfh.estado_trash', '1')
-            ->where('pfh.estado_delete', '1')
-            ->where('pfh.idpersona', '35')
+            ->where('estado_trash', '1')
+            ->where('estado_delete', '1')
+            ->where('idpersona', $idpersona)
             ->get();
 
-
-
-            return ApiResponse::success($query, 'Documentos estándar obtenidos');
+            return ApiResponse::success($data, 'Cateogria de proveedores obtenidos');
 
         } catch (\Throwable $e) {
             return ApiResponse::error($e);

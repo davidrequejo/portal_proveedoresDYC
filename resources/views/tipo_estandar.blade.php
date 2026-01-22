@@ -8,7 +8,7 @@
   
   <title>Tipo Estandar | Portal Proveedores D&C</title>
 
-  <link rel="icon" href="{{ asset('assets/images/brand-logos/ico-opt.png') }}" type="image/png">
+  <link rel="icon" href="{{ asset('assets/images/brand-logos/dc-logo.png') }}" type="image/png">
 
   @include('layouts.lte_head')
   <!--<link rel="stylesheet" href="{{ asset('assets/jstree-3.3.17/dist/themes/default/style.min.css') }}" />-->
@@ -167,14 +167,14 @@
               <!-- ./col Documentos-->
               <div class="col-12 col-sm-12 col-md-6 col-lg-6" >
                 <div class="card">
-                  <div class="card-header border-0" style="background-color: aliceblue;">
+                  <div class="card-header border-0">
                           
-                    <h3 class="card-title m-2 font-weight-bold text-info">Configuracion de Documentos
+                    <h3 class="card-title m-2 font-weight-bold text-principal text-bold">Configuración de Documentos
                     </h3>
                     <div class="float-right">
 
                       <div class="btn-group btn-agregar-proyecto">
-                        <button type="button" class="btn btn-success limpiar_form_docs" style="border-color: #1a6b2c !important;" data-toggle="modal" data-target="#modal-agregar-docs" onclick=""><i class="nav-icon fas fa-file"></i> Crear nuevo</button>
+                        <button type="button" class="btn btn-primary limpiar_form_docs" style="border-color: #2e6da4 !important;" data-toggle="modal" data-target="#modal-agregar-docs" onclick=""><i class="nav-icon fas fa-file"></i> Crear nuevo</button>
                       </div>
                     </div>
                     <div class="card-tools m-2"></div>
@@ -355,8 +355,8 @@
           <div class="modal fade" id="modal-agregar-docs">
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
               <div class="modal-content">
-                <div class="modal-header py-2">
-                  <h4 class="modal-title">Documento</h4>
+                <div class="modal-header py-2 bg-color-principal">
+                  <h4 class="modal-title text-white">Documento</h4>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span class="text-danger" aria-hidden="true">&times;</span>
                   </button>
@@ -400,8 +400,8 @@
                   </form>
                 </div>
                 <div class="modal-footer justify-content-between py-1">
-                  <button type="button" class="btn btn-outline-danger limpiar_form_docs" data-dismiss="modal"><i class="ti ti-circle-dashed-x"></i>Cerrar</button>
-                  <button type="button" class="btn btn-success" id="guardar_registro_docs" ><i class="ti ti-device-floppy"></i> Guardar</button>
+                  <button type="button" class="btn btn-outline-secondary limpiar_form_docs" data-dismiss="modal"><i class="ti ti-circle-dashed-x"></i>Cerrar</button>
+                  <button type="button" class="btn btn-primary" id="guardar_registro_docs" ><i class="ti ti-device-floppy"></i> Guardar</button>
                 </div>
               </div>
               <!-- /.modal-content -->
@@ -433,8 +433,8 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/tipo_estandar.js') }}?version_erp=01.03"></script>
-  <script src="{{ asset('assets/js/documentotipo_estandar.js') }}?version_erp=01.03"></script>
+  <script src="{{ asset('assets/js/tipo_estandar.js') }}?version_erp=01.05"></script>
+  <script src="{{ asset('assets/js/documentotipo_estandar.js') }}?version_erp=01.04"></script>
 
 
 

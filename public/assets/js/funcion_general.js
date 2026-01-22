@@ -892,8 +892,11 @@ function doc_view_extencion(filename, carpeta='', sub_carpeta='', width='50%', h
   var html = ''; var extencion = '';
   var host = '';  var ruta = '';
 
+  console.log(filename);
+  
+
   if (carpeta == '' && sub_carpeta == '') {
-    host = window.location.host == 'localhost'? `http://localhost/admin_sevens/${filename}` : `${window.location.origin}/${filename}` ;
+    host = window.location.host == '127.0.0.1:8000'?  `${filename}`: `${window.location.origin}/${filename}` ;
     ruta = host;
   } else {
     ruta = sub_carpeta == '' || sub_carpeta == null ?  `../dist/docs/${carpeta}/${filename}`: `../dist/docs/${carpeta}/${sub_carpeta}/${filename}`;
@@ -1288,6 +1291,10 @@ function buscar_sunat_reniec(input='') {
           console.log(data);
 
           if (data == null) {
+
+            $(`.valido_novalido`).html('<span class="badge badge-danger">NO ACTIVO</span>');
+            $(`.input_hidden_ss`).val('NO ACTIVO').trigger('change');
+
             $(`#search${input}`).show();
     
             $(`#charge${input}`).hide();
@@ -1297,6 +1304,9 @@ function buscar_sunat_reniec(input='') {
           } else {
 
             if (data.success == false) {
+
+                $(`.valido_novalido`).html('<span class="badge badge-danger">NO ENCONTRADO</span>');
+                $(`.input_hidden_ss`).val('NO ACTIVO').trigger('change');
 
               $(`#search${input}`).show();
 
@@ -1309,7 +1319,9 @@ function buscar_sunat_reniec(input='') {
             } else {
 
               if (data.estado == "ACTIVO") {
-                $(`.valido_novalido`).html('<span class="badge badge-info">ACTIVO</span>');
+
+                $(`.valido_novalido`).html('<span class="badge badge-info" >ACTIVO</span>');
+                $(`.input_hidden_ss`).val('ACTIVO').trigger('change');
 
                 $(`#search${input}`).show();
 
@@ -1328,10 +1340,12 @@ function buscar_sunat_reniec(input='') {
                 data.direccion == null ? $(`#direccion${input}`).val(`${departamento} - ${provincia} - ${distrito}`) : $(`#direccion${input}`).val(data.direccion);
                 data.direccion == null ? $(`#ubicacion${input}`).val(`${departamento} - ${provincia} - ${distrito}`) : $(`#ubicacion${input}`).val(data.direccion);
 
+                toastr.info("Puede continuar con el registro!!");
                 toastr.success("Datos encontrados!!");
 
               } else {
                 $(`.valido_novalido`).html('<span class="badge badge-danger">NO ACTIVO</span>');
+                $(`.input_hidden_ss`).val('NO ACTIVO').trigger('change');
 
                 toastr.info("Se recomienda NO generar FACTURAS ó BOLETAS!!!");
 
@@ -1356,6 +1370,10 @@ function buscar_sunat_reniec(input='') {
           }          
         });
       } else {
+
+        $(`.valido_novalido`).html('<span class="badge badge-danger">NO ENCONTRADO</span>');
+        $(`.input_hidden_ss`).val('NO ACTIVO').trigger('change');
+
         $(`#num_documento${input}`).addClass("is-invalid");
 
         $(`#search${input}`).show();

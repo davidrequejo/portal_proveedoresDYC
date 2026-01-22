@@ -8,7 +8,7 @@
   
   <title>Cargar Documentos | Portal Proveedores D&C</title>
 
-  <link rel="icon" href="{{ asset('assets/images/brand-logos/ico-opt.png') }}" type="image/png">
+  <link rel="icon" href="{{ asset('assets/images/brand-logos/dc-logo_cirsulo_white.png') }}" type="image/png">
 
   @include('layouts.lte_head')
   <!--<link rel="stylesheet" href="{{ asset('assets/jstree-3.3.17/dist/themes/default/style.min.css') }}" />-->
@@ -62,7 +62,7 @@
 
                 <div class="row">
 
-                  <div class="col-12 div_view_periodos_homologacion">
+                  <div class="col-12 div_view_periodos_homologacion ">
 
                       <div class="col-sm-12 col-md-9 col-lg-9">
                         <div class="card">
@@ -71,7 +71,7 @@
                             <h3 class="card-title m-2 font-weight-bold text-info">Mis Periodos de Homologación
                             </h3>
                           </div>
-                          <div class="card-body table-responsive ">
+                          <div class="card-body table-responsive styletabla">
                             <table class="table table-striped table-valign-middle">
                               <thead>
                               <tr>
@@ -113,18 +113,20 @@
                       </div>
 
                   </div>
-                  <div class="col-12 m-3 p-2 btn_regresar_principal" style="background-color: aliceblue; display: none">
 
-                    <div class="card-header" style="display: flex;  align-items: center;">
-                      <h3 class="card-title">
+                  <div class="col-12 btn_regresar_principal " >
+                    <div class="card  m-3 p-2  bg-color-principal">
+
+                    <div style="display: flex;  align-items: center;">
+                      <h3 >
                                                 
-                        <button type="button" class="btn btn-warning btn-lg btn-cancelar m-r-10px" onclick="show_hide_escenario(1);" style="display: none;"><i class="ri-arrow-left-line"></i> Regresar</button>
+                        <button type="button" class="btn btn-secondary btn-lg btn-cancelar m-r-10px" onclick="show_hide_escenario(1);" style="display: none;"><i class="ri-arrow-left-line"></i> Regresar</button>
                         
-                        <h4 class="nombre_periodo_homologacion"></h4>
+                        <h4 class="nombre_periodo_homologacion text-white text-bold"></h4>
                       </h3>
                     </div>
-
-       
+                    </div>
+      
 
                   </div>
 
@@ -133,15 +135,11 @@
 
                       <div class="col-lg-6">
                         <div class="card">
-                          <div class="card-header border-0" style="background-color: aliceblue;">
+                          <div class="card-header border-0" >
                                   
-                            <h3 class="card-title m-2 font-weight-bold text-info">Validación de Documentos
+                            <h3 class="card-title m-2 font-weight-bold text-principal">Mis Documentos
                             </h3>
                             <div class="float-right">
-
-                              <div class="btn-group btn-agregar-proyecto">
-                                <button type="button" class="btn btn-success" style="border-color: #1a6b2c !important;" data-toggle="modal" data-target="#modal-crear_documento" onclick="limpiar_form_subir_doc(); cargarselecttipoDocs();" ><i class="nav-icon fas fa-file"></i> Crear nuevo</button>
-                              </div>
                             </div>
 
                             <div class="card-tools m-2"></div>
@@ -190,13 +188,13 @@
 
                       <div class="col-lg-6">
                         <div class="card">
-                          <div class="card-header border-0" style="background-color: aliceblue;">
-                            <h3 class="card-title m-2 font-weight-bold text-info nombre_documento_pdf">Documento PDF</h3>
+                          <div class="card-header border-0" >
+                            <h3 class="card-title m-2 font-weight-bold text-principal nombre_documento_pdf">Documento PDF</h3>
                           </div>
 
                           <div class="card-body">
                             <div class="card-body p-0 mostrar_documento_pdf" style="height: 750px;">
-                              <div class="alert alert-info alert-dismissible">
+                              <div class="alert bg-color-principal text-white alert-dismissible">
                                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true" disabled></button>
                                 <h5><i class="icon fas fa-info"></i> Sin vista previa!</h5>
                                 Para visualizar un documento, haga clic en el ícono <i class="fas fa-search"></i> ubicado en la fila correspondiente de la tabla del lado izquierdo
@@ -223,7 +221,7 @@
             <div class="modal-dialog">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h6 class="modal-title">Agraegar Documento</h6>
+                  <h6 class="modal-title">Cargar Documento</h6>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                   </button>
@@ -234,15 +232,14 @@
                     <input type="hidden" name="iddocsproveedortipoestandar" id="iddocsproveedortipoestandar" /> 
                     <input type="hidden" name="nombre_seleccion_tipo" id="nombre_seleccion_tipo" /> 
                     <!-- $r->user()->idpersona; -->
-                    <input type="text" name="" id="" value="{{ auth()->user()->idpersona }}" >
+                    <input type="hidden" name="" id="" value="{{ auth()->user()->idpersona }}" >
 
                     <div  class="row" id="cargando-1-formulario">
 
                       <div class="col-12">
                         <div class="form-group">
-                          <label for="descripcion">Selección Tipo Documento</label>                          
-                          <!--<textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
-                          <select name="listar_docs_sin_subir" id="listar_docs_sin_subir" class="form-control is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
+                          <label for="descripcion">Tipo Documento</label>                          
+                            <input type="text" class="form-control nombre_tipo_documento" placeholder="ejmpl. Los Jardines">
                           </select>
                         </div>
                       </div>                    
@@ -335,7 +332,7 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/subirdocs.js') }}?version_erp=01.03"></script>
+  <script src="{{ asset('assets/js/subirdocs.js') }}?version_erp=01.05"></script>
 
   <script>
     $(function() {

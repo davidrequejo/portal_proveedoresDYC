@@ -8,7 +8,7 @@
   
   <title>Actualizar información | Portal Proveedores D&C</title>
 
-  <link rel="icon" href="{{ asset('assets/images/brand-logos/ico-opt.png') }}" type="image/png">
+  <link rel="icon" href="{{ asset('assets/images/brand-logos/dc-logo_cirsulo_white.png') }}" type="image/png">
 
   @include('layouts.lte_head')
   <!--<link rel="stylesheet" href="{{ asset('assets/jstree-3.3.17/dist/themes/default/style.min.css') }}" />-->
@@ -107,7 +107,7 @@
           <div class="container-fluid">
             <div class="row mb-2">
               <div class="col-sm-6">
-                <h1 class="m-0">Actualizar Información Proveedor</h1>
+                <h1 class="m-0 text-principal">Actualizar Información Proveedor</h1>
               </div><!-- /.col -->
 
             </div><!-- /.row -->
@@ -127,7 +127,7 @@
                   <div class=" col-12 col-sm-12 col-md-6 col-lg-5">
                     <div class="card">
                       <div class="card-header border-0" style="background-color: aliceblue;">
-                        <h3 class="card-title m-2 font-weight-bold text-info">Información del Proveedor</h3>
+                        <h3 class="card-title m-2 font-weight-bold text-principal">Información del Proveedor</h3>
                         <div class="card-tools m-2"></div>
                       </div>
                       <div class="modal-body vista_inicial titulo-separador"><i class="fas fa-spinner fa-spin fa-lg " style="color: #e60f00;"></i>  <Span style="color: #e60f00;"> Cargando...</Span> </div>  
@@ -141,7 +141,7 @@
 
                             <div class="col-12 pb-3">
                               <div class="titulo-separador">
-                                <span class="text-bold text-info" >Datos Generales Proveedor</span>
+                                <span class="text-bold text-principal" >Datos Generales Proveedor</span>
                               </div>
                             </div>
 
@@ -173,7 +173,7 @@
                               <div class="form-group">
                                 <label for="descripcion">Nro de documento <sup class="text-danger">*</sup></label>                          
                                 <div class="input-group">
-                                    <input type="number" name="numero_documento_input1" class="form-control" id="numero_documento_input1" placeholder="N° de documento">
+                                    <input type="number" name="numero_documento_input1" class="form-control" id="numero_documento_input1" placeholder="N° de documento" readonly>
                                     <div class="input-group-append" data-toggle="tooltip" data-original-title="Buscar Reniec/SUNAT" onclick="buscar_sunat_reniec('_input1');">
                                       <span class="input-group-text" style="cursor: pointer;">
                                         <i class="fas fa-search text-primary" id="search"></i>
@@ -216,7 +216,7 @@
 
                             <div class="col-12 col-sm-12 col-md-3 col-lg-3  div_campos_pers_nat" style="display: none;">
                               <div class="form-group">
-                                <label>sexo</label>
+                                <label>Sexo</label>
                                 <select name="sexo" id="sexo" class="form-control is-valid select2" placeholder="Sexo" aria-invalid="false">
                                   <option value="M">Masculino</option>
                                   <option value="F">Femenino</option>
@@ -226,15 +226,27 @@
 
                             <div class="col-12 col-sm-12 col-md-3 col-lg-3  div_campos_pers_nat" style="display: none;">
                               <div class="form-group">
-                                <label>fecha Nacimiento</label>
+                                <label>Fecha Nacimiento</label>
                                 <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" class="form-control">
                               </div>
                             </div>
 
                             <div class="col-12 col-sm-12 col-md-4 col-lg-4  div_campos_pers_nat" style="display: none;">
                               <div class="form-group">
-                                <label>R.U.C <span class="d-inline-block text-danger" tabindex="0" data-toggle="tooltip" title="Click Para Verificar Ruc" onclick="buscar_sunat_reniec('_input2');"> <i class="fas fa-question-circle "></i> </span> <span class="valido_novalido"><span class="badge badge-secondary">Por Verificar</span></span>  </label>
-                                <input type="hidden" id="tipo_documento_input2" class="form-control" value="6">
+                                <label>D.N.I <span class="d-inline-block text-danger" tabindex="0" data-toggle="tooltip" title="Click Para Verificar DNI" onclick="buscar_sunat_reniec('_input2');"> 
+                                <svg id="Capa_1" data-name="Capa 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 424.89 470.84" height="15px" width="15px" >
+                                  <defs>
+                                    <style>.cls-1{fill:#0056bd;}.cls-2{fill:#c70034;}</style>
+                                  </defs>
+                                  <path class="cls-1"
+                                    d="M316.23,295.78c-27.73-17.5-60.56-18.06-92.68-17.34L196,277.14h0c-45.82-6.24-69.94-32.37-63.93-80.46.83-6.57,1.44-13.16,2.75-25.29C106,198.54,80.49,222.18,55.37,246.2c-21.52,20.57-21.52,28.31-1,49.23C70.53,311.83,227.35,466.74,242,480.36c9.16,5.79,17.18,4.26,24.17-3.83h0c25.45-25.14,50.94-49,75.87-75.82C379.4,360.51,358.4,322.41,316.23,295.78Z"
+                                    transform="translate(-39.11 -13)" />
+                                  <path class="cls-2"
+                                    d="M458.49,213.31C446,200.62,283.58,34.17,274.75,28c-18-19.19-27.07-19.83-44.87-2.58C217.89,37,205.82,48.64,194.56,61c-17.18,18.83-39.87,33.3-47.55,59.84-2.78,12.55-3.22,18.63-.57,32h0c4.78,38,56.65,64.81,104.83,64.13L291.5,218h0c31.49-1.29,85.43-.13,86.83,49.84-.7,16.58-8.28,50.89-7.18,51.55.84.49,14.64-9.88,21.35-16.32C405.1,291,445.18,252.46,459.19,238,465.36,231.66,466.08,221,458.49,213.31Z"
+                                    transform="translate(-39.11 -13)" />
+                                </svg>
+                                </span> <span class="valido_novalido"><span class="badge badge-secondary">Por Verificar</span></span>  </label>
+                                <input type="hidden" id="tipo_documento_input2" class="form-control" value="1">
                                 <input type="text" name="ruc_pers_nat" id="numero_documento_input2" class="form-control">
                               </div>
                             </div>
@@ -303,7 +315,7 @@
 
                             <div class="col-12 pb-3 div_campos_pers_jud" style="display: none;">
                               <div class="titulo-separador">
-                                <span class="text-bold text-info" >Representante Legal</span>
+                                <span class="text-bold text-principal" >Representante Legal</span>
                               </div>
                             </div>
 
@@ -324,7 +336,7 @@
 
                             <div class="col-12 pb-3 div_campos_pers_jud" style="display: none;">
                               <div class="titulo-separador">
-                                <span class="text-bold text-info" >Contacto Comercial</span>
+                                <span class="text-bold text-principal" >Contacto Comercial</span>
                               </div>
                             </div>
 
@@ -385,7 +397,7 @@
 
                       </div>
                       <div class="modal-footer justify-content-end py-1">
-                        <button type="button" class="btn btn-success" id="editar_registro_proveedor" ><i class="ti ti-device-floppy"></i> Actualizar</button>
+                        <button type="button" class="btn btn-primary" id="editar_registro_proveedor" ><i class="ti ti-device-floppy"></i> Actualizar</button>
                       </div>
 
                     </div>
@@ -403,12 +415,12 @@
                     <div class="card">
                       <div class="card-header border-0" style="background-color: aliceblue;">
                               
-                        <h3 class="card-title m-2 font-weight-bold text-info">Cuentas Bancarias
+                        <h3 class="card-title m-2 font-weight-bold text-principal">Cuentas Bancarias
                         </h3>
                         <div class="float-right">
 
                           <div class="btn-group btn-agregar-proyecto">
-                            <button type="button" class="btn btn-success" style="border-color: #1a6b2c !important;" data-toggle="modal" data-target="#modal-crear_cuentabancaria" onclick=""><i class="nav-icon fas fa-file"></i> Crear nuevo</button>
+                            <button type="button" class="btn btn-primary" style="border-color: #063ffc !important;" data-toggle="modal" data-target="#modal-crear_cuentabancaria" onclick=""><i class="nav-icon fas fa-file"></i> Crear nuevo</button>
                           </div>
                         </div>
                         <div class="card-tools m-2"></div>
@@ -462,8 +474,8 @@
           <div class="modal fade show" id="modal-crear_cuentabancaria"  aria-modal="true" role="dialog">
             <div class="modal-dialog modal-lg">
               <div class="modal-content">
-                <div class="modal-header">
-                  <h6 class="modal-title">Cuenta Bancaria</h6>
+                <div class="modal-header bg-color-principal">
+                  <h6 class="modal-title text-white">Cuenta Bancaria</h6>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                   </button>
@@ -476,7 +488,7 @@
                     <input type="hidden" name="idpersona_CuentaBancaria" id="idpersona_CuentaBancaria">
 
                     <!-- Persona -->
-                    <input type="text" name="idpersona" id="idpersona" value="{{ auth()->user()->idpersona }}">
+                    <input type="hidden" name="idpersona" id="idpersona" value="{{ auth()->user()->idpersona }}">
 
                     <div class="row">
 
@@ -517,19 +529,6 @@
                         </div>
                       </div>
 
-                      <!-- Predeterminado -->
-                      <div class="col-12 col-md-3 col-lg-2">
-                        <div class="form-group">
-                          <span class="d-inline-block" tabindex="0" data-toggle="tooltip" title="cuenta predeterminada">
-                           <label for="predeterminado">Pred?</label>
-                          </span>
-                          <select name="predeterminado" id="predeterminado"  class="form-control is-valid select2" placeholder="Cuenta Predeterminada" aria-invalid="false">
-                            <option value="0">No</option>
-                            <option value="1">Sí</option>
-                          </select>
-                        </div>
-                      </div>
-
                       <!-- Número de cuenta -->
                       <div class="col-12 col-md-4 col-lg-5">
                         <div class="form-group">
@@ -546,6 +545,21 @@
                         </div>
                       </div>
 
+                      <!-- Predeterminado -->
+                      <div class="col-12 col-md-3 col-lg-2">
+                        <div class="form-group">
+                          <span class="d-inline-block" tabindex="0" data-toggle="tooltip" title="cuenta predeterminada">
+                           <label for="predeterminado">Pred?</label>
+                          </span>
+                          <select name="predeterminado" id="predeterminado"  class="form-control is-valid select2" placeholder="Cuenta Predeterminada" aria-invalid="false">
+                            <option value="0">No</option>
+                            <option value="1">Sí</option>
+                          </select>
+                        </div>
+                      </div>
+
+
+
                     </div>
 
                     <!-- /.card-body -->
@@ -555,8 +569,8 @@
 
                 </div>
                 <div class="modal-footer justify-content-between">
-                  <button type="button" class="btn btn-default" data-dismiss="modal" onclick="">Cerrar</button>
-                  <button type="button" class="btn btn-success" id="guardar_registro_cuenta_bank">Guardar</button>
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="">Cerrar</button>
+                  <button type="button" class="btn btn-primary" id="guardar_registro_cuenta_bank">Guardar</button>
                 </div>
               </div>
               <!-- /.modal-content -->
@@ -585,8 +599,8 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/actualizardatosproveedor.js') }}?version_erp=01.03"></script>
-  <script src="{{ asset('assets/js/persona_cuentabancaria.js') }}?version_erp=01.03"></script>
+  <script src="{{ asset('assets/js/actualizardatosproveedor.js') }}?version_erp=01.05"></script>
+  <script src="{{ asset('assets/js/persona_cuentabancaria.js') }}?version_erp=01.05"></script>
 
   <script>
     $(function() {

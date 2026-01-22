@@ -10,9 +10,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Tipo_estandar;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\CredencialesProveedorMail;
-use App\Models\DocsProveedorTipoEstandar;
-use App\Mail\EstadoDocumentoLogisticaMail;
 use App\Models\FechaHomologacion;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 
 class ProveedorController extends Controller
@@ -285,6 +284,131 @@ class ProveedorController extends Controller
         }
     }
 
+    public function ImportarProveedoresExcel(Request $request)
+    {
+        try {
+
+            // ===============================
+            // 1️⃣ Validar archivo
+            // ===============================
+            if (!$request->hasFile('file_excel_proveedor_masivo')) {
+                return ApiResponse::validation([], 'Debe seleccionar un archivo Excel');
+            }
+
+            $file = $request->file('file_excel_proveedor_masivo');
+
+            $ext = strtolower($file->getClientOriginalExtension());
+            if (!in_array($ext, ['xlsx', 'xls'])) {
+                return ApiResponse::validation([], 'El archivo debe ser Excel (.xlsx / .xls)');
+            }
+
+            // ===============================
+            // 2️⃣ Leer Excel (FORMA CORRECTA)
+            // ===============================
+            $spreadsheet = IOFactory::load($file->getPathname());
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // ⛔ NO usar keys A,B,C
+            // ✅ Usar índices 0,1,2
+            $rows = $sheet->toArray('', false, false, false);
+
+            $registros = [];
+            $contador  = 0;
+
+            // ===============================
+            // 3️⃣ Recorrer filas
+            // ===============================
+            foreach ($rows as $i => $row) {
+
+                // Saltar encabezado (fila 1)
+                if ($i === 0) {
+                    continue;
+                }
+
+                // Mapear columnas según tu plantilla REAL
+                $tipoEntidadSunat = trim((string) ($row[0] ?? ''));
+                $tipoDocumento    = trim((string) ($row[1] ?? ''));
+                $numeroDocumento  = trim((string) ($row[2] ?? ''));
+                $razonSocial      = trim((string) ($row[3] ?? ''));
+                $nombres          = trim((string) ($row[4] ?? ''));
+                $apePaterno       = trim((string) ($row[5] ?? ''));
+                $apeMaterno       = trim((string) ($row[6] ?? ''));
+                $telefono         = trim((string) ($row[7] ?? ''));
+                $email            = trim((string) ($row[8] ?? ''));
+                $direccion        = trim((string) ($row[9] ?? ''));
+
+                // ===============================
+                // 4️⃣ Validación mínima REAL
+                // ===============================
+                if (
+                    !$tipoEntidadSunat ||
+                    !$tipoDocumento ||
+                    !$numeroDocumento ||
+                    !$razonSocial
+                ) {
+                    continue;
+                }
+
+                // Validación solo para NATURAL
+                if (strtoupper($tipoEntidadSunat) === 'NATURAL') {
+                    if (!$nombres || !$apePaterno) {
+                        continue;
+                    }
+                }
+
+                // ===============================
+                // 5️⃣ Armar registro
+                // ===============================
+                $registros[] = [
+                    'idtipo_persona'               => 3, // fijo
+                    'tipo_entidad_sunat'           => $tipoEntidadSunat,
+                    'tipo_documento'               => $tipoDocumento,
+                    'numero_documento'             => $numeroDocumento,
+                    'nombre_razonsocial'           => $razonSocial,
+                    'nombre_persona_natural'       => $nombres ?: null,
+                    'apellido_paterno_per_natural' => $apePaterno ?: null,
+                    'apellido_materno_per_natural' => $apeMaterno ?: null,
+                    'celular'                      => $telefono ?: null,
+                    'direccion'                    => $direccion ?: null,
+                    'email'                        => $email ?: null,
+                    'created_at'                   => now(),
+                    'updated_at'                   => now(),
+                ];
+
+                $contador++;
+            }
+
+            // ===============================
+            // 6️⃣ Validar si hay datos
+            // ===============================
+            if (count($registros) === 0) {
+                return ApiResponse::validation([], 'El Excel no contiene datos válidos');
+            }
+
+            // ===============================
+            // 7️⃣ Insertar en BD
+            // ===============================
+            DB::beginTransaction();
+
+            foreach (array_chunk($registros, 300) as $chunk) {
+                foreach ($chunk as $item) {
+                    Proveedor::create($item);
+                }
+            }
+
+            DB::commit();
+
+            return ApiResponse::success(
+                null,
+                "Importación exitosa: {$contador} proveedores"
+            );
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return ApiResponse::error($e);
+        }
+    }
+
 
 
 
@@ -315,17 +439,8 @@ class ProveedorController extends Controller
         $query = DB::table('persona as p')
             ->join('tipo_persona as tp', 'p.idtipo_persona', '=', 'tp.idtipo_persona')
             ->join('sunat_c06_doc_identidad as doc', 'p.tipo_documento', '=', 'doc.code_sunat')
-            ->join('tipoestandarproveedor as test', 'p.idtipoestandarproveedor', '=', 'test.idtipoestandarproveedor')
-
-            // 🔥 LEFT JOIN a documentos
-            ->leftJoin('docsproveedortipoestandar as d', function ($join) {
-                $join->on('p.idpersona', '=', 'd.idpersona')
-                    ->where('d.estado_revision', '=', 'Aprobado');
-            })
-
             ->select(
                 'p.idpersona',
-                'p.idtipoestandarproveedor',
                 'tp.descripcion as tipoPersona',
                 'p.tipo_documento',
                 'p.nombre_razonsocial',
@@ -339,21 +454,16 @@ class ProveedorController extends Controller
                 'p.departamento',
                 'p.email',
                 'p.tipo_entidad_sunat',
-                'test.descripcion as tipo_estandar',
-                'test.nroDocumentos',
-                'p.estado',
-
-                // ✅ CONTEO FINAL
-                DB::raw('COUNT(d.iddocsproveedortipoestandar) as total_docs_registrados')
+                'p.estado'
             )
 
             ->where('p.estado', '1')
             ->where('p.estado_delete', '1')
+            ->where('p.idtipo_persona', '3')
 
             // 🔑 CLAVE: agrupar por persona
             ->groupBy(
                 'p.idpersona',
-                'p.idtipoestandarproveedor',
                 'tp.descripcion',
                 'p.tipo_documento',
                 'p.nombre_razonsocial',
@@ -367,8 +477,6 @@ class ProveedorController extends Controller
                 'p.departamento',
                 'p.email',
                 'p.tipo_entidad_sunat',
-                'test.descripcion',
-                'test.nroDocumentos',
                 'p.estado'
             );
 
@@ -400,7 +508,6 @@ class ProveedorController extends Controller
         $proveedores->getCollection()->transform(function ($proveedor) {
             return [
                 'idpersona'             => $proveedor->idpersona,
-                'idtipoestandarproveedor'=> $proveedor->idtipoestandarproveedor,
                 'tipoPersona'           => $proveedor->tipoPersona,
                 'tipo_documento'        => $proveedor->tipo_documento,
                 'nombre_razonsocial'    => $proveedor->nombre_razonsocial,
@@ -414,9 +521,6 @@ class ProveedorController extends Controller
                 'departamento'          => $proveedor->departamento,
                 'email'                 => $proveedor->email,
                 'tipo_entidad_sunat'    => $proveedor->tipo_entidad_sunat,
-                'tipo_estandar'         => $proveedor->tipo_estandar,
-                'nroDocumentos'         => $proveedor->nroDocumentos,
-                'total_docs_registrados' => $proveedor->total_docs_registrados,
                 'estado'                => $proveedor->estado,
             ];
         });
@@ -474,100 +578,6 @@ class ProveedorController extends Controller
 
     }
 
-
-
-
-
-
-    // listar tipos de estandar y documentos asociados
-    public function listar_tipos_estandar_docs(Request $r)
-    {
-        try {
-            $id = $r->input('idtipoestandar');
-            $idpersona = $r->input('idpersona');
-
-            $data = DB::table('tipoestandarproveedor as est')
-                ->join(
-                    'detalletipoestandarproveedor as det',
-                    'est.idtipoestandarproveedor',
-                    '=',
-                    'det.idtipoestandarproveedor'
-                )
-                ->leftJoin('docsproveedortipoestandar as doc', function ($join) use ($idpersona) {
-                    $join->on(
-                        'det.iddetalletipoestandarproveedor',
-                        '=',
-                        'doc.iddetalletipoestandarproveedor'
-                    )
-                    ->where('doc.idpersona', $idpersona); // 🔥 FILTRO REAL
-                })
-                ->select(
-                    'det.iddetalletipoestandarproveedor',
-                    'det.idtipoestandarproveedor',
-                    'doc.iddocsproveedortipoestandar',
-                    'doc.idpersona',
-                    'det.detalle',
-                    'det.estado_trash',
-                    'det.estado_delete',
-                    'doc.nombreDocumento',
-                    'doc.archivo',
-                    'doc.estado_revision',
-                    'doc.estado_trash as estado_trashDocs',
-                    'doc.estado_delete as estado_deleteDocs'
-                )
-                ->where('est.idtipoestandarproveedor', $id)
-                ->get();
-
-            return ApiResponse::success($data, 'Tipos de estandar y documentos obtenidos');
-
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
-        }
-    }
-
-    
-    // actualizar estado y observacion del documento estandar
-    public function actualizar_estado_doc_estandar(Request $r, $iddocsproveedortipoestandar)
-    {
-        try {
-
-            // 1) Buscar documento y validar pertenencia
-            $doc = DocsProveedorTipoEstandar::where('iddocsproveedortipoestandar', $iddocsproveedortipoestandar)
-                ->firstOrFail();
-
-            // 2) Actualizar SOLO los campos permitidos
-            $doc->estado_revision = $r->input('estado_documentos_update');
-            $doc->observacion     = $r->input('observacion_est_up');
-
-            // 3) Guardar cambios
-            $doc->save();
-
-
-            // 2. Obtener proveedor
-            $proveedor = Proveedor::where('idpersona', $doc->idpersona)->first();
-
-            // 3. Usuario de logística (quien hace la acción)
-            $usuarioLogistica = auth()->user();
-
-            // 4. Enviar correo al proveedor
-            Mail::to($proveedor->email)->send(
-                new EstadoDocumentoLogisticaMail(
-                    $proveedor,
-                    $doc->nombreDocumento,
-                    $doc->estado_revision,
-                    $doc->observacion,
-                    $usuarioLogistica
-                )
-            );
-
-            return ApiResponse::success([], 'Estado actualizado y correo enviado');
-
-            //return ApiResponse::success('Actualizado', 'Estado del documento actualizado correctamente');
-
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
-        }
-    }
 
 
 

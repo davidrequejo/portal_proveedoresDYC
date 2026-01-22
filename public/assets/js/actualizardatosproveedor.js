@@ -34,6 +34,9 @@ function ver_editar_proveedor(){
   $.getJSON(`${BASE_URL}/actualizardatosproveedor/${id}/ver_proveedorupdate`, function (e) {
 
     if (e.status === true) {
+
+      console.log(e);
+      
       
       $("#fecha_inicio_periodo").val(e.data.proveedor.fecha_inicio_periodo);
       $("#fecha_fin_periodo").val(e.data.proveedor.fecha_fin_periodo);
@@ -61,9 +64,18 @@ function ver_editar_proveedor(){
       $("#numero_documento_input2").val(e.data.proveedor.ruc_persona_natural);
       $("#fecha_nacimiento").val(e.data.proveedor.fecha_nacimiento);
 
-      let tipoDocumentoTexto = $('#tipo_documento_input1 option:selected').text();
+      $("#nombre_apellidos_representante_legal").val(e.data.proveedor.nombre_apellidos_representante_legal);
+      $("#telefono_representante").val(e.data.proveedor.numerotelefo_representante_legal);
 
-      controlarCampos(tipoDocumentoTexto);
+      $("#nombre_apellidos_contacto_comercial").val(e.data.proveedor.nombres_contacto_comercial);
+      $("#telefono_contacto_comercial").val(e.data.proveedor.telefono_contacto_comercial);
+      $("#email_contacto_comercial").val(e.data.proveedor.correo_contacto_comercial);
+      $("#cargo_contacto_comercial").val(e.data.proveedor.cargo_contacto_comercial);
+
+      let tipoDocumentoTexto = $('#tipo_documento_input1 option:selected').text();
+      let tipoentidadTexto = $('#tipo_entidad_sunat option:selected').text();
+
+      controlarCampos(tipoDocumentoTexto, tipoentidadTexto);
 
       $(".vista_inicial").hide();
       $(".vista_datos").show();
@@ -80,9 +92,9 @@ function ver_editar_proveedor(){
 ver_editar_proveedor();
 
 
-function controlarCampos(tipoDocumentoTexto) {
+function controlarCampos(tipoDocumentoTexto, tipoentidadTexto){
 
-if (tipoDocumentoTexto=='DNI') {
+if ( tipoentidadTexto=='NATURAL') {
   $('.div_razon_social').hide();
   $('#nombre_persona_natural').prop('required', true);
   $('#apellido_paterno_per_natural').prop('required', true);

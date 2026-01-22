@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\InicioController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\PersonaController;
 Use App\Http\Controllers\ApiReniecSunatController;
@@ -12,8 +13,8 @@ use App\Http\Controllers\BancoController;
 use App\Http\Controllers\PersonaCuentaBancariaController;
 use App\Http\Controllers\ActualizardatosproveedorController;
 use App\Http\Controllers\ActualizardatosclienteController;
-use App\Http\Controllers\ProvProveedorController;
-use App\Http\Controllers\FechaHomologacionController;
+use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\HomologacionController;
 use App\Http\Controllers\DocumentoTipoEstandarController;
 
 
@@ -25,7 +26,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::get('/dashboard', function () {  return view('inicio');   })->name('dashboard');
 
     // :::::::::::::::::::::::::::::: I N I C I O ::::::::::::::::::::::::::::::
-    Route::get('/inicio', function () {  return view('inicio');   })->name('inicio');
+     Route::resource('inicio', InicioController::class);
 
     // ::::::::::::::::: PERSONAS SOCIO NEGOCIO ::::::::::::::::::::::::::::::
     Route::post('/persona/crear_persona', [PersonaController::class, 'crear_persona'])->name('persona.crear_persona');                     // crear
@@ -54,18 +55,30 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::put('/documento-tipo-estandar/eliminar_conf_docs/{id}', [DocumentoTipoEstandarController::class, 'eliminar_documento_tipo_estandar'])->whereNumber('id')->name('documento_tipo_estandar.eliminar');
     Route::resource('documento-tipo-estandar', DocumentoTipoEstandarController::class);
         
-    // :::::::::::::::::::::::::::::: P R O V E E D O R E S :::::::::::::::::::::::::::::: actualizar_estado_doc_estandar
+    // :::::::::::::::::::::::::::::: P R O V E E D O R E S :::::::::::::::::::::::::::::: 
     Route::post('/proveedor/crear_proveedor', [ProveedorController::class, 'crear_proveedor'])->name('proveedor.crear_proveedor');                     // crear
     Route::get('/proveedor/{idpersona}/mostrar_proveedor', [ProveedorController::class, 'mostrar_proveedor'])->whereNumber('idpersona')->name('proveedor.mostrar_proveedor'); //mostar para editar
     Route::put('/proveedor/editar_proveedor/{idpersona}', [ProveedorController::class, 'editar_proveedor'])->whereNumber('idpersona')->name('proveedor.editar_proveedor'); // editar
     Route::put('/proveedor/eliminar_proveedor/{idpersona}', [ProveedorController::class, 'eliminar_proveedor'])->whereNumber('idpersona')->name('proveedor.eliminar_proveedor'); // eliminar
     Route::get('/proveedor/tabla_principal', [ProveedorController::class, 'Listar_Proveedores'])->name('proveedor.Listar_Proveedores'); // AJAX
     Route::get('/proveedor/ver_listar_tipos_estandar_docs', [ProveedorController::class, 'listar_tipos_estandar_docs'])->name('proveedor.listar_tipos_estandar_docs'); //mostar para editar
-    Route::put('/proveedor/actualizar_estado_doc_estandar/{id}', [ProveedorController::class, 'actualizar_estado_doc_estandar'])->whereNumber('id')->name('proveedor.actualizar_estado_doc_estandar'); // editar
+
+    Route::post('/proveedor/importar_proveedores_excel', [ProveedorController::class, 'ImportarProveedoresExcel'])->name('proveedor.ImportarProveedoresExcel'); // importar masivo desde excel
 
     Route::get('/select2/tipoestandar', [ProveedorController::class, 'selec2tipoEstandar']); //  ← select2  
     Route::get('/select2/periodohomologacion', [ProveedorController::class, 'selec2periodohomologacion']); //  ← select2  
     Route::resource('proveedor', ProveedorController::class);
+
+    //:::::::::::::::::::::::::. FECHA HOMOLOGACIÓN :::::::::::::::::::::::::::::: 
+    Route::post('/homologacion/crear_periodo_homologacion', [HomologacionController::class, 'crear_periodo_homologacion'] )->name('homologacion.crear_periodo_homologacion'); // crear
+    Route::get('/homologacion/tabla_periodo_h_principal', [HomologacionController::class, 'listar_periodo_homologacion'] )->name('homologacion.listar_periodo_homologacion'); // AJAX
+    Route::get('/homologacion/{id}/mostrar_periodo_homologacion', [HomologacionController::class, 'mostrar_periodo_homologacion'] )->whereNumber('id')->name('homologacion.mostrar_periodo_homologacion'); // mostrar para editar
+    Route::put('/homologacion/editar_periodo_homologacion/{id}',[HomologacionController::class, 'editar_periodo_homologacion'] )->whereNumber('id')->name('homologacion.editar_periodo_homologacion'); // editar
+    Route::get('/homologacion/listar_docs_xperiodo_xproveedor', [HomologacionController::class, 'listar_docs_xperiodo_xproveedor'] )->name('homologacion.listar_docs_xperiodo_xproveedor'); // AJAX
+    Route::put('/homologacion/actualizar_estado_doc_estandar/{id}', [HomologacionController::class, 'actualizar_estado_doc_estandar'])->whereNumber('id')->name('homologacion.actualizar_estado_doc_estandar'); // editar
+
+    Route::resource('homologacion', HomologacionesController::class );
+
 
     // :::::::::::::::::::::::::::::: API SUNAT RENIEC ok ::::::::::::::::::::::::::::::
     Route::post('/consulta/reniec', [ApiReniecSunatController::class, 'buscarReniec']);
@@ -112,28 +125,28 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     route::put('/actualizardatoscliente/editarcliente', [ActualizardatosclienteController::class, 'editarcliente'])->name('actualizardatoscliente.editarcliente'); // editar
     Route::resource('actualizardatoscliente', ActualizardatosclienteController::class);
 
-    //:::::::::::::::::::::::::. FECHA HOMOLOGACIÓN ::::::::::::::::::::::::::::::
-    Route::post('/fechahomologacion/crear_fecha_homologacion', [FechaHomologacionController::class, 'crear_fecha_homologacion'] )->name('fechahomologacion.crear_fecha_homologacion'); // crear
-    Route::get('/fechahomologacion/tabla_principal', [FechaHomologacionController::class, 'listar_fecha_homologacion'] )->name('fechahomologacion.listar_fecha_homologacion'); // AJAX
-    Route::get('/fechahomologacion/{id}/ver-editar', [FechaHomologacionController::class, 'mostrar_fecha_homologacion'] )->whereNumber('id')->name('fechahomologacion.mostrar_fecha_homologacion'); // mostrar para editar
-    Route::put('/fechahomologacion/editar_fecha_homologacion/{id}',[FechaHomologacionController::class, 'editar_fecha_homologacion'] )->whereNumber('id')->name('fechahomologacion.editar_fecha_homologacion'); // editar
-    Route::put('/fechahomologacion/eliminar_fecha_homologacion/{id}', [FechaHomologacionController::class, 'eliminar_fecha_homologacion'])->whereNumber('id')->name('fechahomologacion.eliminar_fecha_homologacion'); // eliminar
-    Route::resource('fechahomologacion', FechaHomologacionController::class );
 
     // :::::::::::::::::::::::::::::: S U B I R   D O C U M E N T O S  ::::::::::::::::::::::::::::::  periodo_homologacion_xpersona
  
     Route::post('/subir_docs/guardar_doc_estandar_proveedor', [SubirDocsController::class, 'guardar_doc_estandar_proveedor'])->name('subir_docs.guardar_doc_estandar_proveedor'); //Create 
     Route::get('/subir_docs/ver_doc_estandar/{id}', [SubirDocsController::class, 'ver_doc_estandar'])->whereNumber('id')->name('subir_docs.ver_doc_estandar'); //mostar para editar
     Route::put('/subir_docs/editar_doc_estandar_proveedor/{id}', [SubirDocsController::class, 'editar_doc_estandar_proveedor'])->whereNumber('id')->name('subir_docs.editar_doc_estandar_proveedor'); // editar
-    route::put('/subir_docs/eliminar_doc_estandar_proveedor/{iddocsproveedortipoestandar}', [SubirDocsController::class, 'eliminar_doc_estandar_proveedor'])->whereNumber('iddocsproveedortipoestandar')->name('subir_docs.eliminar_doc_estandar_proveedor'); // eliminar
     Route::get('/subir_docs/listar_docs_tipos_est_xuser', [SubirDocsController::class, 'listar_docs_tipos_est_xuser'])->name('subir_docs.listar_docs_tipos_est_xuser'); // AJAX
-    Route::get('/select2/lista_sin_docs_user', [SubirDocsController::class, 'select2_lista_sin_docs']); //  ← select2 docs pendientes por subir
     Route::get('/subir_docs/periodo_homologacion', [SubirDocsController::class, 'periodo_homologacion_xpersona']); //  ← Lista inicial 
     Route::resource('subir_docs', SubirDocsController::class);
    
-    // :::::::::::::::::::::::::::::: REGISTRO DE PROVEEDORES DEL PROVEEDOR  :::::::::::::::::::::::::::::: 
+    // :::::::::::::::::::::::::::::: REGISTRO DE CLIENTES DEL CLIENTE  :::::::::::::::::::::::::::::: 
 
-    Route::resource('prov_proveedor', ProvProveedorController::class);
+    Route::post('/cliente/crear_cliente', [ClienteController::class, 'crear_cliente'])->name('cliente.crear_cliente'); // crear
+    Route::get('/cliente/{idpersona}/mostrar_cliente', [ClienteController::class, 'mostrar_cliente'])->whereNumber('idpersona')->name('cliente.mostrar_cliente'); //mostar para editar
+    Route::put('/cliente/editar_cliente/{idpersona}', [ClienteController::class, 'editar_cliente'])->whereNumber('idpersona')->name('cliente.editar_cliente'); // editar
+    Route::put('/cliente/eliminar_cliente/{idpersona}', [ClienteController::class, 'eliminar_cliente'])->whereNumber('idpersona')->name('cliente.eliminar_cliente'); // eliminar
+    Route::get('/cliente/tabla_principal', [ClienteController::class, 'Listar_clientes'])->name('cliente.Listar_clientes'); // AJAX
+
+    Route::post('/cliente/importar_clientes_excel', [ClienteController::class, 'ImportarclientesExcel'])->name('cliente.ImportarclientesExcel'); // importar masivo desde excel
+
+    Route::resource('cliente', ClienteController::class);
+
 
     // :::::::::::::::::::::::::::::: P R E S U P U E S T O S ::::::::::::::::::::::::::::::
     Route::post('/presupuestos/crear_cabecera',                         [PresupuestoController::class, 'crear_cabecera_presupuesto'])->name('presupuestos.crear.cabecera');

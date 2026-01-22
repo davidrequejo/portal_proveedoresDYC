@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FilePond Plugin Media Preview</title>
+    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+    <link href="./dist/filepond-plugin-media-preview.css" rel="stylesheet">
+    <style>
+        .demo {
+            text-align: center;
+            font-family: Helvetica;
+            margin: 4em auto 0;
+            width: 450px;
+        }
+        a {
+            color: dodgerblue;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="demo">
+        <h3>Media Preview plugin for FilePond demo</h3>
+        <input type="file" multiple="true"/>
+        <a onclick="toggle('video')">Toggle video preview</a> | <a onclick="toggle('audio')">Toggle audio preview</a><br>
+        <a href="https://github.com/nielsboogaard/filepond-plugin-media-preview">Return to the source code</a>
+    </div>
+    
+    <script src="./dist/filepond-plugin-media-preview.js"></script>
+    <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+    
+    <script>
+        // Register the plugin with FilePond
+        FilePond.registerPlugin(FilePondPluginMediaPreview);
+
+        // Get a reference to the file input element
+        const inputElement = document.querySelector('input[type="file"]');
+
+        let allowVideoPreview = true;
+        let allowAudioPreview = true;
+
+        function toggle(toggleType) {
+            if (toggleType === 'video') {
+                allowVideoPreview = !allowVideoPreview;
+            } else {
+                allowAudioPreview = !allowAudioPreview;
+            }
+            FilePond.destroy(inputElement);
+            init();
+        }
+
+        function init() {
+            // Create the FilePond instance
+            const pond = FilePond.create(inputElement, {
+                allowVideoPreview: allowVideoPreview,
+                allowAudioPreview: allowAudioPreview,
+                files: [
+                    {
+                        source: 'source',
+                        options: {
+                            type: 'local',
+                            // Mock file information
+                            file: {
+                                name: 'BigBuckBunny.mp4',
+                                size: 158334976,
+                                type: 'video/mp4',
+                                url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+                                mock: true, // Should be set to true to avoid full file preloading before showing preview
+                            }
+                        }
+                    }
+                ]
+            });
+
+            pond.addFile('./goodmorning.mp4');
+            pond.addFile('./woodpecker.mp3');
+        }
+
+        init();
+    </script>
+
+</body>
+</html>

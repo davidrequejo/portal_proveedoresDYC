@@ -65,7 +65,7 @@ function renderFilas(rows){
   }
 
   rows.forEach(r => {
-    let estado = r.estado_trash == '1' ? '<span class="badge badge-success">Activo</span>' : '<span class="badge badge-danger">Inactivo</span>';
+    let estado = r.estado_trash == '1' ? '<span class="badge badge-new">Activo</span>' : '<span class="badge badge-danger">Inactivo</span>';
 
     let tipoCuenta = '';
     const tipocuenta = (r.estado_revision === null);

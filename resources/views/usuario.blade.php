@@ -8,7 +8,7 @@
   
   <title>Usuarios | Portal Proveedores D&C</title>
 
-  <link rel="icon" href="{{ asset('assets/images/brand-logos/ico-opt.png') }}" type="image/png">
+  <link rel="icon" href="{{ asset('assets/images/brand-logos/dc-logo_cirsulo.png') }}" type="image/png">
 
   @include('layouts.lte_head')
   <!--<link rel="stylesheet" href="{{ asset('assets/jstree-3.3.17/dist/themes/default/style.min.css') }}" />-->
@@ -28,7 +28,7 @@
   </style>
 
 </head>
-<body class="hold-transition sidebar-mini sidebar-collapse layout-fixed">
+<body class="hold-transition sidebar-mini sidebar-collapse layout-fixed pace-orange">
   <div class="wrapper">
 
     <!-- Preloader -->
@@ -89,8 +89,8 @@
                 <div class="float-right">
 
                   <div class="btn-group btn-agregar-usuario">
-                    <button type="button" class="btn btn-success" style="border-color: #1a6b2c !important;" data-toggle="modal" data-target="#modal-agregar-usuario" onclick="limpiar_form_proyecto();" ><i class="ti ti-users-plus"></i> Crear nuevo</button>
-                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" style="border-color: #1a6b2c !important;">
+                    <button type="button" class="btn btn-primary" style="border-color: #2e6da4 !important;" data-toggle="modal" data-target="#modal-agregar-usuario" onclick="limpiar_form_proyecto();" ><i class="ti ti-users-plus"></i> Crear nuevo</button>
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="border-color: #2e6da4 !important;">
                       <span class="sr-only">Toggle Dropdown</span>
                     </button>
                     <div class="dropdown-menu" role="menu">
@@ -181,8 +181,8 @@
           <div class="modal fade" id="modal-agregar-usuario">
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
               <div class="modal-content">
-                <div class="modal-header py-2">
-                  <h4 class="modal-title">Usuarios</h4>
+                <div class="modal-header py-2 bg-color-principal">
+                  <h4 class="modal-title text-white">Usuarios</h4>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span class="text-danger" aria-hidden="true">&times;</span>
                   </button>
@@ -269,8 +269,8 @@
                   </form>
                 </div>
                 <div class="modal-footer justify-content-between py-1">
-                  <button type="button" class="btn btn-outline-danger " data-dismiss="modal"><i class="ti ti-circle-dashed-x"></i>Cerrar</button>
-                  <button type="button" class="btn btn-success" id="guardar_registro_usuario" ><i class="ti ti-device-floppy"></i> Guardar</button>
+                  <button type="button" class="btn btn-outline-secondary " data-dismiss="modal"><i class="ti ti-circle-dashed-x"></i>Cerrar</button>
+                  <button type="button" class="btn btn-primary" id="guardar_registro_usuario" ><i class="ti ti-device-floppy"></i> Guardar</button>
                 </div>
               </div>
               <!-- /.modal-content -->
@@ -300,7 +300,7 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/usuario.js') }}?version_erp=01.03"></script>
+  <script src="{{ asset('assets/js/usuario.js') }}?version_erp=01.05"></script>
 
   <script>
     $(function() {

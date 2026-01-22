@@ -53,7 +53,7 @@ class PersonaCuentaBancariaController extends Controller
             ]);
 
             return ApiResponse::success([
-                'idpersona_cuentaBancaria' => $data
+                'idpersona_cuentabancaria' => $data
             ], 'Cuenta bancaria creada correctamente');
 
         } catch (\Throwable $e) {
@@ -82,7 +82,7 @@ class PersonaCuentaBancariaController extends Controller
 
             if ($r->predeterminado === '1') {
                 PersonaCuentaBancaria::where('idpersona', $cuenta->idpersona)
-                    ->where('idpersona_cuentaBancaria', '!=', $id)
+                    ->where('idpersona_cuentabancaria', '!=', $id)
                     ->update(['predeterminado' => '0']);
             }
 
@@ -98,7 +98,7 @@ class PersonaCuentaBancariaController extends Controller
             ]);
 
             return ApiResponse::success([
-                'idpersona_cuentaBancaria' => $cuenta->idpersona_cuentaBancaria
+                'idpersona_cuentabancaria' => $cuenta->idpersona_cuentabancaria
             ], 'Cuenta bancaria actualizada correctamente');
 
         } catch (\Throwable $e) {
@@ -121,7 +121,7 @@ class PersonaCuentaBancariaController extends Controller
             ]);
 
             return ApiResponse::success([
-                'idpersona_cuentaBancaria' => $id,
+                'idpersona_cuentabancaria' => $id,
                 'estado_trash' => 0
             ], 'Cuenta bancaria eliminada correctamente');
 
@@ -140,7 +140,7 @@ class PersonaCuentaBancariaController extends Controller
         $query = DB::table('persona_cuentabancaria as pcb')
             ->join('banco as b', 'b.idbanco', '=', 'pcb.idbanco')
             ->select(
-                'pcb.idpersona_cuentaBancaria',
+                'pcb.idpersona_cuentabancaria',
                 'pcb.idpersona',
                 'pcb.tipocuenta',
                 'pcb.moneda',

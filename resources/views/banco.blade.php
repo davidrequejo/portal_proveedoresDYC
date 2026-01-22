@@ -8,7 +8,7 @@
   
   <title>Bancos | Portal Proveedores D&C</title>
 
-  <link rel="icon" href="{{ asset('assets/images/brand-logos/ico-opt.png') }}" type="image/png">
+  <link rel="icon" href="{{ asset('assets/images/brand-logos/dc-logo_cirsulo_white.png') }}" type="image/png">
 
   @include('layouts.lte_head')
   <!--<link rel="stylesheet" href="{{ asset('assets/jstree-3.3.17/dist/themes/default/style.min.css') }}" />-->
@@ -268,7 +268,7 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/banco.js') }}?version_erp=01.03"></script>
+  <script src="{{ asset('assets/js/banco.js') }}?version_erp=01.05"></script>
 
   <script>
     $(function() {

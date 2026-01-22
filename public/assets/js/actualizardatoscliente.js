@@ -1,7 +1,7 @@
 const BASE_URL = document.querySelector('meta[name="app-url"]').content;
 const CSRF = document.querySelector('meta[name="csrf-token"]').content;
  
-$("#editar_registro_cliente").on("click", function (e) { $("#submit-form-editarcliente").submit(); });   
+$("#editar_registro_proveedor").on("click", function (e) { $("#submit-form-editarproveedor").submit(); });   
 
 lista_select2(`${BASE_URL}/select2/bancos`, '#idbanco');
 lista_select2(`${BASE_URL}/select2/obtener`, '#distrito'); 
@@ -13,7 +13,6 @@ $("#sexo").select2({ theme: "bootstrap4", placeholder: "Seleccionar Sexo", allow
 
 $("#tratamiento_pers_nat").val('').trigger('change');
 $("#sexo").val('').trigger('change');
-
 
 function limpiar_form_banco(){
   $("#idpersona_CuentaBancaria").val('');
@@ -28,21 +27,18 @@ function limpiar_form_banco(){
   $(".error.invalid-feedback").remove();
 }
 
-function ver_editar_cliente(){
+function ver_editar_proveedor(){
 
   let id = $("#idpersonaUpdate").val();
 
   $.getJSON(`${BASE_URL}/actualizardatoscliente/${id}/ver_clienteupdate`, function (e) {
 
     if (e.status === true) {
-      
-      $("#fecha_inicio_periodo").val(e.data.cliente.fecha_inicio_periodo);
-      $("#fecha_fin_periodo").val(e.data.cliente.fecha_fin_periodo);
 
       $("#idpersona").val(e.data.cliente.idpersona);
 
       $("#idtipo_persona").val(e.data.cliente.idtipo_persona);
-      $("#idtipoestandarcliente").val(e.data.cliente.idtipoestandarcliente).trigger('change');
+      $("#idtipoestandarproveedor").val(e.data.cliente.idtipoestandarproveedor).trigger('change');
       $("#tipo_entidad_sunat").val(e.data.cliente.tipo_entidad_sunat).trigger('change');
       $("#tipo_documento_input1").val(e.data.cliente.tipo_documento).trigger('change');
       $("#numero_documento_input1").val(e.data.cliente.numero_documento);
@@ -62,9 +58,18 @@ function ver_editar_cliente(){
       $("#numero_documento_input2").val(e.data.cliente.ruc_persona_natural);
       $("#fecha_nacimiento").val(e.data.cliente.fecha_nacimiento);
 
-      let tipoDocumentoTexto = $('#tipo_documento_input1 option:selected').text();
+      $("#nombre_apellidos_representante_legal").val(e.data.cliente.nombre_apellidos_representante_legal);
+      $("#telefono_representante").val(e.data.cliente.numerotelefo_representante_legal);
 
-      controlarCampos(tipoDocumentoTexto);
+      $("#nombre_apellidos_contacto_comercial").val(e.data.cliente.nombres_contacto_comercial);
+      $("#telefono_contacto_comercial").val(e.data.cliente.telefono_contacto_comercial);
+      $("#email_contacto_comercial").val(e.data.cliente.correo_contacto_comercial);
+      $("#cargo_contacto_comercial").val(e.data.cliente.cargo_contacto_comercial);
+
+      let tipoDocumentoTexto = $('#tipo_documento_input1 option:selected').text();
+      let tipoentidadTexto = $('#tipo_entidad_sunat option:selected').text();
+
+      controlarCampos(tipoDocumentoTexto, tipoentidadTexto);
 
       $(".vista_inicial").hide();
       $(".vista_datos").show();
@@ -78,57 +83,57 @@ function ver_editar_cliente(){
   });
 }
 
-ver_editar_cliente();
+ver_editar_proveedor();
 
 
- function controlarCampos(tipoDocumentoTexto) {
+function controlarCampos(tipoDocumentoTexto, tipoentidadTexto){
+
+if ( tipoentidadTexto=='NATURAL') {
+  $('.div_razon_social').hide();
+  $('#nombre_persona_natural').prop('required', true);
+  $('#apellido_paterno_per_natural').prop('required', true);
+  $('#apellido_materno_per_natural').prop('required', true);
+  $('#sexo').prop('required', true);
+  $('#tratamiento_pers_nat').prop('required', true);
+  $('#numero_documento_input2').prop('required', true);
+
+  $('.div_campos_pers_jud').hide();
+  $('.div_campos_pers_nat').show();
+
+  $('.class_col_dni_ruc_telefono').addClass('col-md-3 col-lg-3');
+  $('.class_col_dni_ruc_email').addClass('col-md-4 col-lg-4');
+  $('.class_col_dni_ruc_direccion').addClass('col-md-5 col-lg-5');
+
+}else{
+  $('.div_razon_social').show();
+  $('.div_campos_pers_nat').hide();
+  $('.div_campos_pers_jud').show();
   
-  if (tipoDocumentoTexto=='DNI') {
-    $('.div_razon_social').hide();
-    $('#nombre_persona_natural').prop('required', true);
-    $('#apellido_paterno_per_natural').prop('required', true);
-    $('#apellido_materno_per_natural').prop('required', true);
-    $('#sexo').prop('required', true);
-    $('#tratamiento_pers_nat').prop('required', true);
-    $('#numero_documento_input2').prop('required', true);
-
-    $('.div_campos_pers_jud').hide();
-    $('.div_campos_pers_nat').show();
-
-    $('.class_col_dni_ruc_telefono').addClass('col-md-3 col-lg-3');
-    $('.class_col_dni_ruc_email').addClass('col-md-4 col-lg-4');
-    $('.class_col_dni_ruc_direccion').addClass('col-md-5 col-lg-5');
-
-  }else{
-    $('.div_razon_social').show();
-    $('.div_campos_pers_nat').hide();
-    $('.div_campos_pers_jud').show();
-    
-    $('#nombre_razonsocial').prop('required', true);
-    $('#numero_documento_input2').prop('required', false);
-    
-    $('#sexo').prop('required', false);
-    $('#tratamiento_pers_nat').prop('required', false);
-    $('#nombre_persona_natural').prop('required', false);
-    $('#apellido_paterno_per_natural').prop('required', false);
-    $('#apellido_materno_per_natural').prop('required', false);
-
-    $('.class_col_dni_ruc_telefono').addClass('col-md-4 col-lg-4');
-    $('.class_col_dni_ruc_email').addClass('col-md-5 col-lg-5');
-    $('.class_col_dni_ruc_direccion').addClass('col-md-7 col-lg-7');
-  }
+  $('#nombre_razonsocial').prop('required', true);
+  $('#numero_documento_input2').prop('required', false);
   
- }
+  $('#sexo').prop('required', false);
+  $('#tratamiento_pers_nat').prop('required', false);
+  $('#nombre_persona_natural').prop('required', false);
+  $('#apellido_paterno_per_natural').prop('required', false);
+  $('#apellido_materno_per_natural').prop('required', false);
+
+  $('.class_col_dni_ruc_telefono').addClass('col-md-4 col-lg-4');
+  $('.class_col_dni_ruc_email').addClass('col-md-5 col-lg-5');
+  $('.class_col_dni_ruc_direccion').addClass('col-md-7 col-lg-7');
+}
+
+}
 
 
- function editar_datoscliente(e){
+function editar_datosproveedor(e){
 
-  let formData = new FormData($("#form-editar-cliente")[0]);
+  let formData = new FormData($("#form-editar-proveedor")[0]);
   let id = $("#idpersonaUpdate").val();
   let url = '';
 
   if (id === '') {
-    url = `${BASE_URL}/persona-cuenta-bancaria/crear`;
+    url =`${BASE_URL}/persona-cuenta-bancaria/crear`;
   } else {
     url = `${BASE_URL}/actualizardatoscliente/editarcliente`;
     formData.append('_method', 'PUT');
@@ -142,7 +147,7 @@ ver_editar_cliente();
     processData: false,
     success: function (e) {
       if (e.status === true) {
-        ver_editar_cliente();
+        ver_editar_proveedor();
         Swal.fire("Correcto!", "Actualizado correctamente", "success");
         $("#modal-crear_cuentabancaria").modal("hide");
       } else {
@@ -156,7 +161,6 @@ ver_editar_cliente();
 }
 
 
-
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 // ═══════                                       J Q   F O R M   V A L I D A T I O N S                                                              ═══════
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -165,7 +169,7 @@ $(function () {
   $('#sexo').on('change', function() { $(this).trigger('blur'); });
   $('#nombre_razonsocial').on('change', function() { $(this).trigger('blur'); });
 
-  $("#form-editar-cliente").validate({
+  $("#form-editar-proveedor").validate({
     rules: {
       idbanco: { required: true },
       tipocuenta: { required: true },
@@ -200,7 +204,7 @@ $(function () {
 
     submitHandler: function (e) {
       $(".modal-body").animate({ scrollTop: $(document).height() }, 600); // Scrollea hasta abajo de la página
-      editar_datoscliente(e);       
+      editar_datosproveedor(e);       
     },
   });
 
@@ -219,7 +223,6 @@ $('#tipo_entidad_sunat').on('mousedown', function (e) {  e.preventDefault();  th
   toastr.warning("Si no es el tipo Entidad correcto Comunicate con el Administrador.");
 });
 
-
 $(document).ready(function() {
     // Cuando el valor del select cambia
     $('#distrito').change(function() {
@@ -233,8 +236,16 @@ $(document).ready(function() {
         
     });
 
-
-
-
-
 });
+
+function soloNumeros(e) {
+    var tecla = e.key;
+
+    // Permitir solo números
+    if (tecla >= '0' && tecla <= '9') {
+        return true;
+    }
+
+    // Bloquear todo lo demás
+    return false;
+}
