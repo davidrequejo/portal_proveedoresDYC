@@ -178,11 +178,13 @@ function verdocumentos(idpersona_facha_homologacion,descripcion){
   local_idpersona_facha_homologacion = idpersona_facha_homologacion;
   show_hide_escenario(2);
   $(".nombre_periodo_homologacion").html(`<strong>Perido Homologación : </strong>` +descripcion);
+  $("#idpersona_facha_homologacion").val(idpersona_facha_homologacion);
   ver_estados_docs_proveedor(idpersona_facha_homologacion);
   
 }
 
 function ver_estados_docs_proveedor(idpersona_facha_homologacion) {
+
   show_hide_escenario(2);
   //$("#titulo-detalle-proyecto").html(`Documentos del Proveedor: <b class="text-info">${nombre_razonsocial}</b>`);
    $(".tbl_lista_documentos").html('<tr><td colspan="10" class="text-center text-muted">Ninguno</td></tr>');
@@ -202,7 +204,7 @@ function ver_estados_docs_proveedor(idpersona_facha_homologacion) {
           switch (r.estado_revision) {
               case 'Actualizado': estadoHtml = `<span class="badge bg-warning text-dark">Actualizado</span>`; break;
 
-              case 'Observado': estadoHtml = `<span class="badge bg-orange text-white">Observado</span>`; break;
+              case 'Observado': estadoHtml = `<span class="badge bg-orange text-white" data-toggle="tooltip" data-original-title="${r.observacion ?? ''}" style="cursor: pointer;">Observado</span>`; break;
 
               case 'Aprobado': estadoHtml = `<span class="badge bg-success">Aprobado</span>`; break;
 

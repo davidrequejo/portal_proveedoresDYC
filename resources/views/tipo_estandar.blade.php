@@ -433,7 +433,7 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/tipo_estandar.js') }}?version_erp=01.05"></script>
+  <script src="{{ asset('assets/js/tipo_estandar.js') }}?version_erp=01.06"></script>
   <script src="{{ asset('assets/js/documentotipo_estandar.js') }}?version_erp=01.04"></script>
 
 

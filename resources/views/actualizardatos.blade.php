@@ -127,7 +127,7 @@
                   <div class=" col-12 col-sm-12 col-md-6 col-lg-5">
                     <div class="card">
                       <div class="card-header border-0" style="background-color: aliceblue;">
-                        <h3 class="card-title m-2 font-weight-bold text-principal">Información del Proveedor</h3>
+                        <h3 class="card-title m-2 font-weight-bold text-principal">Información del Proveedor - <span>{{ auth()->user()->tiene_cuenta_bancaria }}</span> - <span>{{ auth()->user()->persona?->estado_completoxproveedor  }}</span></h3>
                         <div class="card-tools m-2"></div>
                       </div>
                       <div class="modal-body vista_inicial titulo-separador"><i class="fas fa-spinner fa-spin fa-lg " style="color: #e60f00;"></i>  <Span style="color: #e60f00;"> Cargando...</Span> </div>  
@@ -148,7 +148,7 @@
                             <!-- Tipo Entidad Sunat -->
                             <div class="col-12 col-sm-6 col-md-3 col-lg-3">
                               <div class="form-group">
-                                <label for="descripcion">Tipo Entidad Sunat</label> 
+                                <label for="descripcion">Entidad Sunat</label> 
                                 <select name="tipo_entidad_sunat" id="tipo_entidad_sunat" class="form-control is-valid select2" placeholder="Tipo de documento" aria-invalid="false" readonly>
                                   <option value="NATURAL">NATURAL</option>
                                   <option value="JURIDICA">JURIDICA</option>
@@ -159,7 +159,7 @@
                             <!-- Tipo de documento -->
                             <div class="col-12 col-sm-6 col-md-4 col-lg-4">
                               <div class="form-group">
-                                <label for="descripcion">Tipo de documento</label> 
+                                <label for="descripcion">Tipo de doc.</label> 
                                 
                                 <select name="tipo_documento_input1" id="tipo_documento_input1" class="form-control is-valid select2" placeholder="Tipo de documento" aria-invalid="false" readonly>
                                   <option value="1">DNI</option>
@@ -184,10 +184,10 @@
                               </div>
                             </div>
 
-                            <!-- Nombre y Apellidos -->
+                            <!-- Razon social -->
                             <div class="col-12 col-sm-12 col-md-8 col-lg-8 div_razon_social">
                               <div class="form-group">
-                                <label for="Nombre_Apellidos">Nombre y Apellidos/Razon Social <sup class="text-danger">*</sup></label>
+                                <label for="Nombre_Apellidos">Razón Social <sup class="text-danger">*</sup></label>
                                 <input type="text" name="nombre_razonsocial_input1" class="form-control" id="nombre_razonsocial_input1"  />
                               </div>
                             </div> 
@@ -214,7 +214,7 @@
                               </div>
                             </div>
 
-                            <div class="col-12 col-sm-12 col-md-3 col-lg-3  div_campos_pers_nat" style="display: none;">
+                            <div class="col-12 col-sm-12 col-md-4 col-lg-4  div_campos_pers_nat" style="display: none;">
                               <div class="form-group">
                                 <label>Sexo</label>
                                 <select name="sexo" id="sexo" class="form-control is-valid select2" placeholder="Sexo" aria-invalid="false">
@@ -226,7 +226,7 @@
 
                             <div class="col-12 col-sm-12 col-md-3 col-lg-3  div_campos_pers_nat" style="display: none;">
                               <div class="form-group">
-                                <label>Fecha Nacimiento</label>
+                                <label>F. Nacimiento</label>
                                 <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" class="form-control">
                               </div>
                             </div>
@@ -247,7 +247,7 @@
                                 </svg>
                                 </span> <span class="valido_novalido"><span class="badge badge-secondary">Por Verificar</span></span>  </label>
                                 <input type="hidden" id="tipo_documento_input2" class="form-control" value="1">
-                                <input type="text" name="ruc_pers_nat" id="numero_documento_input2" class="form-control">
+                                <input type="text" name="ruc_pers_nat" id="numero_documento_input2" class="form-control" onkeypress="return soloNumeros(event)" maxlength="8" >
                               </div>
                             </div>
 
@@ -269,7 +269,7 @@
                             <div class="col-12 col-sm-12 class_col_dni_ruc_telefono">
                               <div class="form-group">
                                 <label for="celular">Teléfono</label>
-                                <input type="text" name="celular" id="celular" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text">
+                                <input type="text" name="celular" id="celular" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text" onkeypress="return soloNumeros(event)">
                               </div>
                             </div>
 
@@ -330,7 +330,7 @@
                             <div class="col-12 col-sm-12 col-md-4 col-lg-4 div_campos_pers_jud" style="display: none;">
                               <div class="form-group">
                                 <label for="telefono_representante">Teléfono Representante legal</label>
-                                <input type="text" name="telefono_representante" id="telefono_representante" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text">
+                                <input type="text" name="telefono_representante" id="telefono_representante" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text" onkeypress="return soloNumeros(event)">
                               </div>
                             </div>
 
@@ -360,7 +360,7 @@
                             <div class="col-12 col-sm-12 col-md-4 col-lg-4 div_campos_pers_jud" style="display: none;">
                               <div class="form-group">
                                 <label for="telefono_contacto_comercial">Teléfono</label>
-                                <input type="text" name="telefono_contacto_comercial" id="telefono_contacto_comercial" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text" placeholder="Teléfono">
+                                <input type="text" name="telefono_contacto_comercial" id="telefono_contacto_comercial" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text" placeholder="Teléfono" onkeypress="return soloNumeros(event)">
                               </div>
                             </div>  
 
@@ -397,6 +397,7 @@
 
                       </div>
                       <div class="modal-footer justify-content-end py-1">
+                        <span class="text-danger spiner_enviando_correo" style="display: none"> <i class="fas fa-sync fa-spin"></i> Actualizando... </span>
                         <button type="button" class="btn btn-primary" id="editar_registro_proveedor" ><i class="ti ti-device-floppy"></i> Actualizar</button>
                       </div>
 
@@ -420,7 +421,7 @@
                         <div class="float-right">
 
                           <div class="btn-group btn-agregar-proyecto">
-                            <button type="button" class="btn btn-primary" style="border-color: #063ffc !important;" data-toggle="modal" data-target="#modal-crear_cuentabancaria" onclick=""><i class="nav-icon fas fa-file"></i> Crear nuevo</button>
+                            <button type="button" class="btn btn-primary" style="border-color: #063ffc !important;" data-toggle="modal" data-target="#modal-crear_cuentabancaria" onclick="verificar_tipocuenta();"><i class="nav-icon fas fa-file"></i> Crear nuevo</button>
                           </div>
                         </div>
                         <div class="card-tools m-2"></div>
@@ -485,7 +486,7 @@
                     @csrf
 
                     <!-- PK (hidden si es edición) -->
-                    <input type="hidden" name="idpersona_CuentaBancaria" id="idpersona_CuentaBancaria">
+                    <input type="hidden" name="idpersona_cuentabancaria" id="idpersona_cuentabancaria">
 
                     <!-- Persona -->
                     <input type="hidden" name="idpersona" id="idpersona" value="{{ auth()->user()->idpersona }}">
@@ -508,10 +509,7 @@
                           <select name="tipocuenta" id="tipocuenta"  class="form-control is-valid select2" placeholder="Tipo de Cuenta" aria-invalid="false">
                             <option value="C">Corriente</option>
                             <option value="A">Ahorros</option>
-                            <option value="M">Maestra</option>
-                            <option value="T">CTS</option>
                             <option value="D">Detracción</option>
-                            <option value="S">Cuenta Sueldo</option>
 
                           </select>
                         </div>
@@ -533,7 +531,8 @@
                       <div class="col-12 col-md-4 col-lg-5">
                         <div class="form-group">
                           <label for="numero_cuenta">Número de Cuenta</label>
-                          <input type="number" name="numero_cuenta" id="numero_cuenta" class="form-control" maxlength="45" placeholder="Ej: 12345678900" required  onkeypress="return soloNumeros(event)">
+                          <input type="number" name="numero_cuenta" id="numero_cuenta" class="form-control" maxlength="45" placeholder="Ej: 12345678900" required  onkeypress="return soloNumeros(event)" onkeyup="replica_nrocuenta()">
+                          <input type="hidden" name="numero_cuenta_abono" id="numero_cuenta_abono" class="form-control" maxlength="45" placeholder="Ej: 12345678900" >
                         </div>
                       </div>
 
@@ -570,13 +569,37 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="">Cerrar</button>
-                  <button type="button" class="btn btn-primary" id="guardar_registro_cuenta_bank">Guardar</button>
+                  <span class="text-danger spiner_enviando_correo_cb" style="display: none"> <i class="fas fa-sync fa-spin"></i> Guardando... </span>
+                  <button type="button" class="btn btn-primary " id="guardar_registro_cuenta_bank">Guardar</button>
                 </div>
               </div>
               <!-- /.modal-content -->
             </div>
             <!-- /.modal-dialog -->
           </div>
+
+          <!-- MODAL eliinar CUENTA BANCARIA 
+          <div class="modal fade show" id="modal-eliminar_cuentabancaria"  aria-modal="true" role="dialog">
+            <div class="modal-dialog modal-xs">
+              <div class="modal-content">
+                <div class="modal-body">
+                  <div class="swal2-icon swal2-warning swal2-icon-show" style="display: flex;"><div class="swal2-icon-content">!</div></div>
+                  <h3 class="swal2-title" style="margin: 10px;">¿Está seguro de eliminar la cuenta bancaria?</h3>
+                  
+                  <div class="modal-footer justify-content-center"> 
+                    <button type="button" class="btn btn-danger  delete_registro_cuenta_bank" onclick="delete_cuentacb();">Si Eliminar</button>
+                    <span class="text-danger spiner_enviando_correo_cb_delete" style="display: none"> <i class="fas fa-sync fa-spin"></i> Eliminando... </span>
+                    <button type="button" class="btn btn-secondary cancelar_registro_cb" data-dismiss="modal" onclick="">Cancelar</button>
+                    
+                    
+                  </div>
+
+                </div>
+              </div>
+             
+            </div>
+           
+          </div>-->
 
         </section>
         <!-- /.content -->
@@ -599,8 +622,8 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/actualizardatosproveedor.js') }}?version_erp=01.05"></script>
-  <script src="{{ asset('assets/js/persona_cuentabancaria.js') }}?version_erp=01.05"></script>
+  <script src="{{ asset('assets/js/actualizardatosproveedor.js') }}?version_erp=01.06"></script>
+  <script src="{{ asset('assets/js/persona_cuentabancaria.js') }}?version_erp=01.06"></script>
 
   <script>
     $(function() {

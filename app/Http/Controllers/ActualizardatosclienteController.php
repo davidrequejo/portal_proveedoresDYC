@@ -5,6 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
 use App\Models\Cliente;
+use App\Models\Logbd;
+use Illuminate\Support\Facades\Validator;
+use App\Mail\ProveedorActualizadoLogisticaMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 
 
 class ActualizardatosclienteController extends Controller
@@ -78,12 +83,81 @@ class ActualizardatosclienteController extends Controller
         // Evita sobrescribir con NULL
         $data = array_filter($data, fn ($v) => $v !== null);
 
+
+        // Actualizar cliente
         $cliente->update($data);
+
+                // Obtener valores después de la actualización
+        $cambios = $cliente->getChanges();
+
+        // Etiquetas legibles (opcional pero recomendado)
+        $labels = [
+            'nombre_razonsocial'             => 'razon_social',
+
+            'nombre_persona_natural'         => 'nombre_persona_natural',
+            'apellido_paterno_per_natural'   => 'apellido_paterno_per_natural',
+            'apellido_materno_per_natural'   => 'apellido_materno_per_natural',
+            'sexo'                           => 'sexo',
+            'fecha_nacimiento'               => 'fecha_nacimiento',
+            'Doc. DNI'                       => 'ruc_persona_natural',
+            'tratamiento_pers_natural'       => 'tratamiento_pers_natural',
+            'Documento de Identidad'         => 'numero_documento',
+
+            'email'            => 'email',
+            'celular'            => 'celular',
+            'direccion'          => 'direccion',
+            'departamento'       => 'departamento',
+            'provincia'          => 'provincia',
+            'distrito'           => 'distrito',
+
+        ];
+
+        $observacion = '';
+
+        foreach ($cambios as $campo => $valor) {
+
+            // ignorar campos que no quieres loguear
+            if (!isset($labels[$campo])) { continue; }
+
+            // evitar campos técnicos
+            if (in_array($campo, ['updated_at', 'user_updated'])) { continue; }
+
+            $observacion .= $labels[$campo] . ' : ' . ($valor ?? '-') . "\n";
+        }
+
+        if (trim($observacion) !== '') {
+            Logbd::create([
+                'nombre_tabla'     => 'persona',
+                'id_registrotabla' => $cliente->idpersona,
+                'id_user'          => auth()->id(),
+                'observacion'      => trim($observacion),
+                'accion_realizada' => 'Registro Actualizado',
+                'user_created'     => auth()->id(),
+            ]);
+        }
+
+        /** Enviar correo de notificación a logística */
+        $logistica = DB::table('persona')
+        ->join('tipo_persona', 'persona.idtipo_persona', '=', 'tipo_persona.idtipo_persona')
+        ->where('persona.idtipo_persona', 6)
+        ->where('persona.estado', 1)
+        ->where('persona.estado_delete', 1)
+        ->select('persona.idpersona', 'persona.nombre_razonsocial', 'persona.email', 'tipo_persona.descripcion')
+        ->get();
+
+        foreach ($logistica as $usuarioLogistica) {
+            // Definir tipo y acción basados en el contexto de la actualización
+            $tipo = 'cliente';  // O 'cuenta_bancaria' o 'cliente'
+
+            // Enviar el correo con los datos adecuados
+            Mail::to($usuarioLogistica->email)->queue(new ProveedorActualizadoLogisticaMail($cliente, $tipo));
+        }
+
 
 
         return ApiResponse::success([
             'e' =>'Registro actualizado',
-        ], 'Proveedor actualizado correctamente');
+        ], 'Cliente actualizado correctamente');
     }
 
     

@@ -83,13 +83,13 @@
           <div class="container-fluid">
             <div class="row mb-2">
               <div class="col-sm-6">
-                <h1 class="m-0">Socios de Negocio</h1>
+                <h1 class="m-0">Trabajadores</h1>
               </div><!-- /.col -->
               <div class="col-sm-6">
                 <div class="float-right">
 
                   <div class="btn-group btn-agregar-persona">
-                    <button type="button" class="btn btn-primary" style="border-color: #2e6da4 !important;" data-toggle="modal" data-target="#modal-agregar-proyecto" onclick="limpiar_form_persona();" ><i class="ti ti-users-plus"></i> Crear nuevo</button>
+                    <button type="button" class="btn btn-primary" style="border-color: #2e6da4 !important;" data-toggle="modal" data-target="#modal-agregar-proyecto" onclick="limpiar_form_persona(); verificar_tiporol();" ><i class="ti ti-users-plus"></i> Crear nuevo</button>
                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="border-color: #2e6da4 !important;">
                       <span class="sr-only">Toggle Dropdown</span>
                     </button>
@@ -147,7 +147,6 @@
                         <thead>
                           <tr>                        
                             <th>Acciones</th>
-                            <th data-sort="codigo"      class="sortable">Código</th>
                             <th data-sort="nombre_razonsocial" class="sortable">Razón social</th>
                             <th data-sort="tipo_entidad_sunat"     class="sortable">Tipo Entidad Sunat </th>
                             <th data-sort="abreviatura"     class="sortable">Tipo de Documento</th>
@@ -184,7 +183,7 @@
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
               <div class="modal-content">
                 <div class="modal-header py-2 bg-color-principal">
-                  <h4 class="modal-title text-white">Socios de Negocio</h4>
+                  <h4 class="modal-title text-white">Trabajador</h4>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span class="text-danger" aria-hidden="true">&times;</span>
                   </button>
@@ -263,14 +262,14 @@
                         </div>
                       </div> 
                       <!-- email -->
-                      <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+                      <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                         <div class="form-group">
                           <label for="email">Email</label>
                            <input type="email" name="email" class="form-control" id="email" placeholder="Correo electrónico" onkeyup="convert_minuscula(this);">
                         </div>
                       </div>      
                       <!-- Teléfono -->
-                      <div class="col-12 col-sm-12 col-md-3 col-lg-3">
+                      <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label for="celular">Teléfono</label>
                           <input type="text" name="celular" id="celular" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text">
@@ -437,7 +436,7 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/persona.js') }}?version_erp=01.05"></script>
+  <script src="{{ asset('assets/js/persona.js') }}?version_erp=01.06"></script>
 
   <script>
     $(function() {

@@ -34,9 +34,6 @@ function ver_editar_proveedor(){
   $.getJSON(`${BASE_URL}/actualizardatosproveedor/${id}/ver_proveedorupdate`, function (e) {
 
     if (e.status === true) {
-
-      console.log(e);
-      
       
       $("#fecha_inicio_periodo").val(e.data.proveedor.fecha_inicio_periodo);
       $("#fecha_fin_periodo").val(e.data.proveedor.fecha_fin_periodo);
@@ -95,7 +92,7 @@ ver_editar_proveedor();
 function controlarCampos(tipoDocumentoTexto, tipoentidadTexto){
 
 if ( tipoentidadTexto=='NATURAL') {
-  $('.div_razon_social').hide();
+  $('.div_razon_social').show();
   $('#nombre_persona_natural').prop('required', true);
   $('#apellido_paterno_per_natural').prop('required', true);
   $('#apellido_materno_per_natural').prop('required', true);
@@ -107,8 +104,8 @@ if ( tipoentidadTexto=='NATURAL') {
   $('.div_campos_pers_nat').show();
 
   $('.class_col_dni_ruc_telefono').addClass('col-md-3 col-lg-3');
-  $('.class_col_dni_ruc_email').addClass('col-md-4 col-lg-4');
-  $('.class_col_dni_ruc_direccion').addClass('col-md-5 col-lg-5');
+  $('.class_col_dni_ruc_email').addClass('col-md-5 col-lg-5');
+  $('.class_col_dni_ruc_direccion').addClass('col-md-7 col-lg-7');
 
 }else{
   $('.div_razon_social').show();
@@ -134,6 +131,10 @@ if ( tipoentidadTexto=='NATURAL') {
 
 function editar_datosproveedor(e){
 
+  $(".spiner_enviando_correo").show();
+  $("#editar_registro_proveedor").hide();
+
+
   let formData = new FormData($("#form-editar-proveedor")[0]);
   let id = $("#idpersonaUpdate").val();
   let url = '';
@@ -155,13 +156,40 @@ function editar_datosproveedor(e){
       if (e.status === true) {
         ver_editar_proveedor();
         Swal.fire("Correcto!", "Actualizado correctamente", "success");
-        $("#modal-crear_cuentabancaria").modal("hide");
+        $(".spiner_enviando_correo").hide();
+        $("#editar_registro_proveedor").show();
+
       } else {
+        
         ver_errores(e);
       }
     },
+
     error: function (xhr) {
-      ver_errores(xhr);
+
+      if (xhr.status === 422) {
+
+        let errors = xhr.responseJSON.data;
+        let message = xhr.responseJSON.message;
+        let html = '<ul style="text-align:left">';
+
+        Object.values(errors).forEach(msgs => {
+          msgs.forEach(msg => {
+            html += `<li>${msg}</li>`;
+          });
+        });
+
+        html += '</ul>';
+
+        Swal.fire({
+          icon: 'warning',
+          title: message,
+          html: html
+        });
+      }else {
+        ver_errores(xhr);
+      }
+        
     }
   });
 }
@@ -244,14 +272,5 @@ $(document).ready(function() {
 
 });
 
-function soloNumeros(e) {
-    var tecla = e.key;
 
-    // Permitir solo números
-    if (tecla >= '0' && tecla <= '9') {
-        return true;
-    }
 
-    // Bloquear todo lo demás
-    return false;
-}

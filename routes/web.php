@@ -76,8 +76,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::put('/homologacion/editar_periodo_homologacion/{id}',[HomologacionController::class, 'editar_periodo_homologacion'] )->whereNumber('id')->name('homologacion.editar_periodo_homologacion'); // editar
     Route::get('/homologacion/listar_docs_xperiodo_xproveedor', [HomologacionController::class, 'listar_docs_xperiodo_xproveedor'] )->name('homologacion.listar_docs_xperiodo_xproveedor'); // AJAX
     Route::put('/homologacion/actualizar_estado_doc_estandar/{id}', [HomologacionController::class, 'actualizar_estado_doc_estandar'])->whereNumber('id')->name('homologacion.actualizar_estado_doc_estandar'); // editar
-
-    Route::resource('homologacion', HomologacionesController::class );
+    Route::post('/homologacion/enviar_correo_notificacion', [HomologacionController::class, 'enviar_correo_notificacion'])->name('homologacion.enviar_correo_notificacion'); // enviar correo notificación
+    Route::resource('homologacion', HomologacionController::class );
 
 
     // :::::::::::::::::::::::::::::: API SUNAT RENIEC ok ::::::::::::::::::::::::::::::
@@ -146,25 +146,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::post('/cliente/importar_clientes_excel', [ClienteController::class, 'ImportarclientesExcel'])->name('cliente.ImportarclientesExcel'); // importar masivo desde excel
 
     Route::resource('cliente', ClienteController::class);
-
-
-    // :::::::::::::::::::::::::::::: P R E S U P U E S T O S ::::::::::::::::::::::::::::::
-    Route::post('/presupuestos/crear_cabecera',                         [PresupuestoController::class, 'crear_cabecera_presupuesto'])->name('presupuestos.crear.cabecera');
-     Route::put('/presupuestos/{idpresupuesto}/actualizar_cabecera',    [PresupuestoController::class, 'actualizar_cabecera_presupuesto'])->name('presupuestos.actualizar_cabecera');    
-     Route::get('/presupuestos/{idpresupuesto}/mostrar',                [PresupuestoController::class, 'mostrar_editar'])->name('presupuestos.mostrar');
-    Route::resource('presupuestos', PresupuestoController::class);
-    
-    // :::::::::::::::::::::::::::::: R E C U R S O S  ::::::::::::::::::::::::::::::
-    Route::get('/recursos/listar_recursos_x_niveles',       [RecursoController::class, 'getlistar_recursos_x_nivel'])->name('recursos.getlistar_recursos_x_nivel');
-    Route::get('/recursos/listar_recursos_ultimo_nivel',    [RecursoController::class, 'getlistar_recursos_ultimo_nivel'])->name('recursos.getlistar_recursos_ultimo_nivel');
-    Route::resource('recursos', RecursoController::class);
-
-    // :::::::::::::::::::::::::::::: G R U P O   P R E S U P U E S T O   ::::::::::::::::::::::::::::::
-    Route::get('/arbol-presupuestos/jstree',                [PresupuestoGrupoController::class, 'arbolCompleto'])->name('arbol.presupuestos.jstree');
-    Route::post('/grupos/crear',                            [PresupuestoGrupoController::class, 'crear'])->name('grupo.crear');
-    Route::put('/grupos/{idpresupuesto_grupo}/actualizar',  [PresupuestoGrupoController::class, 'actualizar_grupo'])->name('grupo.actualizar');    
-    Route::get('/grupos/{idpresupuesto_grupo}/mostrar',     [PresupuestoGrupoController::class, 'mostrar_editar'])->name('grupo.mostrar');
-    Route::delete('/grupos/{id}',                           [PresupuestoGrupoController::class, 'destroy'])->name('grupo.delete');
 
     
 });

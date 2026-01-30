@@ -47,3 +47,4 @@
 
   <!-- summernote -->
   <link rel="stylesheet" href="{{ asset('assets/css/style_new.css') }}">
+

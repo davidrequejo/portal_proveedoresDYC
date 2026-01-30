@@ -3,12 +3,17 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class EstadoDocumentoLogisticaMail extends Mailable
+class EstadoDocumentoLogisticaMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
+    
+    // 🔥 ESTO ES LO QUE TE FALTABA
+    public $timeout = 180; // segundos
+    public $tries = 3;
 
     public $proveedor;
     public $documento;

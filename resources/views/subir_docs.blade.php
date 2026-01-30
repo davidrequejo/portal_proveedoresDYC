@@ -232,14 +232,14 @@
                     <input type="hidden" name="iddocsproveedortipoestandar" id="iddocsproveedortipoestandar" /> 
                     <input type="hidden" name="nombre_seleccion_tipo" id="nombre_seleccion_tipo" /> 
                     <!-- $r->user()->idpersona; -->
-                    <input type="hidden" name="" id="" value="{{ auth()->user()->idpersona }}" >
+                    <input type="hidden" name="idpersona_facha_homologacion" id="idpersona_facha_homologacion"  >
 
                     <div  class="row" id="cargando-1-formulario">
 
                       <div class="col-12">
                         <div class="form-group">
                           <label for="descripcion">Tipo Documento</label>                          
-                            <input type="text" class="form-control nombre_tipo_documento" placeholder="ejmpl. Los Jardines">
+                            <input type="text" class="form-control nombre_tipo_documento" placeholder="ejmpl. Los Jardines" readonly>
                           </select>
                         </div>
                       </div>                    
@@ -332,7 +332,7 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/subirdocs.js') }}?version_erp=01.05"></script>
+  <script src="{{ asset('assets/js/subirdocs.js') }}?version_erp=01.06"></script>
 
   <script>
     $(function() {

@@ -214,7 +214,7 @@
                               </div>
                             </div>
 
-                            <div class="col-12 col-sm-12 col-md-3 col-lg-3  div_campos_pers_nat" style="display: none;">
+                            <div class="col-12 col-sm-12 col-md-4 col-lg-4  div_campos_pers_nat" style="display: none;">
                               <div class="form-group">
                                 <label>Sexo</label>
                                 <select name="sexo" id="sexo" class="form-control is-valid select2" placeholder="Sexo" aria-invalid="false">
@@ -247,7 +247,7 @@
                                 </svg>
                                 </span> <span class="valido_novalido"><span class="badge badge-secondary">Por Verificar</span></span>  </label>
                                 <input type="hidden" id="tipo_documento_input2" class="form-control" value="1">
-                                <input type="text" name="ruc_pers_nat" id="numero_documento_input2" class="form-control">
+                                <input type="text" name="ruc_pers_nat" id="numero_documento_input2" class="form-control" onkeypress="return soloNumeros(event)" maxlength="8" > 
                               </div>
                             </div>
 
@@ -269,7 +269,7 @@
                             <div class="col-12 col-sm-12 class_col_dni_ruc_telefono">
                               <div class="form-group">
                                 <label for="celular">Teléfono</label>
-                                <input type="text" name="celular" id="celular" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text">
+                                <input type="text" name="celular" id="celular" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text" onkeypress="return soloNumeros(event)">
                               </div>
                             </div>
 
@@ -330,7 +330,7 @@
                             <div class="col-12 col-sm-12 col-md-4 col-lg-4 div_campos_pers_jud" style="display: none;">
                               <div class="form-group">
                                 <label for="telefono_representante">Teléfono Representante legal</label>
-                                <input type="text" name="telefono_representante" id="telefono_representante" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text">
+                                <input type="text" name="telefono_representante" id="telefono_representante" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text" onkeypress="return soloNumeros(event)">
                               </div>
                             </div>
 
@@ -360,7 +360,7 @@
                             <div class="col-12 col-sm-12 col-md-4 col-lg-4 div_campos_pers_jud" style="display: none;">
                               <div class="form-group">
                                 <label for="telefono_contacto_comercial">Teléfono</label>
-                                <input type="text" name="telefono_contacto_comercial" id="telefono_contacto_comercial" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text" placeholder="Teléfono">
+                                <input type="text" name="telefono_contacto_comercial" id="telefono_contacto_comercial" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text" placeholder="Teléfono" onkeypress="return soloNumeros(event)">
                               </div>
                             </div>  
 
@@ -397,6 +397,7 @@
 
                       </div>
                       <div class="modal-footer justify-content-end py-1">
+                        <span class="text-danger spiner_enviando_correo" style="display: none"> <i class="fas fa-sync fa-spin"></i> Actualizando... </span>
                         <button type="button" class="btn btn-primary" id="editar_registro_proveedor" ><i class="ti ti-device-floppy"></i> Actualizar</button>
                       </div>
 
@@ -420,7 +421,7 @@
                         <div class="float-right">
 
                           <div class="btn-group btn-agregar-proyecto">
-                            <button type="button" class="btn btn-primary" style="border-color: #063ffc !important;" data-toggle="modal" data-target="#modal-crear_cuentabancaria" onclick=""><i class="nav-icon fas fa-file"></i> Crear nuevo</button>
+                            <button type="button" class="btn btn-primary" style="border-color: #063ffc !important;" data-toggle="modal" data-target="#modal-crear_cuentabancaria" onclick=" verificar_tipocuenta();"><i class="nav-icon fas fa-file"></i> Crear nuevo</button>
                           </div>
                         </div>
                         <div class="card-tools m-2"></div>
@@ -476,8 +477,8 @@
               <div class="modal-content">
                 <div class="modal-header bg-color-principal">
                   <h6 class="modal-title text-white">Cuenta Bancaria</h6>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
+                  <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="text-white">×</span>
                   </button>
                 </div>
                 <div class="modal-body">
@@ -485,7 +486,7 @@
                     @csrf
 
                     <!-- PK (hidden si es edición) -->
-                    <input type="hidden" name="idpersona_CuentaBancaria" id="idpersona_CuentaBancaria">
+                    <input type="hidden" name="idpersona_cuentabancaria" id="idpersona_cuentabancaria">
 
                     <!-- Persona -->
                     <input type="hidden" name="idpersona" id="idpersona" value="{{ auth()->user()->idpersona }}">
@@ -508,10 +509,7 @@
                           <select name="tipocuenta" id="tipocuenta"  class="form-control is-valid select2" placeholder="Tipo de Cuenta" aria-invalid="false">
                             <option value="C">Corriente</option>
                             <option value="A">Ahorros</option>
-                            <option value="M">Maestra</option>
-                            <option value="T">CTS</option>
                             <option value="D">Detracción</option>
-                            <option value="S">Cuenta Sueldo</option>
 
                           </select>
                         </div>
@@ -570,6 +568,7 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="">Cerrar</button>
+                  <span class="text-danger spiner_enviando_correo_cb" style="display: none"> <i class="fas fa-sync fa-spin"></i> Guardando... </span>
                   <button type="button" class="btn btn-primary" id="guardar_registro_cuenta_bank">Guardar</button>
                 </div>
               </div>
@@ -599,8 +598,8 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/actualizardatoscliente.js') }}?version_erp=01.05"></script>
-  <script src="{{ asset('assets/js/persona_cuentabancaria.js') }}?version_erp=01.05"></script>
+  <script src="{{ asset('assets/js/actualizardatoscliente.js') }}?version_erp=01.06"></script>
+  <script src="{{ asset('assets/js/persona_cuentabancaria.js') }}?version_erp=01.06"></script>
 
   <script>
     $(function() {

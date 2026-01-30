@@ -83,11 +83,10 @@ function renderFilas(rows){
       <tr class="fila-proyecto" data-id="${r.idpersona}">          
         <td class="py-1"> 
           <div class="btn-group btn-group-sm">
-            <button class="btn btn-warning text-nowrap bnt-editar-proyecto" onclick="ver_editar_persona(${r.idpersona})" data-toggle="tooltip" data-original-title="Editar"><i class="ti ti-edit"></i></button>
-            <button class="btn btn-danger text-nowrap bn-ver-proyecto" onclick="eliminar_persona(${r.idpersona}, '${r.nombre_razonsocial}')" data-toggle="tooltip" data-original-title="Ver"><i class="ti ti-trash"></i></button>
+            <button class="btn text-nowrap bnt-editar-proyecto" onclick="ver_editar_persona(${r.idpersona})" data-toggle="tooltip" data-original-title="Editar"><i class="fas fa-pencil-alt color_icon_opt"></i></button>
+            <button class="btn text-nowrap bn-ver-proyecto" onclick="eliminar_persona(${r.idpersona}, '${r.nombre_razonsocial}')" data-toggle="tooltip" data-original-title="Eliminar"><i class="fas fa-trash color_icon_opt"></i></button>
           </div>
         </td>
-        <td class="py-1 text-center" >${String(r.idpersona).padStart(3, '0')}</td>
         <td class="py-1 text-nowrap" >${r.nombre_razonsocial ?? ''}</td>
         <td class="py-1" >${r.tipo_entidad_sunat ?? ''}</td>
         <td class="py-1" >${r.abreviatura ?? ''}</td>
@@ -482,3 +481,11 @@ $(function () {
   $('#tipo_documento').rules('add', { required: true, messages: {  required: "Campo requerido" } });
 
 });
+
+
+
+function verificar_tiporol() {   
+  $('#idtipo_persona option[value="3"]').remove();
+  $('#idtipo_persona option[value="5"]').remove();
+  
+};

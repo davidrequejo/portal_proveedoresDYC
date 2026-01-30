@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
 use App\Models\Homologacion;
+use App\Models\Proveedor;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Models\DocsProveedorTipoEstandar;
 use App\Mail\EstadoDocumentoLogisticaMail;
+use App\Mail\NotificacionDocumentosHomologacionMail;
+use Illuminate\Support\Facades\Mail;
 
 class HomologacionController extends Controller
 {
@@ -195,18 +198,47 @@ class HomologacionController extends Controller
       try {
           $idpersona = $r->input('idpersona');
 
-          $data =  DB::table('persona_facha_homologacion')
-          ->select(
-              'idpersona_facha_homologacion',
-              'descripcion',
-              'fecha_inicio',
-              'fecha_fin',
-              'estado_trash'
-          )
-          ->where('estado_trash', '1')
-          ->where('estado_delete', '1')
-          ->where('idpersona', $idpersona)
-          ->get();
+     $data = DB::table('persona_facha_homologacion as pfh')
+        ->join(
+            'docsproveedortipoestandar as docs',
+            'docs.idpersona_facha_homologacion',
+            '=',
+            'pfh.idpersona_facha_homologacion'
+        )
+        ->join(
+            'detalletipoestandarproveedor as dtp',
+            'dtp.iddetalletipoestandarproveedor',
+            '=',
+            'docs.iddetalletipoestandarproveedor'
+        )
+        ->join(
+            'tipoestandarproveedor as tep',
+            'tep.idtipoestandarproveedor',
+            '=',
+            'dtp.idtipoestandarproveedor'
+        )
+        ->select(
+            'pfh.idpersona_facha_homologacion',
+            'pfh.descripcion',
+            'pfh.fecha_inicio',
+            'pfh.fecha_fin',
+            'pfh.estado_trash',
+
+            // 👉 dato adicional
+            'tep.descripcion as tipo_estandar'
+        )
+        ->where('pfh.estado_trash', '1')
+        ->where('pfh.estado_delete', '1')
+        ->where('pfh.idpersona', $idpersona)
+        ->groupBy(
+            'pfh.idpersona_facha_homologacion',
+            'pfh.descripcion',
+            'pfh.fecha_inicio',
+            'pfh.fecha_fin',
+            'pfh.estado_trash',
+            'tep.descripcion'
+        )
+        ->get();
 
           return ApiResponse::success($data, 'Cateogria de proveedores obtenidos');
 
@@ -291,6 +323,52 @@ class HomologacionController extends Controller
                 ->get();
 
             return ApiResponse::success($data, 'Documentos obtenidos correctamente');
+
+        } catch (\Throwable $e) {
+            return ApiResponse::error($e);
+        }
+    }
+
+    // enviar correo notificación
+    public function enviar_correo_notificacion(Request $r)
+    {
+        try {
+
+            $idpersona = $r->input('idpersona');
+            $idperiodo_homologacion = $r->input('idperiodo_homologacion');
+
+            // 1. Obtener proveedor
+            $proveedor = Proveedor::where('idpersona', $idpersona)->first();
+
+            // 2. Usuario de logística (quien hace la acción)
+            $usuarioLogistica = auth()->user();
+
+            // 3. Obtener documentos del periodo
+            $documentos = DB::table('docsproveedortipoestandar as docs')
+                ->join( 'persona_facha_homologacion as pfh', 'docs.idpersona_facha_homologacion', '=', 'pfh.idpersona_facha_homologacion' )
+                ->join( 'detalletipoestandarproveedor as dtp', 'docs.iddetalletipoestandarproveedor', '=', 'dtp.iddetalletipoestandarproveedor' )
+                ->join( 'documento_tipo_estandar as destts', 'destts.iddocumento_tipo_estandar', '=', 'dtp.iddocumento_tipo_estandar' )
+                ->select(
+                    'destts.descripcion',
+                    'docs.estado_revision',
+                    'docs.observacion'
+                )
+                ->where('pfh.idpersona_facha_homologacion', $idperiodo_homologacion)
+                ->where('pfh.estado_trash', '1')
+                ->where('pfh.estado_delete', '1')
+                ->where('docs.idpersona', $idpersona)
+                ->get();
+
+            // 4. Enviar correo al proveedor
+            Mail::to($proveedor->email)->queue(
+                new NotificacionDocumentosHomologacionMail(
+                    $proveedor,
+                    $documentos,
+                    $usuarioLogistica
+                )
+            );
+
+            return ApiResponse::success([], 'Correo de notificación enviado al proveedor');
 
         } catch (\Throwable $e) {
             return ApiResponse::error($e);

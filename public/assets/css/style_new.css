@@ -126,6 +126,17 @@
     color: #6c757d;
   }
 
+  .form-control {
+      height: calc(2px + 1.8125rem) !important;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      padding: 0.25rem 0.5rem !important;
+      border-radius: 0.2rem;
+  }
+  .select2-container--bootstrap4{
+    font-size: small;
+  }
+
 /*badge-personalizado*/
   .badge-new {
       color: #fff;

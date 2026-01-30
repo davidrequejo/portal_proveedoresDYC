@@ -213,10 +213,28 @@ function limpiar_form_cliente(){
   
   //Mostramos los Materiales
   $("#idpersona").val("");
-  $("#codigo").val("");
-  $("#descripcion").val("");
+  $("#numero_documento").val("");
+
+  $("#nombre_razonsocial").val("");
+  $("#nombre_persona_natural").val("");
+  $("#apellido_paterno_per_natural").val("");
+  $("#apellido_materno_per_natural").val("");
+
+  $("#celular").val("");
+  $("#email").val("");
+  $("#sitio_web").val("");
   $("#direccion").val("");
-  $("#ubicacion").val("");
+
+  $("#provincia").val("");
+  $("#departamento").val("");
+  $("#usuario_portal").val("");
+  $("#clave_portal").val("");
+
+  $("#tipo_entidad_sunat").val("").trigger('change');
+  $("#distrito").val("").trigger('change');
+  $("#estado_sunat").val("").trigger('change');
+  
+  $(".valido_novalido").html(`<span class="badge badge-secondary">Por Verificar</span>`);
 
   // Limpiamos las validaciones
   $(".form-control").removeClass('is-valid');
@@ -260,6 +278,8 @@ function ver_editar_cliente(idpersona) {
         $("#usuario_portal").val('');
         $("#clave_portal").val('');
       }
+
+      $("#estado_sunat").val('ACTIVO').trigger('change');
 
       $("#cargando-1-formulario").show();
       $("#cargando-2-formulario").hide();

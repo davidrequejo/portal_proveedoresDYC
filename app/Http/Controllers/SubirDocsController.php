@@ -80,6 +80,7 @@ class SubirDocsController extends Controller
 						$doc->idpersona = $userId;
 						$doc->iddetalletipoestandarproveedor = $r->input('listar_docs_sin_subir', $doc->iddetalletipoestandarproveedor);
 						$doc->nombreDocumento = $r->input('nombre_seleccion_tipo', $doc->nombreDocumento);
+						$doc->idpersona_facha_homologacion = $r->input('idpersona_facha_homologacion', $doc->idpersona_facha_homologacion);
 
 						// 3) Si suben archivo nuevo, borrar anterior y guardar nuevo
 						if ($r->hasFile('doc1') && $r->file('doc1')->isValid()) {
@@ -116,6 +117,9 @@ class SubirDocsController extends Controller
 
 						// 4) Guardar cambios
 						$doc->save();
+
+
+            
 
 						return ApiResponse::success('Actualizado', 'Documento estándar actualizado correctamente');
 
@@ -159,7 +163,8 @@ class SubirDocsController extends Controller
                     'docs.iddocsproveedortipoestandar',
                     'docs.idpersona',
                     'docs.nombreDocumento',
-                    'docs.archivo',
+                    'docs.archivo', 
+                    'docs.observacion', 
                     'docs.estado_revision',
                     'docs.estado_trash',
                     'docs.estado_delete'

@@ -67,5 +67,25 @@
 <script src="{{ asset('adminlte3/plugins/datatables2/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script> --}}
 
 <!-- Funciones generales -->
-<script src="{{ asset('assets/js/funcion_crud.js') }}?version_erp=01.05"></script>
+<script src="{{ asset('assets/js/funcion_crud.js') }}?version_erp=01.06"></script>
 <script src="{{ asset('assets/js/funcion_general.js') }}?version_erp=01.03"></script>
+
+<script>
+    function alertaPerfilIncompleto() {
+
+      let mensajes = [];
+
+      @if(!auth()->user()->tiene_cuenta_bancaria)
+        mensajes.push('• Registrar al menos una cuenta bancaria');
+      @endif
+
+      @if(auth()->user()->persona?->estado_completoxproveedor != 1)
+        mensajes.push('• Completar datos del proveedor');
+      @endif
+
+      mensajes.push('• Cerrar sesión y volver a ingresar');
+
+      Swal.fire("Para habilitar el módulo debe!", mensajes.map(m => '' + m).join('<br>') , "warning");
+
+    }
+</script>

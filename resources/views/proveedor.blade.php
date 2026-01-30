@@ -132,6 +132,12 @@
                 <div class="float-right">
 
                   <div class="btn-group btn-agregar-proyecto">
+                    <button type="button" class="btn" style="border-color: #fcfcfc !important;" ><i class="fas fa-sync" style="color: #246ea2;"></i></button>
+                    <button type="button" class="btn">
+                      <i class="fas fa-bell fa-lg" style="color: #246ea2;"></i>
+                      <sup class="text-danger"><span class="badge badge-danger navbar-badge">3</span></sup>
+          
+                    </button>
                     <button type="button" class="btn btn-primary" style="border-color: #fcfcfc !important;" data-toggle="modal" data-target="#modal-agregar-proveedor" onclick="limpiar_form_proveedor();" ><i class="ti ti-users-plus"></i> Crear nuevo</button>
                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="border-color: #fcfcfc !important;">
                       <span class="sr-only">Toggle Dropdown</span>
@@ -301,7 +307,8 @@
                         </table>
                       </div>
                       <div class="modal-footer justify-content-end">
-                        <button type="button" class="btn btn-xs btn-outline-secondary" >  <i class="fas fa-mail-bulk fa-lg"></i> Enviar Revisión</button>
+                        <span class="text-danger spiner_enviando_correo" style="display: none"> <sup>*</sup> <i class="fas fa-sync fa-spin"></i> Enviendo... </span>
+                        <button type="button" class="btn btn-xs btn-outline-secondary enviar_coreo_notificacion_proveeor" onclick="enviar_correo_notificacion();">  <i class="fas fa-mail-bulk fa-lg"></i> Enviar Notificación</button>
                       </div>
                     </div>
                     <!-- /.card -->
@@ -377,7 +384,7 @@
                              </span> <span class="valido_novalido"> <span class="badge badge-secondary">Por Verificar</span> </span></label>                          
                            <div class="input-group">
                             
-                              <input type="number" name="numero_documento" class="form-control" id="numero_documento" placeholder="N° de documento">
+                              <input type="number" name="numero_documento" class="form-control" id="numero_documento" placeholder="N° de documento" onkeypress="return soloNumeros(event)" maxlength="11" />
                               <div class="input-group-append" data-toggle="tooltip" data-original-title="Buscar Reniec/SUNAT" onclick="buscar_sunat_reniec();">
                                 <span class="input-group-text" style="cursor: pointer;">
                                   <i class="fas fa-search text-primary" id="search"></i>
@@ -392,7 +399,7 @@
                       <!-- Nombre y Apellidos -->
                       <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                         <div class="form-group">
-                          <label for="Nombre_Apellidos">Nombre y Apellidos/Razon Social <sup class="text-danger">*</sup></label>
+                          <label for="Nombre_Apellidos">Razon Social <sup class="text-danger">*</sup></label>
                           <input type="text" name="nombre_razonsocial" class="form-control" id="nombre_razonsocial"  />
                         </div>
                       </div> 
@@ -409,7 +416,7 @@
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label>Teléfono</label>
-                          <input type="text" name="celular" id="celular" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text">
+                          <input type="text" name="celular" id="celular" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text" onkeypress="return soloNumeros(event)">
                         </div>
                       </div>
 
@@ -524,7 +531,7 @@
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
-                <h6 class="modal-title">Actualizar Estado : <strong class='text-info nombre_doc_edit'></strong> </h6>
+                <h6 class="modal-title text-bold">Actualizar Estado : <strong class='text-principal nombre_doc_edit'></strong> </h6>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">×</span>
                 </button>
@@ -532,10 +539,10 @@
               <div class="modal-body">
                 <form id="form-actualizar-estado" name="form-actualizar-estado" method="POST">
                   @csrf
-                  <input type="text" name="iddocsproveedortipoestandar" id="iddocsproveedortipoestandar" /> 
-                  <input type="text" name="idpersonadoc" id="idpersonadoc" /> 
-                  <input type="text" name="inputnombre_razonsocial_tipo" id="inputnombre_razonsocial_tipo" />
-                  <input type="text" name="inputemail_proveedor_env_correo" id="inputemail_proveedor_env_correo" />
+                  <input type="hidden" name="iddocsproveedortipoestandar" id="iddocsproveedortipoestandar" /> 
+                  <input type="hidden" name="idpersonadoc" id="idpersonadoc" /> 
+                  <input type="hidden" name="inputnombre_razonsocial_tipo" id="inputnombre_razonsocial_tipo" />
+                  <input type="hidden" name="inputemail_proveedor_env_correo" id="inputemail_proveedor_env_correo" />
 
                   <div  class="row" id="cargando-3-formulario">
 
@@ -543,15 +550,14 @@
                       <label for="estado_documentos">Estado de Documento</label>
                       <select name="estado_documentos_update" id="estado_documentos_update" class="form-control is-valid select2" placeholder="Estado de Documentos" aria-invalid="false">
                         <option value="Aprobado">Aprobado</option>
-                        <option value="Rechazado">Observado</option>
-                        <option value="Rechazado">Rechazado</option>
+                        <option value="Observado">Observado</option>
                       </select>
                     </div>
 
                     <div class="col-12 mt-2">
                       <div class="form-group">
-                        <label for="observacion_est_up">Obs </label> <br>
-                        <textarea name="observacion_est_up" id="observacion_est_up" class="form-control" rows="2"></textarea>
+                        <label for="observacion_est_up">Observacion </label> <br>
+                        <textarea name="observacion_est_up" id="observacion_est_up" class="form-control" rows="3"></textarea>
                       </div>
                     </div>
 
@@ -578,8 +584,8 @@
                 </form>
               </div>
               <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-success" id="guardar_registro_actualizar_estado" ><i class="ti ti-device-floppy"></i> Guardar</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="guardar_registro_actualizar_estado" ><i class="ti ti-device-floppy"></i> Guardar</button>
               </div>
             </div>
             <!-- /.modal-content -->
@@ -807,8 +813,8 @@
 
 
  
-  <script src="{{ asset('assets/js/proveedor.js') }}?version_erp=01.05"></script>
-  <script src="{{ asset('assets/js/proveedor_carga_masiva.js') }}?version_erp=01.05"></script>
+  <script src="{{ asset('assets/js/proveedor.js') }}?version_erp=01.06"></script>
+  <script src="{{ asset('assets/js/proveedor_carga_masiva.js') }}?version_erp=01.06"></script>
 
   <script>
     $(function() {

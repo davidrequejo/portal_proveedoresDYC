@@ -6,7 +6,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="app-url" content="{{ url('/') }}">
   
-  <title>Proveedores | Portal Proveedores D&C</title>
+  <title>Clientes | Portal Proveedores D&C</title>
 
   <link rel="icon" href="{{ asset('assets/images/brand-logos/dc-logo_cirsulo_white.png') }}" type="image/png">
 
@@ -117,7 +117,7 @@
     <!-- Main Sidebar Container -->
     @include('layouts.lte_aside')   
 
-    @if (auth()->user()->perm_client_vista_client)
+    @if (auth()->user()->perm_client_vista_adm)
 
       <!-- Content Wrapper. Contains page content -->
       <div class="content-wrapper">
@@ -377,7 +377,7 @@
                              </span> <span class="valido_novalido"> <span class="badge badge-secondary">Por Verificar</span> </span></label>                          
                            <div class="input-group">
                             
-                              <input type="number" name="numero_documento" class="form-control" id="numero_documento" placeholder="N° de documento">
+                              <input type="number" name="numero_documento" class="form-control" id="numero_documento" placeholder="N° de documento" onkeypress="return soloNumeros(event)" maxlength="11" />
                               <div class="input-group-append" data-toggle="tooltip" data-original-title="Buscar Reniec/SUNAT" onclick="buscar_sunat_reniec();">
                                 <span class="input-group-text" style="cursor: pointer;">
                                   <i class="fas fa-search text-primary" id="search"></i>
@@ -409,7 +409,7 @@
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label>Teléfono</label>
-                          <input type="text" name="celular" id="celular" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text">
+                          <input type="text" name="celular" id="celular" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text" onkeypress="return soloNumeros(event)">
                         </div>
                       </div>
 
@@ -807,8 +807,8 @@
 
 
  
-  <script src="{{ asset('assets/js/cliente.js') }}?version_erp=01.05"></script>
-  <script src="{{ asset('assets/js/cliente_carga_masiva.js') }}?version_erp=01.05"></script>
+  <script src="{{ asset('assets/js/cliente.js') }}?version_erp=01.06"></script>
+  <script src="{{ asset('assets/js/cliente_carga_masiva.js') }}?version_erp=01.06"></script>
 
   <script>
     $(function() {

@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Acceso al Portal de Proveedores</title>
+    <title>Notificación de Actualización</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f5f5f5;font-family:Arial, Helvetica, sans-serif;font-size:14px;color:#333;">
 
@@ -26,11 +26,11 @@
                         >
 
                         <h2 style="margin:0;font-size:22px;font-weight:bold; text-align: center !important;">
-                            ¡Bienvenido al Portal de Homologación!
+                            Actualización de Información @if($tipo == 'proveedor')del Proveedor @elseif($tipo == 'cliente') del Cliente @endif
                         </h2>
 
                         <p style="margin:8px 0 0;font-size:14px; text-align: center !important;">
-                            Credenciales de acceso
+                            Información actualizada en el sistema
                         </p>
 
                     </td>
@@ -40,50 +40,33 @@
                 <tr>
                     <td style="padding:30px;">
 
-                        <p style="margin:0 0 15px;">
-                            Estimado(a)
-                            <strong>{{ $nombre }}</strong>,
+                        <p style="margin:0 0 15px;">Hola, equipo de Logística. </p>
+
+                        <p style="margin:0 0 20px;line-height:1.5;">
+                            @if($tipo == 'proveedor')
+                                Se ha actualizado la información del proveedor en el sistema:
+                                <p style="margin:0 0 20px;line-height:1.5;">
+                                  <strong>Proveedor:  </strong> {{ $data->nombre_razonsocial }}
+                                </p>
+                            @elseif($tipo == 'cliente')
+                                Se ha actualizado la información del cliente en el sistema:
+                                <p style="margin:0 0 20px;line-height:1.5;">
+                                  <strong>Cliente:  </strong> {{ $data->nombre_razonsocial }}
+                                    </p>
+                            @endif
                         </p>
 
                         <p style="margin:0 0 20px;line-height:1.5;">
-                            Se ha creado correctamente su acceso al
-                            <strong>Portal de Proveedores</strong>.
-                            A continuación, le compartimos sus credenciales de ingreso:
-                        </p>
-                        <p style="margin:0 0 20px;line-height:1.5;">
-                          <strong>Usuario:  </strong> {{ $usuario }}
-                        </p>
-
-                        <p style="margin:0 0 20px;line-height:1.5;">
-                          <strong>Clave:  </strong> {{ $clave }}
+                            Para más detalles, puedes acceder al portal correspondiente a través del siguiente enlace:
                         </p>
 
                         <!-- BOTÓN -->
                         <p style="margin:30px 0 0;text-align:center;">
                             <a href="{{ config('app.url') }}"
-                                style=" background-color:#2563eb; color:#ffffff; padding:12px 20px; border-radius:8px; text-decoration:none; font-weight:bold; display:inline-block; width: 100%;"
+                                style=" background-color:#2563eb; color:#ffffff; padding:12px 20px; border-radius:8px; text-decoration:none; font-weight:bold; display:inline-block; width: 80%;"
                             >
-                                Ingresar al Portal
+                                Clic Para Ingresar al Portal
                             </a>
-                        </p>
-
-                        <!-- MENSAJE FINAL 
-                        <p style="margin:25px 0 0;line-height:1.5;">
-                            Por motivos de seguridad, le recomendamos cambiar su contraseña
-                            luego de iniciar sesión por primera vez.
-                        </p>-->
-
-                        <p style="margin:15px 0 0;line-height:1.5;">
-                            Si presenta algún inconveniente o requiere soporte,
-                            puede comunicarse con nosotros escribiendo al correo
-                            <strong>{{ $correoSoporte }}</strong>.
-                        </p>
-
-                        <!-- FIRMA -->
-                        <p style="margin:25px 0 0;">
-                            Atentamente,<br>
-                            <strong>{{ $nombreSoporte }}</strong><br>
-                            Área de Logística
                         </p>
 
                     </td>
@@ -96,7 +79,7 @@
                             Este correo es informativo, por favor no responder a este mensaje.
                         </p>
                         <p style="margin:8px 0 0;">
-                            © {{ date('Y') }} DC Grupo Inmobiliario – Todos los derechos reservados
+                            © {{ date('Y') }} DyC Grupo Inmobiliario – Todos los derechos reservados
                         </p>
                     </td>
                 </tr>

@@ -268,7 +268,7 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/fechahomologacion.js') }}?version_erp=01.05"></script>
+  <script src="{{ asset('assets/js/fechahomologacion.js') }}?version_erp=01.06"></script>
 
   <script>
     $(function() {

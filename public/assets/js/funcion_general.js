@@ -1230,7 +1230,6 @@ function buscar_sunat_reniec(input='') {
       $.post(`${BASE_URL}/consulta/reniec`, { dni: dni_ruc }, function (data, status) {
 
         //data = JSON.parse(data);  
-        console.log(data);
 
         if (data == null) {
 
@@ -1288,6 +1287,7 @@ function buscar_sunat_reniec(input='') {
         $.post(`${BASE_URL}/consulta/sunat`, { ruc: dni_ruc }, function (data, status) {
 
 
+          console.log('data');
           console.log(data);
 
           if (data == null) {
@@ -1611,4 +1611,27 @@ function no_pdf() {
 
 function dowload_pdf() {
   toastr.success("El documento se descargara en breve!!")
+}
+
+
+function soloNumeros(e) {
+    let key = e.which || e.keyCode;
+
+    // Permitir: backspace, tab, delete, flechas
+    if (
+        key === 8  || // backspace
+        key === 9  || // tab
+        key === 46 || // delete
+        (key >= 37 && key <= 40) // flechas
+    ) {
+        return true;
+    }
+
+    // Permitir solo números (0–9)
+    if (key >= 48 && key <= 57) {
+        return true;
+    }
+
+    e.preventDefault();
+    return false;
 }

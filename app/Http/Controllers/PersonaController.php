@@ -144,7 +144,8 @@ class PersonaController extends Controller
                 'p.estado'
             )
             ->where('p.estado', '1')  // Filtrar personaes activos
-            ->where('p.estado_delete', '1');  // Filtrar personaes no eliminados
+            ->where('p.estado_delete', '1')  // Filtrar personaes no eliminados
+            ->whereNotIn('p.idtipo_persona', [3, 5]);  // ni proveedores ni clientes
 
         // Si hay un término de búsqueda, lo aplicamos en las columnas
         if ($q !== '') {

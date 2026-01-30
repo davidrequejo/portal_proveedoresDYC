@@ -154,6 +154,7 @@ function renderFilas(rows){
             <button class="btn btn-xs text-nowrap bnt-editar-proyecto" onclick="ver_editar_proveedor(${r.idpersona})" data-toggle="tooltip" data-original-title="Editar"> <i class="fas fa-pencil-alt color_icon_opt"></i></button>
             <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="lista_homologaciones(${r.idpersona}, '${r.nombre_razonsocial ?? ''}','${r.email ?? ''}')" data-toggle="tooltip" data-original-title="Homologaciones"><i class="fas fa-folder fa-0 color_icon_opt"></i></button>
             <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="eliminar_proveedor(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')" data-toggle="tooltip" data-original-title="Eliminar"><i class="fas fa-trash color_icon_opt"></i></button>
+            <button class="btn btn-xs text-nowrap" onclick="sincronizacions10(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')" data-toggle="tooltip" data-original-title="Sincronizar"><i class="fas fa-globe" style="color: #74C0FC;"></i></button>
           </div>
         </td>
         <td class="py-1 text-center"> ${String('000').padStart(3, '0')} </td>
@@ -237,18 +238,28 @@ $(".recargar-tabla-proyecto").on("click", function(){
 function limpiar_form_proveedor(){
   
   //Mostramos los Materiales
-  $("#fecha_inicio_periodo").val("");
-  $("#fecha_fin_periodo").val("");
   $("#idpersona").val("");
-  $("#codigo").val("");
-  $("#descripcion").val("");
-  $("#direccion").val("");
-  $("#ubicacion").val("");
-  $("#fecha_inicio").val("");
-  $("#fecha_fin").val("");
+  $("#numero_documento").val("");
 
-  $("#idempresa").val("").trigger('change');
-  $("#idsocio_negocio").val("").trigger('change');
+  $("#nombre_razonsocial").val("");
+  $("#nombre_persona_natural").val("");
+  $("#apellido_paterno_per_natural").val("");
+  $("#apellido_materno_per_natural").val("");
+
+  $("#celular").val("");
+  $("#email").val("");
+  $("#sitio_web").val("");
+  $("#direccion").val("");
+
+  $("#provincia").val("");
+  $("#departamento").val("");
+  $("#usuario_portal").val("");
+  $("#clave_portal").val("");
+
+  $("#tipo_entidad_sunat").val("").trigger('change');
+  $("#distrito").val("").trigger('change');
+  $("#estado_sunat").val("").trigger('change');
+  $(".valido_novalido").html(`<span class="badge badge-secondary">Por Verificar</span>`);
 
   // Limpiamos las validaciones
   $(".form-control").removeClass('is-valid');
@@ -296,6 +307,8 @@ function ver_editar_proveedor(idpersona) {
         $("#clave_portal").val('');
       }
 
+      $("#estado_sunat").val('ACTIVO').trigger('change');
+
       $("#cargando-1-formulario").show();
       $("#cargando-2-formulario").hide();
     } else {
@@ -330,7 +343,7 @@ function guardar_y_editar_proveedor(e) {
         if (e.status == true) {          
           tabla_principal_cargar();
           limpiar_form_proveedor();
-          Swal.fire("Correcto!", "Proyecto guardado correctamente", "success");          
+          Swal.fire("Correcto!", "Guardado correctamente", "success");          
           $("#modal-agregar-proveedor").modal("hide");           
         }else{
           ver_errores(e);				 
@@ -402,7 +415,7 @@ function eliminar_proveedor(id, nombres) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-// ═══════                                       S E C C I O N   HOMOLOGACIONES                                                    ═══════
+// ═══════                                                    S E C C I O N   HOMOLOGACIONES                                                        ═══════
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 function limpiar_homologacion() {
@@ -432,6 +445,8 @@ function lista_homologaciones(idpersona, nombre_razonsocial, email) {
 
   $.getJSON(`${BASE_URL}/homologacion/tabla_periodo_h_principal`,{ idpersona: idpersona}, function (e) {
     if (e.status == true) {
+      console.log(e.data);
+      
       $(".tabla-list-homolog").empty('');
       e.data.forEach(r => {
       
@@ -447,7 +462,7 @@ function lista_homologaciones(idpersona, nombre_razonsocial, email) {
             <td class="py-1 text-nowrap" >${r.descripcion} </td>
             <td class="py-1 text-nowrap" >${r.fecha_inicio}</td>
             <td class="py-1 text-nowrap" >${r.fecha_fin}</td>
-            <td class="py-1 text-nowrap" >Tipo Estandar 5</td>
+            <td class="py-1 text-nowrap" >${r.tipo_estandar}</td>
             <td class="py-1 text-center" style="cursor:pointer">
               <button class="btn btn-xs text-nowrap" onclick="ver_documentos_x_homologacion(${r.idpersona_facha_homologacion},'${r.descripcion}')" data-toggle="tooltip" data-original-title="Ver Detalle"><i class="fas fa-eye fa-lg color_icon_opt"></i></button>
             </td>
@@ -462,8 +477,6 @@ function lista_homologaciones(idpersona, nombre_razonsocial, email) {
   }).fail(function (xhr) { ver_errores(xhr);  });
 
 }
-
-
 
 function guardar_y_editar_homoloacion(e) {
   // e.preventDefault(); //No se activará la acción predeterminada del evento
@@ -566,14 +579,15 @@ function ver_documentos_x_homologacion(id, descripcion) {
           let estadoHtml = '';
           const isPendiente = (r.estado_revision == 'Pendiente');
 
+          console.log(r.estado_revision);
+          
+
           switch (r.estado_revision) {
-              case 'Registrado': estadoHtml = `<span class="badge bg-warning text-dark">Registrado</span>`; break;
+              case 'Actualizado': estadoHtml = `<span class="badge bg-warning text-dark">Actualizado</span>`; break;
 
               case 'Observado': estadoHtml = `<span class="badge bg-orange text-white">Observado</span>`; break;
 
               case 'Aprobado': estadoHtml = `<span class="badge bg-success">Aprobado</span>`; break;
-
-              case 'Rechazado': estadoHtml = `<span class="badge bg-dark">Rechazado</span>`; break;
 
               default: estadoHtml = `<span class="badge bg-danger">Pendiente.</span>`; 
           }
@@ -585,20 +599,19 @@ function ver_documentos_x_homologacion(id, descripcion) {
             <td class="py-1 text-nowrap" >${estadoHtml}</td>
             <td class="py-1 text-center" style="cursor:pointer">
                 ${r.archivo
-                    ? `<a class="text-muted"
+                    ? `<a class="text-principal"
                          onclick="ver_documento_proveedor('${BASE_URL}/${r.archivo}','${r.descripcion}')">
                         <i class="fas fa-search"></i>
                        </a>`
                     : `<a class="text-muted"
-                         onclick="ver_documento_proveedor('${BASE_URL}/${r.archivo}','${r.descripcion}')">
+                         onclick="toastr_info('No hay documento adjunto','Sin documento')">
                         <i class="fas fa-search"></i>
-                       </a>—`
+                       </a>`
                 }
             </td>
             <td class="py-1 text-center" >
               ${isPendiente
-                  ? `<a class="btn  btn-sm disabled"
-                      style="pointer-events:none; opacity:0.6;">
+                  ? `<a class="text-muted" onclick="toastr_info('No hay documento adjunto','Sin documento')" >
                       <i class="fas fa-pencil-alt "></i>
                     </a>`
                   : `<a class="btn btn-sm"
@@ -636,7 +649,7 @@ function ver_documento_proveedor(ruta_documento, nombre_documento) {
 
   $('.ver_documento_modal').html(``); 
 
-  var doc_html = doc_view_extencion(ruta_documento, '', '', '100%', '100%' );
+  var doc_html = doc_view_extencion(ruta_documento, '', '', '100%', '600px' );
 
   $('.ver_documento_modal').html(doc_html);
 
@@ -708,6 +721,31 @@ function guardar_y_editar_act_estado(e) {
     },
     error: function (jqXhr) { ver_errores(jqXhr); },
   });
+}
+
+function enviar_correo_notificacion() {  
+  $('.spiner_enviando_correo').show();
+  $('.enviar_coreo_notificacion_proveeor').hide();
+
+  $.post(`${BASE_URL}/homologacion/enviar_correo_notificacion`,
+    {
+      idperiodo_homologacion: idfechaperso_homol_edit,
+      idpersona: idpersona_tipo,
+      nombre_razonsocial: nombre_razonsocial_tipo,
+      email: email_proveedor_env_correo
+    },
+    function (e) {
+      if (e.status == true) {
+        $('.spiner_enviando_correo').hide();
+        $('.enviar_coreo_notificacion_proveeor').show();
+        Swal.fire("Correcto!", "Correo enviado correctamente", "success");          
+      } else {
+        ver_errores(e);				 
+      }
+    }
+  ).fail(function (xhr) { ver_errores(xhr);  });
+
+  
 }
 
 // ══════════════════════════════════════════════════════════════════════════════════
@@ -939,3 +977,6 @@ $(function () {
   $('#estado_documentos_update').rules('add', { required: true, messages: {  required: "Campo requerido" } });
 
 });
+
+
+

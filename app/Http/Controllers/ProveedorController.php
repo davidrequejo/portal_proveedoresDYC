@@ -95,12 +95,17 @@ class ProveedorController extends Controller
               }
 
               // 4. Enviar correo con credenciales al proveedor
+                // 4.1 obtenener nombre y correo del soporte desde el usuario autenticado
+                $nombreSoporte = auth()->user()->persona?->nombre_razonsocial;
+                $correoSoporte = auth()->user()->persona?->email;
               try {
-                  Mail::to($createProveedor->email)->send(
+                  Mail::to($createProveedor->email)->queue(
                       new CredencialesProveedorMail(
                           nombre: $createProveedor->nombre_razonsocial,
                           usuario: $r->usuario_portal,
-                          clave: $r->clave_portal
+                          clave: $r->clave_portal,
+                          nombreSoporte: $nombreSoporte,
+                          correoSoporte: $correoSoporte
                       )
                   );
               } catch (\Throwable $e) {
@@ -122,6 +127,10 @@ class ProveedorController extends Controller
     public function editar_proveedor(Request $r, $idpersona)
     {
         try {
+
+            // 4.1 obtenener nombre y correo del soporte desde el usuario autenticado
+            $nombreSoporte = auth()->user()->persona?->nombre_razonsocial;
+            $correoSoporte = auth()->user()->persona?->email;
 
             // 1. Validación
             $data = $r->validate([
@@ -175,11 +184,13 @@ class ProveedorController extends Controller
 
               // 2. Enviar correo con credenciales al proveedor
               try {
-                  Mail::to($r->email)->send(
+                  Mail::to($r->email)->queue(
                       new CredencialesProveedorMail(
                           nombre: $r->nombre_razonsocial,
                           usuario: $r->usuario_portal,
-                          clave: $r->clave_portal
+                          clave: $r->clave_portal,
+                          nombreSoporte: $nombreSoporte,
+                          correoSoporte: $correoSoporte
                       )
                   );
               } catch (\Throwable $e) {
@@ -197,20 +208,32 @@ class ProveedorController extends Controller
               ]);
 
               // 3. Registrar permisos en tabla intermedia si el usuario fue creado
+              $permisos = [8, 9];
+
               if ($user->id) {
-                  DB::table('usuario_permiso')->insert([
-                      'users_id' => $user->id,
-                      'idpermiso' => '10',
-                  ]);
+
+                $data = [];
+
+                foreach ($permisos as $permiso) {
+                    $data[] = [
+                        'users_id' => $user->id,
+                        'idpermiso' => $permiso,
+                    ];
+                }
+
+                  DB::table('usuario_permiso')->insert($data);
+
               }
 
               // 4. Enviar correo con credenciales al proveedor
               try {
-                  Mail::to($r->email)->send(
+                  Mail::to($r->email)->queue(
                       new CredencialesProveedorMail(
                           nombre: $r->nombre_razonsocial,
                           usuario: $r->usuario_portal,
-                          clave: $r->clave_portal
+                          clave: $r->clave_portal,
+                          nombreSoporte: $nombreSoporte,
+                          correoSoporte: $correoSoporte
                       )
                   );
               } catch (\Throwable $e) {
@@ -409,9 +432,6 @@ class ProveedorController extends Controller
         }
     }
 
-
-
-
     public function Listar_Proveedores(Request $r)
     {
         // Parámetros de entrada del request
@@ -559,7 +579,6 @@ class ProveedorController extends Controller
 
     }
 
-    
     public function selec2periodohomologacion()
     {
       try {

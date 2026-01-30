@@ -6,8 +6,12 @@ use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
 use App\Models\PersonaCuentaBancaria;
 use App\Models\Banco;
+use App\Models\Logbd;
+use App\Models\Persona;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NotificacioncuentaBancariaLogisticaMail;
 
 class PersonaCuentaBancariaController extends Controller
 {
@@ -46,14 +50,65 @@ class PersonaCuentaBancariaController extends Controller
                 'tipocuenta'           => $r->tipocuenta,
                 'moneda'               => $r->moneda,
                 'numero_cuenta'        => $r->numero_cuenta,
-                'numero_cuenta_abono'  => $r->numero_cuenta,
+                'numero_cuenta_abono'  => $r->numero_cuenta_abono,
                 'cuenta_interbancaria' => $r->cuenta_interbancaria,
                 'predeterminado'       => $r->predeterminado,
                 'user_created'         => auth()->id() ?? null,
             ]);
 
+            /* ================== LOG ================== */
+            $labels = [
+                'idbanco'              => 'idbanco',
+                'tipocuenta'           => 'tipocuenta',
+                'moneda'               => 'moneda',
+                'numero_cuenta'        => 'numero_cuenta',
+                'numero_cuenta_abono'  => 'numero_cuenta_abono',
+                'cuenta_interbancaria' => 'cuenta_interbancaria',
+                'predeterminado'       => 'predeterminado',
+            ];
+
+            $observacion = '';
+
+            foreach ($labels as $campo => $label) {
+                if (isset($cuenta->$campo)) {
+                    $observacion .= $label . ' : ' . ($cuenta->$campo ?? '-') . "\n";
+                }
+            }
+
+            Logbd::create([
+                'nombre_tabla'     => 'persona_cuentabancaria',
+                'id_registrotabla' => $cuenta->idpersona_cuentabancaria,
+                'id_user'          => auth()->id(),
+                'observacion'      => trim($observacion),
+                'accion_realizada' => 'Registro Nuevo',
+                'user_created'     => auth()->id(),
+            ]);
+
+            //obtenermos clieente o proveedor
+            $cliente_proveedor = Persona::findOrFail($cuenta->idpersona);
+
+            $tipo_persona = $cliente_proveedor->idtipo_persona==3 ? 'proveedor' : 'cliente';
+
+            //    3	PROVEEDOR
+            //    5	CLIENTE
+
+            /** Enviar correo de notificación a logística */
+            $logistica = DB::table('persona')
+            ->join('tipo_persona', 'persona.idtipo_persona', '=', 'tipo_persona.idtipo_persona')
+            ->where('persona.idtipo_persona', 6)
+            ->where('persona.estado', 1)
+            ->where('persona.estado_delete', 1)
+            ->select('persona.idpersona', 'persona.nombre_razonsocial', 'persona.email', 'tipo_persona.descripcion')
+            ->get();
+
+            foreach ($logistica as $usuarioLogistica) {
+
+                // Enviar el correo con los datos adecuados
+                Mail::to($usuarioLogistica->email)->queue(new NotificacioncuentaBancariaLogisticaMail($cliente_proveedor,$cuenta, $tipo_persona, 'agregar') );
+            }
+
             return ApiResponse::success([
-                'idpersona_cuentabancaria' => $data
+                'cuentas' => 'Cuenta Bancaria creada',
             ], 'Cuenta bancaria creada correctamente');
 
         } catch (\Throwable $e) {
@@ -91,14 +146,69 @@ class PersonaCuentaBancariaController extends Controller
                 'tipocuenta'           => $r->tipocuenta,
                 'moneda'               => $r->moneda,
                 'numero_cuenta'        => $r->numero_cuenta,
-                'numero_cuenta_abono'  => $r->numero_cuenta,
+                'numero_cuenta_abono'  => $r->numero_cuenta_abono,
                 'cuenta_interbancaria' => $r->cuenta_interbancaria,
                 'predeterminado'       => $r->predeterminado,
                 'user_updated'         => auth()->id() ?? null,
             ]);
 
+            // Obtener valores después de la actualización
+            $cambios = $cuenta->getChanges();
+            
+            $labels = [
+                'idbanco'              => 'idbanco',
+                'tipocuenta'           => 'tipocuenta',
+                'moneda'               => 'moneda',
+                'numero_cuenta'        => 'numero_cuenta',
+                'numero_cuenta_abono'  => 'numero_cuenta_abono',
+                'cuenta_interbancaria' => 'cuenta_interbancaria',
+                'predeterminado'       => 'Predeterminado',
+            ];
+            $observacion = '';
+
+            foreach ($cambios as $campo => $valor) {
+                if (!isset($labels[$campo])) { continue; }
+                if (in_array($campo, ['updated_at', 'user_updated'])) { continue; }
+                $observacion .= $labels[$campo] . ' : ' . ($valor ?? '-') . "\n";
+            }
+
+            if (trim($observacion) !== '') {
+                Logbd::create([
+                    'nombre_tabla'     => 'persona_cuentabancaria',
+                    'id_registrotabla' => $cuenta->idpersona_cuentabancaria,
+                    'id_user'          => auth()->id(),
+                    'observacion'      => trim($observacion),
+                    'accion_realizada' => 'Registro Actualizado',
+                    'user_created'     => auth()->id(),
+                ]);
+            }
+
+
+            //obtenermos clieente o proveedor
+            $cliente_proveedor = Persona::findOrFail($cuenta->idpersona);
+
+            $tipo_persona = $cliente_proveedor->idtipo_persona==3 ? 'proveedor' : 'cliente';
+
+            //    3	PROVEEDOR
+            //    5	CLIENTE
+
+            /** Enviar correo de notificación a logística */
+            $logistica = DB::table('persona')
+            ->join('tipo_persona', 'persona.idtipo_persona', '=', 'tipo_persona.idtipo_persona')
+            ->where('persona.idtipo_persona', 6)
+            ->where('persona.estado', 1)
+            ->where('persona.estado_delete', 1)
+            ->select('persona.idpersona', 'persona.nombre_razonsocial', 'persona.email', 'tipo_persona.descripcion')
+            ->get();
+
+            foreach ($logistica as $usuarioLogistica) {
+
+                // Enviar el correo con los datos adecuados
+                Mail::to($usuarioLogistica->email)->queue(new NotificacioncuentaBancariaLogisticaMail($cliente_proveedor,$cuenta, $tipo_persona, 'editar') );
+            }
+
             return ApiResponse::success([
-                'idpersona_cuentabancaria' => $cuenta->idpersona_cuentabancaria
+                'update' =>  'cambios'
             ], 'Cuenta bancaria actualizada correctamente');
 
         } catch (\Throwable $e) {
@@ -119,6 +229,47 @@ class PersonaCuentaBancariaController extends Controller
                 'estado_trash' => '0',
                 'user_delete'  => auth()->id() ?? null,
             ]);
+
+            /* ================== OBSERVACIÓN ================== */
+            $observacion = "idbanco : {$cuenta->idbanco}\n";
+            $observacion .= "tipocuenta : {$cuenta->tipocuenta}\n";
+            $observacion .= "moneda : {$cuenta->moneda}\n";
+            $observacion .= "numero_cuenta : {$cuenta->numero_cuenta}";
+
+            /* ================== LOG ================== */
+            Logbd::create([
+                'nombre_tabla'     => 'persona_cuentabancaria',
+                'id_registrotabla' => $cuenta->idpersona_cuentabancaria,
+                'id_user'          => auth()->id(),
+                'observacion'      => $observacion,
+                'accion_realizada' => 'Registro Eliminado',
+                'user_created'     => auth()->id(),
+            ]);
+
+
+            //obtenermos clieente o proveedor
+            $cliente_proveedor = Persona::findOrFail($cuenta->idpersona);
+
+            $tipo_persona = $cliente_proveedor->idtipo_persona==3 ? 'proveedor' : 'cliente';
+
+            //    3	PROVEEDOR
+            //    5	CLIENTE
+
+            /** Enviar correo de notificación a logística */
+            $logistica = DB::table('persona')
+            ->join('tipo_persona', 'persona.idtipo_persona', '=', 'tipo_persona.idtipo_persona')
+            ->where('persona.idtipo_persona', 6)
+            ->where('persona.estado', 1)
+            ->where('persona.estado_delete', 1)
+            ->select('persona.idpersona', 'persona.nombre_razonsocial', 'persona.email', 'tipo_persona.descripcion')
+            ->get();
+
+            foreach ($logistica as $usuarioLogistica) {
+
+                // Enviar el correo con los datos adecuados
+                Mail::to($usuarioLogistica->email)->queue(new NotificacioncuentaBancariaLogisticaMail($cliente_proveedor,$cuenta, $tipo_persona, 'desactivar') );
+            }
+
 
             return ApiResponse::success([
                 'idpersona_cuentabancaria' => $id,
@@ -188,7 +339,7 @@ class PersonaCuentaBancariaController extends Controller
         }
     }
 
-        public function Listar_Proveedores(Request $r)
+    public function Listar_Proveedores(Request $r)
     {
         // Parámetros de entrada del request
         $perPage = (int) $r->input('per_page', 20);           // Número de elementos por página (por defecto 20)

@@ -111,15 +111,15 @@
         <a class="nav-link" data-toggle="dropdown" href="#">
           <img src="../dist/docs/all_trabajador/perfil/" class="user-image img-circle" alt="User Image" width="30" onerror="this.src='{{ asset('adminlte3/dist/svg/user_default.svg') }}';"> 
               
-          <span class="hidden-xs d-none show-min-width-1200px text-white" >{{ Auth::user()->name }}</span>
+          <span class="hidden-xs d-none show-min-width-1200px text-white text-bold" style="font-size: small;" >{{ auth()->user()->persona?->nombre_razonsocial }}</span>
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
           <!-- Widget: user widget style 1 -->
           <div class="card card-widget widget-user mb-0">
             <!-- Add the bg color to the header using any of the bg-* classes -->
             <div class="widget-user-header" style="background-color: #231f20">
-              <h3 class="widget-user-username text-white">{{ Auth::user()->name }}</h3>
-              <h5 class="widget-user-desc text-white">ADM</h5>
+              <h3 class="widget-user-username text-white  text-bold" style="font-size: larger;">{{ auth()->user()->persona?->nombre_razonsocial }}</h3>
+              <h5 class="widget-user-desc text-white" style="font-size: larger;">{{ Auth::user()->name }}</h5>
             </div>
             <div class="widget-user-image">
               <img class="img-circle elevation-2" src="../dist/docs/all_trabajador/perfil/" alt="User Avatar" onerror="this.src='{{ asset('adminlte3/dist/svg/user_default.svg') }}';" />

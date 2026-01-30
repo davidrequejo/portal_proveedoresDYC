@@ -1,3 +1,11 @@
+  @php
+    $user = auth()->user();
+
+    $puedeDocumentos =
+        $user->perm_proveedor_vista_documentos_client &&
+        $user->tiene_cuenta_bancaria &&
+        $user->persona?->estado_completoxproveedor == 1;
+  @endphp
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
@@ -23,7 +31,7 @@
         <div class="input-group" data-widget="sidebar-search">
           <input class="form-control form-control-sidebar" type="search" placeholder="Buscar modulo..." aria-label="Search">
           <div class="input-group-append">
-            <button class="btn btn-sidebar">
+            <button class="btn btn-xs btn-sidebar">
               <i class="fas fa-search fa-fw"></i>
             </button>
           </div>
@@ -44,10 +52,11 @@
             <li class="nav-item">
               <a href="{{ route('proveedor.index') }}" class="nav-link {{ request()->routeIs('proveedor.*') ? 'active' : '' }}">
                 <i class="nav-icon ti ti-user-cog"></i>
-                <p> Proveedores</p>
+                <p> Proveedor</p>
               </a>
             </li>
             @endif
+
 
             @if (auth()->user()->perm_proveedor_vista_act_datos_client)
             <li class="nav-item">
@@ -57,20 +66,30 @@
               </a>
             </li>
             @endif
-            
-            @if (auth()->user()->perm_proveedor_vista_documentos_client)
+
+             @if (auth()->user()->perm_proveedor_vista_documentos_client)
             <li class="nav-item">
-              <a href="{{ route('subir_docs.index') }}" class="nav-link {{ request()->routeIs('subir_docs.*') ? 'active' : '' }}">
-                <i class="nav-icon fas fa-file"></i>
-                <p> Documentación</p>
-              </a>
+              @if($puedeDocumentos)
+                  <a href="{{ route('subir_docs.index') }}"
+                    class="nav-link {{ request()->routeIs('subir_docs.*') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-file"></i>
+                    <p>Documentación</p>
+                  </a>
+              @else
+                  <a href="javascript:void(0)"
+                    class="nav-link text-muted"
+                    onclick="alertaPerfilIncompleto()">
+                    <i class="nav-icon fas fa-file"></i>
+                    <p>Documentación</p>
+                  </a>
+              @endif
             </li>
             @endif
 
           @if (auth()->user()->perm_client_vista_adm)
             <li class="nav-item">
               <a href="{{ route('cliente.index') }}" class="nav-link {{ request()->routeIs('cliente.*') ? 'active' : '' }}">
-                <i class="nav-icon ti ti-user-cog"></i>
+                <i class="nav-icon fas fa-user-tag"></i>
                 <p> Cliente</p>
               </a>
             </li>
@@ -102,7 +121,7 @@
                 <li class="nav-item">
                   <a href="{{ route('tipo_estandar.index') }}" class="nav-link {{ request()->routeIs('tipo_estandar.*') ? 'active' : '' }}">
                     <i class="nav-icon fas fa-tenge"></i>
-                    <p>Proveedor Tipo</p>
+                    <p>Categoria Proveedor</p>
                   </a>
                 </li>  
               @endif  
@@ -129,7 +148,7 @@
                 <li class="nav-item">
                   <a href="{{ route('persona.index') }}" class="nav-link {{ request()->routeIs('persona.*') ? 'active' : '' }}">
                     <i class="ti ti-users nav-icon"></i>
-                    <p>Socio Negocio</p>
+                    <p>Trabajadores</p>
                   </a>
                 </li>
                @endif
@@ -156,3 +175,4 @@
     </div>
     <!-- /.sidebar -->
   </aside>
+

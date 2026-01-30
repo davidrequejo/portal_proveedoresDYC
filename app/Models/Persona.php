@@ -75,6 +75,15 @@ class Persona extends Model
         'user_trash',
     ];
 
+     public function cuentasBancarias()
+    {
+        return $this->hasMany(
+            PersonaCuentaBancaria::class,
+            'idpersona',
+            'idpersona'
+        );
+    }
+
 
     public static function personas()
     {

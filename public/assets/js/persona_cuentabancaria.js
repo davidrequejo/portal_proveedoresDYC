@@ -80,13 +80,13 @@ function renderFilas(rows){
     }
 
     $tb.append(`
-      <tr class="fila-banco" data-id="${r.idpersona_CuentaBancaria}">
+      <tr class="fila-banco" data-id="${r.idpersona_cuentabancaria}">
         <td>
           <div class="btn-group btn-group-sm">
-            <button class="btn" onclick="ver_editar_cuentabancaria(${r.idpersona_CuentaBancaria})">
+            <button class="btn" onclick="ver_editar_cuentabancaria(${r.idpersona_cuentabancaria})">
               <i class="fas fa-pencil-alt color_icon_opt"></i>
             </button>
-            <button class="btn" onclick="eliminar_cuentabancaria(${r.idpersona_CuentaBancaria}, '${r.banco}')">
+            <button class="btn" onclick="eliminar_cuentabancaria(${r.idpersona_cuentabancaria}, '${r.banco}')">
               <i class="fas fa-trash color_icon_opt"></i>
             </button>
           </div>
@@ -170,7 +170,7 @@ $(".recargar-tabla-proyecto").on("click", function(){
 
 
 function limpiar_form_banco(){
-  $("#idpersona_CuentaBancaria").val('');
+  $("#idpersona_cuentabancaria").val('');
   $("#idbanco").val('');
   $("#tipocuenta").val('');
   $("#moneda").val('');
@@ -182,21 +182,22 @@ function limpiar_form_banco(){
   $(".error.invalid-feedback").remove();
 }
 
-function ver_editar_cuentabancaria(idpersona_CuentaBancaria){
+function ver_editar_cuentabancaria(idpersona_cuentabancaria){
 
   limpiar_form_banco();
   $('#modal-crear_cuentabancaria').modal('show');
 
-  $.getJSON(`${BASE_URLl}/persona-cuenta-bancaria/${idpersona_CuentaBancaria}/ver-editar`, function (e) {
+  $.getJSON(`${BASE_URLl}/persona-cuenta-bancaria/${idpersona_cuentabancaria}/ver-editar`, function (e) {
 
     if (e.status === true) {
-      $("#idpersona_CuentaBancaria").val(e.data.idpersona_CuentaBancaria);
+      $("#idpersona_cuentabancaria").val(e.data.idpersona_cuentabancaria);
       $("#idpersona").val(e.data.idpersona);
       $("#idbanco").val(e.data.idbanco).trigger('change');
       $("#tipocuenta").val(e.data.tipocuenta).trigger('change');
       $("#moneda").val(e.data.moneda).trigger('change');
       $("#predeterminado").val(e.data.predeterminado).trigger('change');
       $("#numero_cuenta").val(e.data.numero_cuenta);
+      $("#numero_cuenta_abono").val(e.data.numero_cuenta_abono);
       $("#cuenta_interbancaria").val(e.data.cuenta_interbancaria);
     } else {
       toastr.error('Registro no encontrado');
@@ -209,8 +210,11 @@ function ver_editar_cuentabancaria(idpersona_CuentaBancaria){
 
 function guardar_y_editar_cuentabancaria(e){
 
+  $('.spiner_enviando_correo_cb').show();
+  $('#guardar_registro_cuenta_bank').hide();
+
   let formData = new FormData($("#form-cuenta-bancaria")[0]);
-  let id = $("#idpersona_CuentaBancaria").val();
+  let id = $("#idpersona_cuentabancaria").val();
   let url = '';
 
   if (id === '') {
@@ -218,6 +222,7 @@ function guardar_y_editar_cuentabancaria(e){
   } else {
     url = `${BASE_URLl}/persona-cuenta-bancaria/editar/${id}`;
     formData.append('_method', 'PUT');
+    
   }
 
   $.ajax({
@@ -230,8 +235,10 @@ function guardar_y_editar_cuentabancaria(e){
       if (e.status === true) {
         tabla_principal_cnta_bank();
         limpiar_form_banco();
-        Swal.fire("Correcto!", "Banco guardado correctamente", "success");
+        Swal.fire("Correcto!", "Guardado correctamente", "success");
         $("#modal-crear_cuentabancaria").modal("hide");
+          $('.spiner_enviando_correo_cb').hide();
+          $('#guardar_registro_cuenta_bank').show();
       } else {
         ver_errores(e);
       }
@@ -242,9 +249,63 @@ function guardar_y_editar_cuentabancaria(e){
   });
 }
 
-function eliminar_cuentabancaria(id, descripcion){
+
+
+function eliminar_cuentabancaria(id, descripcion) {
 
   Swal.fire({
+    title: "¿Eliminar banco?",
+    html: `<b class="text-danger">${descripcion}</b>`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, eliminar",
+    showLoaderOnConfirm: true,
+    allowOutsideClick: () => !Swal.isLoading(),
+
+    preConfirm: () => {
+      return $.ajax({
+        url: `${BASE_URLl}/persona-cuenta-bancaria/eliminar/${id}`,
+        type: "PUT",
+        dataType: "json",
+        data: {
+          _token: $('meta[name="csrf-token"]').attr('content')
+        }
+      })
+      .then((e) => {
+        if (e.status !== true) {
+          throw new Error(e.message || 'Error al eliminar');
+        }
+        return e;
+      })
+      .catch((error) => {
+        Swal.showValidationMessage(
+          `❌ ${error.message}`
+        );
+      });
+    }
+  }).then((result) => {
+
+    // 👉 SOLO entra aquí cuando el AJAX terminó bien
+    if (result.isConfirmed) {
+      Swal.fire(
+        "Eliminado!",
+        "Banco eliminado correctamente",
+        "success"
+      );
+      tabla_principal_cnta_bank();
+    }
+
+  });
+}
+
+
+/*let idcuentabn_delete = null;
+function eliminar_cuentabancaria(id, descripcion){
+
+  $("#modal-eliminar_cuentabancaria").modal('show');
+  idcuentabn_delete = id;
+
+ Swal.fire({
     title: "¿Eliminar banco?",
     html: `<b class="text-danger">${descripcion}</b>`,
     icon: "warning",
@@ -269,7 +330,66 @@ function eliminar_cuentabancaria(id, descripcion){
       });
     }
   });
-}
+}*/
+
+  /*function delete_cuentacb(idcuentabn_delete) {  
+    $('.spiner_enviando_correo_cb_delete').show();
+    $('.delete_registro_cuenta_bank').hide();
+    $('.cancelar_registro_cb').hide();
+
+
+    $.post(`${BASE_URLl}/persona-cuenta-bancaria/eliminar/${idcuentabn_delete}`, { _token: CSRFF },
+      function (e) {
+        if (e.status == true) {
+          $('.spiner_enviando_correo_cb_delete').hide();
+          $('.delete_registro_cuenta_bank').show();
+          $('.cancelar_registro_cb').show();
+          tabla_principal_cnta_bank();
+          $("#modal-eliminar_cuentabancaria").modal('hide');
+          Swal.fire("Correcto!", "Cuenta bancaria eliminada correctamente", "success");          
+        } else {
+          ver_errores(e);				 
+        }
+      }
+    ).fail(function (xhr) { ver_errores(xhr);  });
+
+    
+  }*/
+
+  /*function delete_cuentacb() {
+  
+    const token = $('meta[name="csrf-token"]').attr('content');
+
+    $('.spiner_enviando_correo_cb_delete').show();
+    $('.delete_registro_cuenta_bank, .cancelar_registro_cb').hide();
+
+    $.ajax({
+      url: `${BASE_URLl}/persona-cuenta-bancaria/eliminar/${idcuentabn_delete}`,
+      type: "PUT",
+      dataType: "json",
+      data: { _token: token }
+    })
+    .done(function (e) {
+      if (e.status === true) {
+        tabla_principal_cnta_bank();
+        $("#modal-eliminar_cuentabancaria").modal('hide');
+        Swal.fire("Correcto!", "Cuenta bancaria eliminada correctamente", "success");
+      } else {
+        ver_errores(e);
+      }
+    })
+    .fail(function (xhr) {
+      ver_errores(xhr);
+    })
+    .always(function () {
+      $('.spiner_enviando_correo_cb_delete').hide();
+      $('.delete_registro_cuenta_bank, .cancelar_registro_cb').show();
+    });
+  }*/
+
+
+
+
 
 
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -432,29 +552,12 @@ $(function () {
 });
 
 
-function soloNumeros(e) {
-    let key = e.which || e.keyCode;
-
-    // Permitir: backspace, tab, delete, flechas
-    if (
-        key === 8  || // backspace
-        key === 9  || // tab
-        key === 46 || // delete
-        (key >= 37 && key <= 40) // flechas
-    ) {
-        return true;
-    }
-
-    // Permitir solo números (0–9)
-    if (key >= 48 && key <= 57) {
-        return true;
-    }
-
-    e.preventDefault();
-    return false;
-}
-
 $('#numero_cuenta, #cuenta_interbancaria').on('input', function () {
     this.value = this.value.replace(/[^0-9]/g, '');
 });
+
+function replica_nrocuenta() {   $('#numero_cuenta_abono').val($('#numero_cuenta').val()); }
+
+
+function verificar_tipocuenta() {   if ($('#tipo_entidad_sunat').val() === 'NATURAL') { $('#tipocuenta option[value="D"]').remove();  $('#tipocuenta option[value="C"]').remove(); }else{ $('#tipocuenta option[value="A"]').remove();} };
 

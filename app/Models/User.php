@@ -60,6 +60,7 @@ class User extends Authenticatable
      */
     protected $appends = [
         'profile_photo_url',
+        'tiene_cuenta_bancaria',
     ];
 
     /**
@@ -78,6 +79,15 @@ class User extends Authenticatable
     public function persona()
     {
         return $this->belongsTo(Persona::class, 'idpersona', 'idpersona');
+    }
+
+    public function getTieneCuentaBancariaAttribute()
+    {
+        if (!$this->persona) {
+            return false;
+        }
+
+        return $this->persona->cuentasBancarias()->exists();
     }
 
     public function permisos()
