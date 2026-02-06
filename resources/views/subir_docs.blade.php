@@ -78,29 +78,13 @@
                                 <th>#</th>
                                 <th class="text-center">Ver</th>
                                 <th >Descripcion</th>
-                                <th >Fecha Inicio</th>
-                                <th >Fecha Fin</th>
+                                <th >Fecha Inicio Proceso</th>
+                                <th >Fecha Inicio Homologación</th>
+                                <th >Fecha Fin Homologación</th>
                                 <th class="text-center">Estado</th>
                               </tr>
                               </thead>
                               <tbody class="tbl_lista_periodos_homologacion">
-                              <tr>
-                                <td>001</td>
-                                <td>
-                                  <img src="/assets/images/default/pdf_icon.png" alt="Product 1" class="img-circle img-size-32 mr-2">
-                                  Fecha Ruc de la empresa
-                                </td>
-                                <td><span class="badge bg-success">Verificado</span></td>
-                                <td>
-                                  <a href="#" class="text-muted">
-                                    <i class="fas fa-search"></i>
-                                  </a>
-                                </td>
-                                <td class="text-center">
-                                  <a class="btn btn-info btn-sm" href="#"><i class="fas fa-pencil-alt"></i> Editar</a>                              
-                                </td>
-                              </tr>
-
                               </tbody>
                             </table>
                           </div>
@@ -149,31 +133,15 @@
                             <table class="table table-striped table-valign-middle">
                               <thead>
                               <tr>
-                                <th>#</th>
-                                <th>Descripcion Doc.</th>
-                                <th>Estado</th>
-                                <th>Ver</th>
-                                <th class="text-center">Act. Estado</th>
+                                <th class="text-center">#</th>
+                                <th class="text-center">Descripción Doc.</th>
+                                <th class="text-center">Estado</th>
+                                <th class="text-center">Modelo</th>
+                                <th class="text-center">Ver</th>
+                                <th class="text-center">Actualizar</th>
                               </tr>
                               </thead>
                               <tbody class="tbl_lista_documentos">
-                              <tr>
-                                <td>001</td>
-                                <td>
-                                  <img src="/assets/images/default/pdf_icon.png" alt="Product 1" class="img-circle img-size-32 mr-2">
-                                  Fecha Ruc de la empresa
-                                </td>
-                                <td><span class="badge bg-success">Verificado</span></td>
-                                <td>
-                                  <a href="#" class="text-muted">
-                                    <i class="fas fa-search"></i>
-                                  </a>
-                                </td>
-                                <td class="text-center">
-                                  <a class="btn btn-info btn-sm" href="#"><i class="fas fa-pencil-alt"></i> Editar</a>                              
-                                </td>
-                              </tr>
-
                               </tbody>
                             </table>
                           </div>
@@ -239,8 +207,7 @@
                       <div class="col-12">
                         <div class="form-group">
                           <label for="descripcion">Tipo Documento</label>                          
-                            <input type="text" class="form-control nombre_tipo_documento" placeholder="ejmpl. Los Jardines" readonly>
-                          </select>
+                            <input type="text" class="form-control  fs-h-input nombre_tipo_documento" placeholder="ejmpl. Los Jardines" readonly>
                         </div>
                       </div>                    
 
@@ -270,7 +237,7 @@
                       <div class="col-12 mt-2" hidden>
                         <div class="form-group">
                           <label for="descripcion">Descripción </label> <br>
-                          <textarea name="descripcion" id="descripcion" class="form-control" rows="2"></textarea>
+                          <textarea name="descripcion" id="descripcion" class="form-control fs-h-input" rows="2"></textarea>
                         </div>
                       </div>
 

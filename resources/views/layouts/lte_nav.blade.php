@@ -1,3 +1,70 @@
+<style>
+/* Item */
+.notification-item {
+  max-width: 100%;
+  align-items: flex-start;
+}
+
+/* Ícono */
+.notification-icon {
+  margin-right: 8px;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+/* Contenido */
+.notification-content {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Título */
+.notification-title {
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Fila proveedor / periodo */
+.notification-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #6c757d;
+  margin-top: 2px;
+}
+
+/* Proveedor */
+.notification-proveedor {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Periodo alineado a la derecha */
+.notification-periodo {
+  white-space: nowrap;
+  margin-left: 8px;
+}
+
+/* Línea divisoria */
+.notification-divider {
+  border-top: 1px solid #e5e7eb;
+  margin: 4px 0;
+}
+
+/* Tiempo */
+.notification-time {
+  font-size: 13px;
+  color: #9aa0a6;
+  text-align: left;
+}
+
+
+</style>
 <!-- Navbar -->
   <nav class="main-header navbar navbar-expand navbar-white navbar-light text-white bg-color-principal">
     <!-- Left navbar links -->
@@ -14,7 +81,7 @@
     <ul class="navbar-nav ml-auto">
 
       <!-- Messages Dropdown Menu -->
-      <li class="nav-item dropdown">
+      <li class="nav-item dropdown hidden">
         <a class="nav-link" data-toggle="dropdown" href="#">
           <i class="far fa-comments text-white" ></i>
           <span class="badge badge-danger navbar-badge">3</span>
@@ -72,7 +139,7 @@
         </div>
       </li>
       <!-- Notifications Dropdown Menu -->
-      <li class="nav-item dropdown">
+      <!--<li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">
           <i class="far fa-bell text-white"></i>
           <span class="badge badge-warning navbar-badge">15</span>
@@ -97,7 +164,75 @@
           <div class="dropdown-divider"></div>
           <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
         </div>
+      </li>-->
+      <!-- Notifications Dropdown Menu -->
+      <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#">
+          <i class="far fa-bell text-white"></i>
+
+          @php
+            $unreadCount = auth()->user()->unreadNotifications->count();
+          @endphp
+
+          @if($unreadCount > 0)
+            <span class="badge badge-warning navbar-badge">
+              {{ $unreadCount }}
+            </span>
+          @endif
+        </a>
+
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+
+          <span class="dropdown-item dropdown-header">
+            {{ $unreadCount }} Notificaciones
+          </span>
+
+          <div class="dropdown-divider"></div>
+
+          @forelse(auth()->user()->unreadNotifications->take(5) as $n)
+            <a href="{{ route('notificaciones.leer', $n->id) }}"
+              class="dropdown-item notification-item d-flex">
+
+              <!-- Contenido -->
+              <div class="notification-content">
+
+                <!-- Título -->
+                <div class="notification-title">
+                {{$n->data['mensaje']}}
+                </div>
+
+                <!-- Proveedor + Periodo en 2 columnas -->
+                <div class="notification-row">
+                  <span class="notification-proveedor">
+                    {{ $n->data['Proveedor'] ?? 'Proveedor' }}
+                  </span>                 
+                </div>
+                <!-- Tiempo -->
+                <div class="notification-time">
+                   Periodo - {{ $n->data['periodo'] ?? '2026' }}
+                </div>
+                 <span class="float-right text-muted text-sm">{{ $n->created_at->diffForHumans() }}</span>
+
+              </div>
+            </a>
+
+
+            <div class="dropdown-divider"></div>
+          @empty
+            <span class="dropdown-item text-muted text-center">
+              No tienes notificaciones
+            </span>
+            <div class="dropdown-divider"></div>
+          @endforelse
+
+          <a href="{{ route('notificaciones.marcarTodas') }}"
+            class="dropdown-item dropdown-footer text-center">
+            Marcar todas como leídas
+          </a>
+
+        </div>
       </li>
+
 
       {{-- Full Scren --}}
       <li class="nav-item">

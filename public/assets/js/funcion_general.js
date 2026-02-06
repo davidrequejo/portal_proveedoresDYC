@@ -893,18 +893,20 @@ function doc_view_extencion(filename, carpeta='', sub_carpeta='', width='50%', h
   var host = '';  var ruta = '';
 
   console.log(filename);
+  console.log(BASE_URL);
+  
   
 
   if (carpeta == '' && sub_carpeta == '') {
-    host = window.location.host == '127.0.0.1:8000'?  `${filename}`: `${window.location.origin}/${filename}` ;
+    host = window.location.host == '127.0.0.1:8000'?  `${filename}`: `${BASE_URL}/${filename}` ;
     ruta = host;
   } else {
-    ruta = sub_carpeta == '' || sub_carpeta == null ?  `../dist/docs/${carpeta}/${filename}`: `../dist/docs/${carpeta}/${sub_carpeta}/${filename}`;
+    ruta = sub_carpeta == '' || sub_carpeta == null ?  `${BASE_URL}/${filename}`: `../dist/docs/${carpeta}/${sub_carpeta}/${filename}`;
     
     if (sub_carpeta == '' || sub_carpeta == null) {
-      host = window.location.host == 'localhost'? `http://localhost/admin_sevens/dist/docs/${carpeta}/${filename}` : `${window.location.origin}/dist/docs/${carpeta}/${filename}` ;
+      host = '127.0.0.1:8000'? `${filename}`: `${BASE_URL}/${filename}` ;
     } else {
-      host = window.location.host == 'localhost'? `http://localhost/admin_sevens/dist/docs/${carpeta}/${sub_carpeta}/${filename}` : `${window.location.origin}/dist/docs/${carpeta}/${sub_carpeta}/${filename}` ;
+      host = '127.0.0.1:8000'? `${filename}`: `${BASE_URL}/${filename}` ;
     }
   }
   
@@ -947,7 +949,7 @@ function doc_view_extencion(filename, carpeta='', sub_carpeta='', width='50%', h
 
   }else if ( extrae_extencion(filename) == "docx" ||  extrae_extencion(filename) == "docm"  || extrae_extencion(filename) == "dot" ||  extrae_extencion(filename) == "dotx" ||  extrae_extencion(filename) == "dotm") {
 
-    html = `<img src="../dist/svg/docx.svg" alt="" width="50%" height="50%" >`;
+    html = `<img src="${BASE_URL}/assets/images/default/wordnew.jpg" alt="" width="50%" height="50%" >`;
     extencion = extrae_extencion(filename);
 
   }else if ( extrae_extencion(filename) == "doc") {
@@ -1222,6 +1224,10 @@ function buscar_sunat_reniec(input='') {
   let tipo_doc = $(`#tipo_documento${input}`).val();
 
   let dni_ruc = $(`#numero_documento${input}`).val(); 
+  let tipo_entidad_sunat = $(`#tipo_entidad_sunat${input}`).val(); 
+
+  console.log(tipo_entidad_sunat);
+  
    
   if (tipo_doc == "1") { //dni
 

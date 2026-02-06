@@ -2,20 +2,23 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Notificación de Cuenta Bancaria</title>
+    <title>Notificación de Homologación</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f5f5f5;font-family:Arial, Helvetica, sans-serif;font-size:14px;color:#333;">
 
+<!-- CONTENEDOR GENERAL -->
 <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f5f5f5;">
     <tr>
         <td align="center">
 
-            <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;margin:20px auto;border-radius:10px;overflow:hidden;">
+            <!-- CONTENEDOR BLANCO -->
+            <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;margin:20px auto;">
 
-                <!-- HEADER -->
+                <!-- HEADER / BANNER -->
                 <tr>
                     <td style="background-color:#231f20;padding:25px 30px;color:#ffffff;" align="center">
-                        <img
+
+                        <img 
                             src="https://optimiza360.pe/portal_proveedor/public/assets/images/brand-logos/logo-dc-inmobiliario-grupo.png"
                             alt="DC Grupo Inmobiliario"
                             width="160"
@@ -23,45 +26,36 @@
                         >
 
                         <h2 style="margin:0;font-size:22px;font-weight:bold;">
-                            {{ $tipo == 'proveedor' ? 'Proveedor' : 'Cliente' }}
-                            @switch($accion)
-                                @case('agregar') agregó @break
-                                @case('editar') actualizó @break
-                                @case('desactivar') eliminó @break
-                            @endswitch
-                            cuenta bancaria
+                            ¡Tu información es importante para nosotros!
                         </h2>
-
                         <p style="margin:8px 0 0;font-size:14px;">
-                            Información actualizada en el portal de Homologación
+                            Proceso de Homologación de Proveedores
                         </p>
+
                     </td>
                 </tr>
+
 
                 <!-- CUERPO -->
                 <tr>
                     <td style="padding:30px;">
 
-                        <p>Hola, equipo de Logística.</p>
-
-                        <p style="line-height:1.5;">
-                            Se registró una actualización de cuenta bancaria con el siguiente detalle:
+                        <p style="margin:0 0 15px;">
+                            Estimado(a)
+                            <strong>{{ $proveedor->nombre_razonsocial ?? $proveedor->nombre }}</strong>,
                         </p>
 
-                        <p><strong>{{ $tipo == 'proveedor' ? 'Proveedor' : 'Cliente' }}:</strong> {{ $data->nombre_razonsocial }}</p>
-
-                        <p>
-                            <strong>Tipo de Cuenta:</strong>
-                            @switch($cuenta->tipocuenta)
-                                @case('C') Corriente @break
-                                @case('A') Ahorros @break
-                                @case('D') Detracción @break
-                                @default No especificado
-                            @endswitch
+                        <p style="margin:0 0 15px;line-height:1.5;">
+                             Le informamos que se ha creado un nuevo proceso de homologación.  
+                             Por favor, revise el proceso para proceder con el registro de la información necesaria.
                         </p>
 
-                        <p>
-                            <strong>N° de Cuenta:</strong> {{ $cuenta->numero_cuenta }}
+                        <!-- MENSAJE FINAL -->
+                        <p style="margin:20px 0 0;line-height:1.5;">
+                            Si requiere orientación, soporte o tiene alguna consulta adicional, no dude en comunicarse con nosotros escribiendo al correo <strong>{{ $correoSoporte }}</strong>
+                            , donde con gusto lo atenderemos.
+
+                            Agradecemos su disposición y colaboración para el cumplimiento de los requisitos establecidos.
                         </p>
 
                         <p style="line-height:1.5;">
@@ -75,6 +69,13 @@
                             </a>
                         </p>
 
+                        <!-- FIRMA -->
+                        <p style="margin:25px 0 0;">
+                            Atentamente,<br>
+                            <strong>{{ $nombreSoporte }}</strong>
+                            
+                        </p>
+
                     </td>
                 </tr>
 
@@ -82,10 +83,10 @@
                 <tr>
                     <td style="background-color:#f0f0f0;padding:20px 30px;font-size:12px;color:#666;text-align:center;">
                         <p style="margin:0;">
-                            Este correo es informativo, por favor no responder.
+                            Este correo es informativo, por favor no responder a este mensaje.
                         </p>
                         <p style="margin:8px 0 0;">
-                            © {{ date('Y') }} DyC Grupo Inmobiliario – Todos los derechos reservados
+                            © {{ date('Y') }} DC Grupo Inmobiliario – Todos los derechos reservados
                         </p>
                     </td>
                 </tr>

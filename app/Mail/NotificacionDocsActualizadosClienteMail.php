@@ -3,10 +3,12 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class NotificacionDocumentosHomologacionMail extends Mailable implements ShouldQueue
+class NotificacionDocsActualizadosClienteMail  extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -15,14 +17,10 @@ class NotificacionDocumentosHomologacionMail extends Mailable implements ShouldQ
     public $tries = 3;
 
     public $proveedor;
-    public $documentos;
-    public $usuarioLogistica;
 
-    public function __construct($proveedor, $documentos, $usuarioLogistica)
+    public function __construct($proveedor)
     {
         $this->proveedor        = $proveedor;
-        $this->documentos       = $documentos;
-        $this->usuarioLogistica = $usuarioLogistica;
     }
 
     /*public function build()
@@ -36,7 +34,7 @@ class NotificacionDocumentosHomologacionMail extends Mailable implements ShouldQ
     }*/
     public function build()
     {
-        return $this->subject('Resultado de revisión de documentos de homologación')
-            ->view('emails.notificacion_documentos_homologacion');
+        return $this->subject('Cliente Actualizó sus documentos de homologación')
+            ->view('emails.notificacion_docs_actualizados_clienteMail');
     }
 }

@@ -198,7 +198,7 @@
                         <div class="form-group">
                           <label for="descripcion">Persona</label>                          
                           <!--<textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
-                          <select name="idpersona" id="idpersona" class="form-control is-valid select2" placeholder="Persona" aria-invalid="false">
+                          <select name="idpersona" id="idpersona" class="form-control is-valid select2 fs-h-input" placeholder="Persona" aria-invalid="false">
                           </select>
                         </div>
                       </div>
@@ -207,7 +207,7 @@
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label for="descripcion">Tipo Persona</label> 
-                           <input type="text" name="tipoPersona" id="tipoPersona" class="form-control" readonly >                         
+                           <input type="text" name="tipoPersona" id="tipoPersona" class="form-control fs-h-input" readonly >                         
                         </div>
                       </div>
 
@@ -215,14 +215,14 @@
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label for="email">Usuario <sup class="text-danger">*</sup></label>
-                          <input type="text" name="email" class="form-control" id="email"  />
+                          <input type="text" name="email" class="form-control fs-h-input" id="email"  />
                         </div>
                       </div> 
                       <!-- Teléfono -->
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label for="password">Contraseña</label>
-                          <input type="password" name="password" id="password" class="form-control" >
+                          <input type="password" name="password" id="password" class="form-control fs-h-input" >
                         </div>  
                       </div>
 

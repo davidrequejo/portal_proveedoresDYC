@@ -18,7 +18,7 @@ class Persona extends Model
 
         /* ================== CLAVES ================== */
         'idtipo_persona',
-        'idtipoestandarproveedor',
+        'idarea_persona',
 
         /* ================== CÓDIGOS ================== */
         'codigo_s10',

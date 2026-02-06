@@ -158,8 +158,7 @@ tabla_principal_cargar_fecha_homologacion();
 function limpiar_form_fecha_homologacion() {
   $("#idfecha_homologacion").val('');
   $("#descripcion").val('');
-  $("#fecha_inicio").val('');
-  $("#fecha_fin").val('');
+  $("#fecha_inicio_proceso").val('');
   $(".form-control").removeClass('is-valid is-invalid');
   $(".error.invalid-feedback").remove();
 }
@@ -173,8 +172,7 @@ function ver_editar_fecha_homologacion(id) {
     if (e.status === true) {
       $("#idfecha_homologacion").val(e.data.idfecha_homologacion);
       $("#descripcion").val(e.data.descripcion);
-      $("#fecha_inicio").val(e.data.fecha_inicio);
-      $("#fecha_fin").val(e.data.fecha_fin);
+      $("#fecha_inicio_proceso").val(e.data.fecha_inicio_proceso);
     } else {
       toastr.error('Registro no encontrado');
     }
@@ -246,13 +244,11 @@ $(function () {
   $("#form-agregar-fechahomologacion").validate({
     rules: {
       descripcion:   { required: true },
-      fecha_inicio:  { required: true },
-      fecha_fin:     { required: true }
+      fecha_inicio_proceso:  { required: true },
     },
     messages: {
       descripcion:  { required: "Campo requerido" },
-      fecha_inicio: { required: "Campo requerido" },
-      fecha_fin:    { required: "Campo requerido" }
+      fecha_inicio_proceso: { required: "Campo requerido" },
     },
         errorElement: "span",
 

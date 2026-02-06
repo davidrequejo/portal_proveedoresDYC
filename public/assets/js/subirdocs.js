@@ -63,9 +63,10 @@ function lista_periodos_homologacion() {
               </div>            
             </td>
             <td class="py-1 text-nowrap" >${r.descripcion}</td>
-            <td class="py-1 text-nowrap" >${r.fecha_inicio}</td>
-            <td class="py-1 text-nowrap" >${r.fecha_fin}</td>
-            <td class="py-1 text-center" ><span class="badge badge-new">${r.estado_trash ?? ''} Activo</span> </td>
+            <td class="py-1 text-nowrap" >${r.fecha_inicio_proceso}</td>
+            <td class="py-1 text-nowrap" >${r.fecha_fin_periodo_h ??'Por Asignar'}</td>
+            <td class="py-1 text-nowrap" >${r.fecha_inicio_periodo_h??'Por Asignar'}</td>            
+            <td class="py-1 text-center" ><span class="badge badge-new">${r.estado_homologacion ?? ''} </span> </td>
 
           </tr>
         `);
@@ -187,7 +188,7 @@ function ver_estados_docs_proveedor(idpersona_facha_homologacion) {
 
   show_hide_escenario(2);
   //$("#titulo-detalle-proyecto").html(`Documentos del Proveedor: <b class="text-info">${nombre_razonsocial}</b>`);
-   $(".tbl_lista_documentos").html('<tr><td colspan="10" class="text-center text-muted">Ninguno</td></tr>');
+   $(".tbl_lista_documentos").html('<tr><td colspan="10" class="text-center text-muted"><i class="fas fa-sync-alt fa-spin"></i> Cargando ...</td></tr>');
 
    var cont =1;
 
@@ -198,7 +199,9 @@ function ver_estados_docs_proveedor(idpersona_facha_homologacion) {
       $(".tbl_lista_documentos").empty('');
       e.data.forEach(r => {
 
-          let estadoHtml = '';
+          let estadoHtml = ''; let donw_tipo_doc = '';
+
+
           const isPendiente = (r.estado_revision == 'Pendiente');
 
           switch (r.estado_revision) {
@@ -212,15 +215,17 @@ function ver_estados_docs_proveedor(idpersona_facha_homologacion) {
 
               default: estadoHtml = `<span class="badge bg-danger">Pendiente.</span>`; 
           }
+          donw_tipo_doc = r.tipo_documento == 'Modelo'?` <a type="button" class="btn btn-block btn-xs" href="${BASE_URL}/${r.archivo_modelo}" download="Modelo ${r.descripcion ?? ''}"> Descargar <i class="fas fa-cloud-download-alt fa-1x color_icon_opt"></i></a>`:'';
 
 
 
         $(".tbl_lista_documentos").append(`
           <tr>
-            <td class="py-1"> ${String(cont++).padStart(3, '0')} </td>
-            <td class="py-1 text-nowrap" ><i class="fas fa-file-pdf fa-lg text-principal"></i> ${r.descripcion ?? ''}</td>
-            <td class="py-1 text-nowrap" >${estadoHtml} </td>
-            <td class="py-1 text-nowrap" ><a  class="text-muted" onclick="ver_documento_proveedor('${r.archivo ?? ''}','${r.descripcion ?? ''}')"><i class="fas fa-search text-warning"></i></a></td>
+            <td class="py-1 text-center"> ${String(cont++).padStart(3, '0')} </td>
+            <td class="py-1 text-center" ><i class="fas fa-file-pdf fa-lg text-principal"></i> ${r.descripcion ?? ''}</td>
+            <td class="py-1 text-center" >${estadoHtml} </td>
+             <td class="py-1 text-center" >${donw_tipo_doc}</td>
+            <td class="py-1 text-center" ><a  class="text-muted" onclick="ver_documento_proveedor('${r.archivo ?? ''}','${r.descripcion ?? ''}')"><i class="fas fa-search text-warning"></i></a></td>
             <td class="py-1 text-center" >
               <div class="btn-group btn-group-sm">
                 <button class="btn text-nowrap bnt-editar-proyecto" onclick="ver_editar_documento(${r.iddocsproveedortipoestandar}, '${r.descripcion}')" data-toggle="tooltip" data-original-title="Editar"><i class="fas fa-pencil-alt color_icon_opt"></i></button>
@@ -261,18 +266,13 @@ function ver_editar_documento(id, nombre_documento) {
     
     if (e.status == true) {
 
-      console.log('editar');
-      console.log(e);
-      
-      
-
       $("#iddocsproveedortipoestandar").val(e.data.iddocsproveedortipoestandar);
 
       //validamoos DOC-1
       if (e.data.archivo && e.data.archivo.trim() !== "") {
         $("#doc_old_1").val(e.data.archivo);
-        $("#doc1_nombre").html(`` + extrae_extencion(`${BASE_URL}/${e.data.archivo}`) );
-        $("#doc1_ver").html( doc_view_extencion(`${BASE_URL}/${e.data.archivo}`, '', '', '100%', '210') );
+        $("#doc1_nombre").html(`` + extrae_extencion(`${e.data.archivo}`) );
+        $("#doc1_ver").html( doc_view_extencion(`${e.data.archivo}`, '', '', '100%', '210') );
       } else {
         $("#doc1_ver").html('<img src="/assets/svg/pdf.svg" alt="" width="50%">');
         $("#doc1_nombre").html('');

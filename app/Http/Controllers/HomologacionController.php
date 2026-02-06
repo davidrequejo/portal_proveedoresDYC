@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Models\DocsProveedorTipoEstandar;
 use App\Mail\EstadoDocumentoLogisticaMail;
 use App\Mail\NotificacionDocumentosHomologacionMail;
+use App\Mail\NotificacionNuevaHomologacionMail;
 use Illuminate\Support\Facades\Mail;
 
 class HomologacionController extends Controller
@@ -23,18 +24,17 @@ class HomologacionController extends Controller
             $data = $r->validate([
                 'idproveedor' => 'required',
                 'idtipoestandarproveedor' => 'required',
-                'descripcion_homologacion'  => 'required|string|max:45',
-                'fecha_inicio_periodo'              => 'required|date',
-                'fecha_fin_periodo'                 => 'required|date|after_or_equal:fecha_inicio',
+                'descripcion_homologacion'  => 'string|max:45',
+                'fecha_inicio_proceso' => 'required|date',
             ]);
 
             $p_homologacion = Homologacion::create([
                 'idpersona'   => $r->idproveedor,
                 'descripcion'  => $r->descripcion_homologacion,
-                'fecha_inicio'  => $r->fecha_inicio_periodo,
-                'fecha_fin'     => $r->fecha_fin_periodo,
+                'fecha_inicio_proceso'  => $r->fecha_inicio_proceso,
                 'estado_trash'  => '1',
                 'estado_delete' => '1',
+                'user_init_process'  => auth()->id() ?? null,
                 'user_created'  => auth()->id() ?? null,
             ]);
 
@@ -60,6 +60,24 @@ class HomologacionController extends Controller
 
             DB::table('docsproveedortipoestandar')->insert($docsInsert);
 
+						//envio de Notifición correo
+
+						// 1. Obtener proveedor
+            $proveedor = Proveedor::where('idpersona', $p_homologacion->idpersona)->first();
+
+						// 2. Usuario de logística (quien hace la acción)
+            $nombreSoporte = auth()->user()->persona?->nombre_razonsocial;
+            $correoSoporte = auth()->user()->persona?->email;
+
+						// 4. Enviar correo al proveedor
+            Mail::to($proveedor->email)->queue(
+                new NotificacionNuevaHomologacionMail(
+                    $proveedor,
+                    $nombreSoporte,
+                    $correoSoporte
+                )
+            );
+
             return ApiResponse::success([
                 'Respuesta' => 'Creado correctamente'
             ], 'Fecha de homologación creada correctamente');
@@ -77,9 +95,9 @@ class HomologacionController extends Controller
             // 1) Validación
             $data = $r->validate([
                 'idtipoestandarproveedor'   => 'required',
-                'descripcion_homologacion'  => 'required|string|max:45',
-                'fecha_inicio_periodo'      => 'required|date',
-                'fecha_fin_periodo'         => 'required|date|after_or_equal:fecha_inicio_periodo',
+                'descripcion_homologacion'  => 'string|max:45',
+                'fecha_inicio_proceso'      => 'required|date',
+               //'fecha_fin_periodo'         => 'required|date|after_or_equal:fecha_inicio_periodo',
             ]);
 
             // 2) Buscar el periodo existente
@@ -91,7 +109,7 @@ class HomologacionController extends Controller
             // 3) Actualizar cabecera
             $p_homologacion->update([
                 'descripcion'   => $r->descripcion_homologacion,
-                'fecha_inicio'  => $r->fecha_inicio_periodo,
+                'fecha_inicio_proceso'  => $r->fecha_inicio_proceso,
                 'fecha_fin'     => $r->fecha_fin_periodo,
                 'user_updated'  => auth()->id() ?? null, // si tienes este campo
             ]);
@@ -170,6 +188,40 @@ class HomologacionController extends Controller
         }
     }
 
+    public function establecerfechas_periodo_homologacion(Request $r, $idpersona_facha_homologacion) {
+        try {
+            // 1) Validación
+            $data = $r->validate([
+                'idtipoestandarproveedor'   => 'required',
+                'fecha_inicio_periodo_h'      => 'required|date',
+                'fecha_fin_periodo_h'   => 'required|date|after_or_equal:fecha_inicio_periodo_h',
+            ]);
+
+            // 2) Buscar el periodo existente
+            $p_homologacion = Homologacion::where('idpersona_facha_homologacion', $idpersona_facha_homologacion)
+                ->where('estado_trash', '1')
+                ->where('estado_delete', '1')
+                ->firstOrFail();
+
+            // 3) Actualizar 
+            $p_homologacion->update([
+                'fecha_fin_periodo_h'  => $r->fecha_fin_periodo_h,
+                'fecha_inicio_periodo_h'     => $r->fecha_inicio_periodo_h,
+                'estado_homologacion' => 'Vigente',
+                'user_fin_process'  => auth()->id() ?? null,
+            ]);
+
+            return ApiResponse::success([
+                'Respuesta' => 'Fechas Establecidas correctamente'
+            ], 'Periodo de homologación actualizado correctamente');
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return ApiResponse::error($e);
+        }
+
+    }
+
     public function eliminar_fecha_homologacion(Request $r, int $idfecha_homologacion)
     {
         try {
@@ -198,47 +250,44 @@ class HomologacionController extends Controller
       try {
           $idpersona = $r->input('idpersona');
 
-     $data = DB::table('persona_facha_homologacion as pfh')
-        ->join(
-            'docsproveedortipoestandar as docs',
-            'docs.idpersona_facha_homologacion',
-            '=',
-            'pfh.idpersona_facha_homologacion'
-        )
-        ->join(
-            'detalletipoestandarproveedor as dtp',
-            'dtp.iddetalletipoestandarproveedor',
-            '=',
-            'docs.iddetalletipoestandarproveedor'
-        )
-        ->join(
-            'tipoestandarproveedor as tep',
-            'tep.idtipoestandarproveedor',
-            '=',
-            'dtp.idtipoestandarproveedor'
-        )
-        ->select(
-            'pfh.idpersona_facha_homologacion',
-            'pfh.descripcion',
-            'pfh.fecha_inicio',
-            'pfh.fecha_fin',
-            'pfh.estado_trash',
+            /*$data = DB::table('persona_facha_homologacion as pfh')
+              ->join( 'docsproveedortipoestandar as docs', 'docs.idpersona_facha_homologacion', '=', 'pfh.idpersona_facha_homologacion' )
+              ->join( 'detalletipoestandarproveedor as dtp', 'dtp.iddetalletipoestandarproveedor', '=', 'docs.iddetalletipoestandarproveedor' )
+              ->join( 'tipoestandarproveedor as tep', 'tep.idtipoestandarproveedor', '=', 'dtp.idtipoestandarproveedor' )
+              ->select( 'pfh.idpersona_facha_homologacion', 'pfh.descripcion', 'pfh.fecha_inicio_proceso', 'pfh.fecha_fin', 'pfh.fecha_inicio_periodo_h',
+                  'pfh.fecha_fin_periodo_h', 'pfh.estado_homologacion', 'pfh.estado_trash', 'tep.descripcion as tipo_estandar'
+              )
+              ->where('pfh.estado_trash', '1')
+              ->where('pfh.estado_delete', '1')
+              ->where('pfh.idpersona', $idpersona)
+              ->groupBy( 'pfh.idpersona_facha_homologacion', 'pfh.descripcion', 'pfh.fecha_inicio_proceso', 'pfh.fecha_fin', 'pfh.fecha_inicio_periodo_h',
+                  'pfh.fecha_fin_periodo_h', 'pfh.estado_homologacion', 'pfh.estado_trash', 'tep.descripcion' )
+              ->get();*/
 
-            // 👉 dato adicional
-            'tep.descripcion as tipo_estandar'
-        )
-        ->where('pfh.estado_trash', '1')
-        ->where('pfh.estado_delete', '1')
-        ->where('pfh.idpersona', $idpersona)
-        ->groupBy(
-            'pfh.idpersona_facha_homologacion',
-            'pfh.descripcion',
-            'pfh.fecha_inicio',
-            'pfh.fecha_fin',
-            'pfh.estado_trash',
-            'tep.descripcion'
-        )
-        ->get();
+          $data = DB::table('persona_facha_homologacion as pfh')
+          ->join('docsproveedortipoestandar as docs', 'docs.idpersona_facha_homologacion', '=', 'pfh.idpersona_facha_homologacion')
+          ->join('detalletipoestandarproveedor as dtp', 'dtp.iddetalletipoestandarproveedor', '=', 'docs.iddetalletipoestandarproveedor')
+          ->join('tipoestandarproveedor as tep', 'tep.idtipoestandarproveedor', '=', 'dtp.idtipoestandarproveedor')
+          ->select( 'pfh.idpersona_facha_homologacion', 'pfh.descripcion', 'pfh.fecha_inicio_proceso', 'pfh.fecha_fin', 'pfh.fecha_inicio_periodo_h', 
+              'pfh.fecha_fin_periodo_h', 'pfh.estado_homologacion', 'pfh.estado_trash', 'tep.descripcion as tipo_estandar',
+              DB::raw(" CASE WHEN COUNT(docs.iddocsproveedortipoestandar) = SUM(CASE WHEN docs.estado_revision = 'Aprobado' THEN 1 ELSE 0 END) THEN 1 ELSE 0 END as todo_aprobado ")
+          )
+          ->where('pfh.estado_trash', '1')
+          ->where('pfh.estado_delete', '1')
+          ->where('pfh.idpersona', $idpersona)
+          ->groupBy(
+              'pfh.idpersona_facha_homologacion',
+              'pfh.descripcion',
+              'pfh.fecha_inicio_proceso',
+              'pfh.fecha_fin',
+              'pfh.fecha_inicio_periodo_h',
+              'pfh.fecha_fin_periodo_h',
+              'pfh.estado_homologacion',
+              'pfh.estado_trash',
+              'tep.descripcion'
+          )
+          ->get();
+
 
           return ApiResponse::success($data, 'Cateogria de proveedores obtenidos');
 
@@ -257,8 +306,11 @@ class HomologacionController extends Controller
                     'idpersona_facha_homologacion',
                     'idpersona',        // <- en tu create guardas idpersona
                     'descripcion',
-                    'fecha_inicio',
-                    'fecha_fin'
+                    'fecha_inicio_proceso',
+                    'fecha_fin',
+                    'fecha_inicio_periodo_h',
+                    'fecha_fin_periodo_h',
+                    'estado_homologacion'
                 ])
                 ->where('idpersona_facha_homologacion', $idpersona_facha_homologacion)
                 ->where('estado_trash', '1')
@@ -297,7 +349,7 @@ class HomologacionController extends Controller
             $idPeriodo = $r->input('idperiodo_homologacion');
             $idpersona = $r->input('idpersona'); // puede venir o no
 
-            $data = DB::table('docsproveedortipoestandar as docs')
+            $data_estandar = DB::table('docsproveedortipoestandar as docs')
                 ->join( 'persona_facha_homologacion as pfh', 'docs.idpersona_facha_homologacion', '=', 'pfh.idpersona_facha_homologacion' )
                 ->join( 'detalletipoestandarproveedor as dtp', 'docs.iddetalletipoestandarproveedor', '=', 'dtp.iddetalletipoestandarproveedor' )
                 ->join( 'documento_tipo_estandar as destts', 'destts.iddocumento_tipo_estandar', '=', 'dtp.iddocumento_tipo_estandar' )
@@ -312,17 +364,42 @@ class HomologacionController extends Controller
                     'docs.estado_delete'
                 )
                 ->where('pfh.idpersona_facha_homologacion', $idPeriodo)
+                ->whereIn('destts.tipo_documento', ['Estandar', 'Modelo'])
                 ->where('pfh.estado_trash', '1')
                 ->where('pfh.estado_delete', '1')
-
-                // 👇 FILTRO CONDICIONAL
                 ->when($idpersona, function ($q) use ($idpersona) {
                     $q->where('docs.idpersona', $idpersona);
                 })
-
                 ->get();
 
-            return ApiResponse::success($data, 'Documentos obtenidos correctamente');
+            $data_interno = DB::table('docsproveedortipoestandar as docs')
+                ->join( 'persona_facha_homologacion as pfh', 'docs.idpersona_facha_homologacion', '=', 'pfh.idpersona_facha_homologacion' )
+                ->join( 'detalletipoestandarproveedor as dtp', 'docs.iddetalletipoestandarproveedor', '=', 'dtp.iddetalletipoestandarproveedor' )
+                ->join( 'documento_tipo_estandar as destts', 'destts.iddocumento_tipo_estandar', '=', 'dtp.iddocumento_tipo_estandar' )
+                ->select(
+                    'destts.descripcion',
+                    'docs.iddocsproveedortipoestandar',
+                    'docs.idpersona',
+                    'docs.nombreDocumento',
+                    'docs.archivo',
+                    'docs.estado_revision',
+                    'docs.estado_trash',
+                    'docs.estado_delete'
+                )
+                ->where('pfh.idpersona_facha_homologacion', $idPeriodo)
+                ->where('destts.tipo_documento', 'Interno')
+                ->where('pfh.estado_trash', '1')
+                ->where('pfh.estado_delete', '1')
+                ->when($idpersona, function ($q) use ($idpersona) {
+                    $q->where('docs.idpersona', $idpersona);
+                })
+                ->get();
+
+            return ApiResponse::success(
+              [
+                'data_est' => $data_estandar,
+                'data_int'   => $data_interno
+              ], 'Documentos obtenidos correctamente');
 
         } catch (\Throwable $e) {
             return ApiResponse::error($e);
@@ -341,7 +418,9 @@ class HomologacionController extends Controller
             $proveedor = Proveedor::where('idpersona', $idpersona)->first();
 
             // 2. Usuario de logística (quien hace la acción)
-            $usuarioLogistica = auth()->user();
+            //$usuarioLogistica = auth()->user();
+            $nombreSoporte = auth()->user()->persona?->nombre_razonsocial;
+            $correoSoporte = auth()->user()->persona?->email;
 
             // 3. Obtener documentos del periodo
             $documentos = DB::table('docsproveedortipoestandar as docs')
@@ -355,6 +434,7 @@ class HomologacionController extends Controller
                 )
                 ->where('pfh.idpersona_facha_homologacion', $idperiodo_homologacion)
                 ->where('pfh.estado_trash', '1')
+								->whereIn('destts.tipo_documento', ['Estandar', 'Modelo'])
                 ->where('pfh.estado_delete', '1')
                 ->where('docs.idpersona', $idpersona)
                 ->get();
@@ -364,7 +444,8 @@ class HomologacionController extends Controller
                 new NotificacionDocumentosHomologacionMail(
                     $proveedor,
                     $documentos,
-                    $usuarioLogistica
+                    $nombreSoporte,
+                    $correoSoporte
                 )
             );
 
@@ -375,8 +456,6 @@ class HomologacionController extends Controller
         }
     }
 
-
-    
     // actualizar estado y observacion del documento estandar
     public function actualizar_estado_doc_estandar(Request $r, $iddocsproveedortipoestandar)
     {
@@ -393,27 +472,102 @@ class HomologacionController extends Controller
             // 3) Guardar cambios
             $doc->save();
 
-
-            // 2. Obtener proveedor
-           // $proveedor = Proveedor::where('idpersona', $doc->idpersona)->first();
-
-            // 3. Usuario de logística (quien hace la acción)
-           /* $usuarioLogistica = auth()->user();
-
-            // 4. Enviar correo al proveedor
-            Mail::to($proveedor->email)->send(
-                new EstadoDocumentoLogisticaMail(
-                    $proveedor,
-                    $doc->nombreDocumento,
-                    $doc->estado_revision,
-                    $doc->observacion,
-                    $usuarioLogistica
-                )
-            );*/
-
             return ApiResponse::success([], 'Estado actualizado y correo enviado');
 
             //return ApiResponse::success('Actualizado', 'Estado del documento actualizado correctamente');
+
+        } catch (\Throwable $e) {
+            return ApiResponse::error($e);
+        }
+    }
+
+    // Cargar Documento interno
+    public function cargar_documento_interno_estandar(Request $r, $iddocsproveedortipoestandar)
+    {
+        try {
+
+          // 1) Buscar documento y validar pertenencia
+          $doc = DocsProveedorTipoEstandar::where('iddocsproveedortipoestandar', $iddocsproveedortipoestandar)->firstOrFail();
+
+          $archivoNuevo = $r->input('doc_old_1');
+
+          // 👉 Si suben nuevo archivo
+          if ($r->hasFile('doc1') && $r->file('doc1')->isValid()) {
+
+              /* =========================
+              * 1️⃣ Eliminar archivo antiguo
+              * ========================= */
+              $ruta = public_path($doc->archivo);
+
+              if (is_file($ruta)) {
+                  // 🔥 CLAVE EN WINDOWS
+                  @chmod($ruta, 0777);
+
+                  if (!@unlink($ruta)) {
+                      dd('NO SE PUDO BORRAR', $ruta);
+                  }
+              }
+
+              /* =========================
+              * 2️⃣ Guardar nuevo archivo
+              * ========================= */
+              $file = $r->file('doc1');
+
+              $date_now = now()->format('Ymd_His');
+              $ext = $file->getClientOriginalExtension();
+
+              $filename = $date_now . '__'
+                  . random_int(0, 20)
+                  . round(microtime(true))
+                  . random_int(21, 41)
+                  . '.' . $ext;
+
+              $destino = public_path('uploads/docs_proveedor_estandar');
+
+              if (!is_dir($destino)) {
+                  mkdir($destino, 0755, true);
+              }
+
+              $file->move($destino, $filename);
+
+              $archivoNuevo = 'uploads/docs_proveedor_estandar/' . $filename;
+          }
+
+          /* =========================
+          * 3️⃣ Armar data update
+          * ========================= */
+          $dataUpdate = [
+              'estado_revision'    => $r->input('estado_documentos_update'),
+              'observacion' => $r->input('observacion_est_up'),
+              'user_updated'   => auth()->id() ?? null,
+          ];
+
+          // 👉 Solo actualizar archivo si se subió uno nuevo
+          if ($archivoNuevo) {
+              $dataUpdate['archivo'] = $archivoNuevo;
+          }
+
+          /* =========================
+          * 4️⃣ Update
+          * ========================= */
+          $doc->update($dataUpdate);
+
+          return ApiResponse::success(
+              'Documento interno Cargado Correctamente',
+              'Documento actualizado correctamente'
+          );
+
+
+
+
+
+
+
+
+
+
+            return ApiResponse::success([], 'Estado actualizado');
+
 
         } catch (\Throwable $e) {
             return ApiResponse::error($e);

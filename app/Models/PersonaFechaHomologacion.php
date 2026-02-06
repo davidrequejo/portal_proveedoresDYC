@@ -46,7 +46,7 @@ class PersonaFechaHomologacion extends Model
      */
     public static function select2PersonaFechaHomologacion()
     {
-        return DB::table('idpersona_facha_homologacion as pfh')
+        return DB::table('persona_facha_homologacion as pfh')
             ->select(
                 'pfh.idpersona_facha_homologacion',
                 'pfh.descripcion'
@@ -57,6 +57,50 @@ class PersonaFechaHomologacion extends Model
             ->get();
     }
 
+
+    public static function select2estado_homologacion()
+    {
+        return  DB::table('persona_facha_homologacion as pfh')
+              ->select('pfh.estado_homologacion')
+              ->where('pfh.estado_trash', '1')
+              ->where('pfh.estado_delete', '1')
+              ->distinct()
+              ->orderBy('pfh.estado_homologacion')
+              ->get();
+    }
+
+
+    
+    public static function select2proveedor()
+    {
+        return  DB::table('persona_facha_homologacion as pfh')
+              ->join('persona as p', 'p.idpersona', '=', 'pfh.idpersona')
+              ->join('sunat_c06_doc_identidad as sd', 'p.tipo_documento', '=', 'sd.code_sunat')
+              ->select('p.idpersona as idpersona', 'p.nombre_razonsocial', 'p.numero_documento', 'sd.abreviatura as tipodocumento' )
+              ->where('pfh.estado_trash', '1')
+              ->where('pfh.estado_delete', '1')
+              ->groupBy('p.idpersona', 'p.nombre_razonsocial', 'p.numero_documento', 'sd.abreviatura' )
+              ->orderBy('p.nombre_razonsocial')
+              ->get();
+    }
+
+
+    public static function select2usuarioproceso()
+    {
+        return DB::table('persona_facha_homologacion as pfh')
+            ->join('users as u', 'u.id', '=', 'pfh.user_init_process')
+            ->join('persona as p', 'u.idpersona', '=', 'p.idpersona')
+            ->join('sunat_c06_doc_identidad as sd', 'p.tipo_documento', '=', 'sd.code_sunat')
+            ->select( 'u.id as iduser', 'p.idpersona as idpersona', 'p.nombre_razonsocial', 'p.numero_documento', 'sd.abreviatura as tipodocumento' )
+            ->where('pfh.estado_trash', '1')
+            ->where('pfh.estado_delete', '1')
+            ->groupBy('u.id', 'p.idpersona', 'p.nombre_razonsocial', 'p.numero_documento', 'sd.abreviatura' )
+            ->orderBy('p.nombre_razonsocial')
+            ->get();
+    }
+
+
+
     /**
      * Relación con Persona
      */
@@ -65,11 +109,5 @@ class PersonaFechaHomologacion extends Model
         return $this->belongsTo(Persona::class, 'idpersona');
     }
 
-    /**
-     * Relación con FechaHomologacion
-     */
-    public function fechaHomologacion()
-    {
-        return $this->belongsTo(FechaHomologacion::class, 'idfecha_homologacion');
-    }
+
 }

@@ -202,7 +202,7 @@
                       <div class="col-12 col-sm-12 col-md-3 col-lg-3">
                         <div class="form-group">
                           <label for="codigo_bank_s10">Cod s10</label>
-                          <input type="number" name="codigo_bank_s10" id="codigo_bank_s10" class="form-control">
+                          <input type="number" name="codigo_bank_s10" id="codigo_bank_s10" class="form-control form-control-sm">
                         </div>
                       </div>
 
@@ -210,7 +210,7 @@
                       <div class="col-12 col-sm-12 col-md-9 col-lg-9">
                         <div class="form-group">
                           <label for="descripcion">Descripción <sup class="text-danger">*</sup></label>
-                          <input type="text" name="descripcion" class="form-control" id="descripcion"  />
+                          <input type="text" name="descripcion" class="form-control form-control-sm" id="descripcion"  />
                         </div>
                       </div>    
 
@@ -218,7 +218,7 @@
                       <div class="col-12 col-sm-12 col-md-9 col-lg-9">
                         <div class="form-group">
                           <label for="abreviatura">Abreviatura <sup class="text-danger">*</sup></label>
-                          <input type="text" name="abreviatura" class="form-control" id="abreviatura"  />
+                          <input type="text" name="abreviatura" class="form-control form-control-sm" id="abreviatura"  />
                         </div>
                       </div>  
 

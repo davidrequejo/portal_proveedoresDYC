@@ -16,7 +16,8 @@ use App\Http\Controllers\ActualizardatosclienteController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\HomologacionController;
 use App\Http\Controllers\DocumentoTipoEstandarController;
-
+use App\Http\Controllers\NotificacionController; 
+use App\Http\Controllers\AllHomologacionesController; 
 
 
 Route::get('/', function () {  return redirect()->route('login'); });
@@ -32,6 +33,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::post('/persona/crear_persona', [PersonaController::class, 'crear_persona'])->name('persona.crear_persona');                     // crear
     Route::get('/persona/tabla_principal', [PersonaController::class, 'Listar_personas'])->name('persona.Listar_personas'); // AJAX
     Route::get('/select2/Rolpersona', [PersonaController::class, 'selec2Rolpersona']);
+    Route::get('/select2/Areapersona', [PersonaController::class, 'selec2areapersona']);
     Route::get('/persona/{idpersona}/ver-editar', [PersonaController::class, 'mostrar_editar_persona'])->whereNumber('idpersona')->name('persona.mostrar_editar_persona'); //mostar para editar
     Route::put('/persona/editar_persona/{idpersona}', [PersonaController::class, 'editar_persona'])->whereNumber('idpersona')->name('persona.editar_persona'); // editar
     Route::put('/persona/eliminar_persona/{idpersona}', [PersonaController::class, 'eliminar_persona'])->whereNumber('idpersona')->name('persona.eliminar_persona'); // eliminar
@@ -74,8 +76,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::get('/homologacion/tabla_periodo_h_principal', [HomologacionController::class, 'listar_periodo_homologacion'] )->name('homologacion.listar_periodo_homologacion'); // AJAX
     Route::get('/homologacion/{id}/mostrar_periodo_homologacion', [HomologacionController::class, 'mostrar_periodo_homologacion'] )->whereNumber('id')->name('homologacion.mostrar_periodo_homologacion'); // mostrar para editar
     Route::put('/homologacion/editar_periodo_homologacion/{id}',[HomologacionController::class, 'editar_periodo_homologacion'] )->whereNumber('id')->name('homologacion.editar_periodo_homologacion'); // editar
+    Route::put('/homologacion/establecerfechas_periodo_homologacion/{id}',[HomologacionController::class, 'establecerfechas_periodo_homologacion'] )->whereNumber('id')->name('homologacion.establecerfechas_periodo_homologacion'); // editar
     Route::get('/homologacion/listar_docs_xperiodo_xproveedor', [HomologacionController::class, 'listar_docs_xperiodo_xproveedor'] )->name('homologacion.listar_docs_xperiodo_xproveedor'); // AJAX
     Route::put('/homologacion/actualizar_estado_doc_estandar/{id}', [HomologacionController::class, 'actualizar_estado_doc_estandar'])->whereNumber('id')->name('homologacion.actualizar_estado_doc_estandar'); // editar
+    Route::put('/homologacion/cargar_documento_interno_estandar/{id}', [HomologacionController::class, 'cargar_documento_interno_estandar'])->whereNumber('id')->name('homologacion.cargar_documento_interno_estandar'); // editar
+    
     Route::post('/homologacion/enviar_correo_notificacion', [HomologacionController::class, 'enviar_correo_notificacion'])->name('homologacion.enviar_correo_notificacion'); // enviar correo notificación
     Route::resource('homologacion', HomologacionController::class );
 
@@ -147,5 +152,17 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
     Route::resource('cliente', ClienteController::class);
 
-    
+    //::::::::::::::::::::::::::::::.NOTIFICACIONES:::::::::::::::::::::::::::::::::..
+    // marcar una notificación
+    Route::get('/notificacion/leer/{id}', [NotificacionController::class, 'leer'] )->name('notificaciones.leer');
+    // marcar todas
+    Route::get('/notificaciones/marcar-todas', [NotificacionController::class, 'marcarTodas'] )->name('notificaciones.marcarTodas');
+
+    //::::::::::::::::::::::::::::::::.ALL NOTIFICACIONES ::::::::::::::::::::::::::::::: 
+     Route::get('/homologaciones/listar_homologaciones_all', [AllHomologacionesController::class, 'listar_homologaciones_all'])->name('all_homologaciones.listar_homologaciones_all'); // AJAX
+     Route::get('/select2/compradores_all', [AllHomologacionesController::class, 'select2compradoreshomologacion']); //  ← select2 
+     Route::get('/select2/proveedores_all', [AllHomologacionesController::class, 'select2proveedoreshomologacion']); //  ← select2 
+     Route::get('/select2/estado_homologacion_all', [AllHomologacionesController::class, 'select2estadohomologacion']); //  ← select2 
+     Route::get('/select2/tipoestandar_all', [AllHomologacionesController::class, 'selec2tipoEstandar']); //  ← select2 
+     Route::resource('all_homologaciones', AllHomologacionesController::class);
 });

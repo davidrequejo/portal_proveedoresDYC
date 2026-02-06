@@ -149,7 +149,7 @@
                             <div class="col-12 col-sm-6 col-md-3 col-lg-3">
                               <div class="form-group">
                                 <label for="descripcion">Entidad Sunat</label> 
-                                <select name="tipo_entidad_sunat" id="tipo_entidad_sunat" class="form-control is-valid select2" placeholder="Tipo de documento" aria-invalid="false" readonly>
+                                <select name="tipo_entidad_sunat" id="tipo_entidad_sunat" class="form-control form-control-sm is-valid select2" placeholder="Tipo de documento" aria-invalid="false" readonly>
                                   <option value="NATURAL">NATURAL</option>
                                   <option value="JURIDICA">JURIDICA</option>
                                 </select>
@@ -161,7 +161,7 @@
                               <div class="form-group">
                                 <label for="descripcion">Tipo de doc.</label> 
                                 
-                                <select name="tipo_documento_input1" id="tipo_documento_input1" class="form-control is-valid select2" placeholder="Tipo de documento" aria-invalid="false" readonly>
+                                <select name="tipo_documento_input1" id="tipo_documento_input1" class="form-control form-control-sm is-valid select2" placeholder="Tipo de documento" aria-invalid="false" readonly>
                                   <option value="1">DNI</option>
                                   <option value="6">RUC</option>
                                 </select>
@@ -173,7 +173,7 @@
                               <div class="form-group">
                                 <label for="descripcion">Nro de documento <sup class="text-danger">*</sup></label>                          
                                 <div class="input-group">
-                                    <input type="number" name="numero_documento_input1" class="form-control" id="numero_documento_input1" placeholder="N° de documento" readonly>
+                                    <input type="number" name="numero_documento_input1" class="form-control form-control-sm" id="numero_documento_input1" placeholder="N° de documento" readonly>
                                     <div class="input-group-append" data-toggle="tooltip" data-original-title="Buscar Reniec/SUNAT" onclick="buscar_sunat_reniec('_input1');">
                                       <span class="input-group-text" style="cursor: pointer;">
                                         <i class="fas fa-search text-primary" id="search"></i>
@@ -188,7 +188,7 @@
                             <div class="col-12 col-sm-12 col-md-8 col-lg-8 div_razon_social">
                               <div class="form-group">
                                 <label for="Nombre_Apellidos">Razón Social <sup class="text-danger">*</sup></label>
-                                <input type="text" name="nombre_razonsocial_input1" class="form-control" id="nombre_razonsocial_input1"  />
+                                <input type="text" name="nombre_razonsocial_input1" class="form-control form-control-sm" id="nombre_razonsocial_input1"  />
                               </div>
                             </div> 
 
@@ -196,28 +196,28 @@
                             <div class="col-12 col-sm-12 col-md-4 col-lg-4  div_campos_pers_nat" style="display: none;">
                               <div class="form-group">
                                 <label>Nombres</label>
-                                <input type="text" name="nombre_persona_natural" id="nombre_persona_natural" class="form-control">
+                                <input type="text" name="nombre_persona_natural" id="nombre_persona_natural" class="form-control form-control-sm">
                               </div>
                             </div>
 
                             <div class="col-12 col-sm-12 col-md-4 col-lg-4  div_campos_pers_nat" style="display: none;">
                               <div class="form-group">
                                 <label>Apellido Paterno</label>
-                                <input type="text" name="apellido_paterno_per_natural" id="apellido_paterno_per_natural" class="form-control">
+                                <input type="text" name="apellido_paterno_per_natural" id="apellido_paterno_per_natural" class="form-control form-control-sm">
                               </div>
                             </div>
 
                             <div class="col-12 col-sm-12 col-md-4 col-lg-4  div_campos_pers_nat" style="display: none;">
                               <div class="form-group">
                                 <label>Apellido Materno</label>
-                                <input type="text" name="apellido_materno_per_natural" id="apellido_materno_per_natural" class="form-control">
+                                <input type="text" name="apellido_materno_per_natural" id="apellido_materno_per_natural" class="form-control form-control-sm">
                               </div>
                             </div>
 
                             <div class="col-12 col-sm-12 col-md-4 col-lg-4  div_campos_pers_nat" style="display: none;">
                               <div class="form-group">
                                 <label>Sexo</label>
-                                <select name="sexo" id="sexo" class="form-control is-valid select2" placeholder="Sexo" aria-invalid="false">
+                                <select name="sexo" id="sexo" class="form-control form-control-sm is-valid select2" placeholder="Sexo" aria-invalid="false">
                                   <option value="M">Masculino</option>
                                   <option value="F">Femenino</option>
                                 </select>
@@ -227,7 +227,7 @@
                             <div class="col-12 col-sm-12 col-md-3 col-lg-3  div_campos_pers_nat" style="display: none;">
                               <div class="form-group">
                                 <label>F. Nacimiento</label>
-                                <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" class="form-control">
+                                <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" class="form-control form-control-sm">
                               </div>
                             </div>
 
@@ -246,15 +246,15 @@
                                     transform="translate(-39.11 -13)" />
                                 </svg>
                                 </span> <span class="valido_novalido"><span class="badge badge-secondary">Por Verificar</span></span>  </label>
-                                <input type="hidden" id="tipo_documento_input2" class="form-control" value="1">
-                                <input type="text" name="ruc_pers_nat" id="numero_documento_input2" class="form-control" onkeypress="return soloNumeros(event)" maxlength="8" >
+                                <input type="hidden" id="tipo_documento_input2" class="form-control form-control-sm" value="1">
+                                <input type="text" name="ruc_pers_nat" id="numero_documento_input2" class="form-control form-control-sm" onkeypress="return soloNumeros(event)" maxlength="8" >
                               </div>
                             </div>
 
                             <div class="col-12 col-sm-12 col-md-2 col-lg-2  div_campos_pers_nat" style="display: none;">
                               <div class="form-group">
                                 <label>Tratamiento </label>                                                            
-                                <select name="tratamiento_pers_nat" id="tratamiento_pers_nat" class="form-control is-valid select2" placeholder="Tratamiento" aria-invalid="false">
+                                <select name="tratamiento_pers_nat" id="tratamiento_pers_nat" class="form-control form-control-sm is-valid select2" placeholder="Tratamiento" aria-invalid="false">
                                   <option value="01">Ing.</option>
                                   <option value="02">Sr.</option>
                                   <option value="03">Srta.</option>
@@ -269,7 +269,7 @@
                             <div class="col-12 col-sm-12 class_col_dni_ruc_telefono">
                               <div class="form-group">
                                 <label for="celular">Teléfono</label>
-                                <input type="text" name="celular" id="celular" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text" onkeypress="return soloNumeros(event)">
+                                <input type="text" name="celular" id="celular" class="form-control form-control-sm" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text" onkeypress="return soloNumeros(event)">
                               </div>
                             </div>
 
@@ -277,7 +277,7 @@
                             <div class="col-12 col-sm-12  class_col_dni_ruc_email">
                               <div class="form-group">
                                 <label for="email">Email</label>
-                                <input type="email" name="email" class="form-control" id="email" placeholder="Correo electrónico" onkeyup="convert_minuscula(this);">
+                                <input type="email" name="email" class="form-control form-control-sm" id="email" placeholder="Correo electrónico" onkeyup="convert_minuscula(this);">
                               </div>
                             </div>   
 
@@ -285,7 +285,7 @@
                             <div class="col-12 col-sm-12  class_col_dni_ruc_direccion">
                               <div class="form-group">
                                 <label for="direccion">Dirección </label> <br>
-                                <textarea name="direccion" id="direccion" class="form-control" rows="1"></textarea>
+                                <textarea name="direccion" id="direccion" class="form-control form-control-sm" rows="1"></textarea>
                               </div>
                             </div>
 
@@ -293,7 +293,7 @@
                             <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                               <div class="form-group">
                                 <label for="distrito">Distrito</label>
-                                <select name="distrito" id="distrito" class="form-control select2" style="width: 100%;"  > </select>   
+                                <select name="distrito" id="distrito" class="form-control form-control-sm select2" style="width: 100%;"  > </select>   
                               </div>
                             </div> 
 
@@ -301,7 +301,7 @@
                             <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                               <div class="form-group">
                                 <label for="provincia">Provincia</label>
-                                <input type="text" name="provincia" class="form-control" id="provincia"  readonly/>
+                                <input type="text" name="provincia" class="form-control form-control-sm" id="provincia"  readonly/>
                               </div>
                             </div> 
 
@@ -309,7 +309,7 @@
                             <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                               <div class="form-group">
                                 <label for="departamento">Departamento</label>
-                                <input type="text" name="departamento" class="form-control" id="departamento"  readonly />
+                                <input type="text" name="departamento" class="form-control form-control-sm" id="departamento"  readonly />
                               </div>
                             </div> 
 
@@ -323,14 +323,14 @@
                             <div class="col-12 col-sm-12 col-md-8 col-lg-8 div_campos_pers_jud" style="display: none;">
                               <div class="form-group">
                                 <label for="nombre_apellidos_representante_legal">Representante legal</label>
-                                <input type="text" name="nombre_apellidos_representante_legal" id="nombre_apellidos_representante_legal" class="form-control" placeholder="Nombre y Apellidos"  />
+                                <input type="text" name="nombre_apellidos_representante_legal" id="nombre_apellidos_representante_legal" class="form-control form-control-sm" placeholder="Nombre y Apellidos"  />
                               </div>
                             </div>
 
                             <div class="col-12 col-sm-12 col-md-4 col-lg-4 div_campos_pers_jud" style="display: none;">
                               <div class="form-group">
                                 <label for="telefono_representante">Teléfono Representante legal</label>
-                                <input type="text" name="telefono_representante" id="telefono_representante" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text" onkeypress="return soloNumeros(event)">
+                                <input type="text" name="telefono_representante" id="telefono_representante" class="form-control form-control-sm" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text" onkeypress="return soloNumeros(event)">
                               </div>
                             </div>
 
@@ -344,7 +344,7 @@
                             <div class="col-12 col-sm-12 col-md-4 col-lg-4 div_campos_pers_jud" style="display: none;">
                               <div class="form-group">
                                 <label for="nombre_apellidos_contacto_comercial">Nombres  </label>
-                                <input type="text" name="nombre_apellidos_contacto_comercial" id="nombre_apellidos_contacto_comercial" class="form-control" placeholder="Nombre y Apellidos"  />
+                                <input type="text" name="nombre_apellidos_contacto_comercial" id="nombre_apellidos_contacto_comercial" class="form-control form-control-sm" placeholder="Nombre y Apellidos"  />
                               </div>
                             </div>  
 
@@ -352,7 +352,7 @@
                             <div class="col-12 col-sm-12 col-md-4 col-lg-4 div_campos_pers_jud" style="display: none;">
                               <div class="form-group">
                                 <label for="cargo_contacto_comercial">Cargo</label>
-                                <input type="text" name="cargo_contacto_comercial" id="cargo_contacto_comercial" class="form-control" placeholder="Cargo"  />
+                                <input type="text" name="cargo_contacto_comercial" id="cargo_contacto_comercial" class="form-control form-control-sm" placeholder="Cargo"  />
                               </div>
                             </div>  
 
@@ -360,7 +360,7 @@
                             <div class="col-12 col-sm-12 col-md-4 col-lg-4 div_campos_pers_jud" style="display: none;">
                               <div class="form-group">
                                 <label for="telefono_contacto_comercial">Teléfono</label>
-                                <input type="text" name="telefono_contacto_comercial" id="telefono_contacto_comercial" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text" placeholder="Teléfono" onkeypress="return soloNumeros(event)">
+                                <input type="text" name="telefono_contacto_comercial" id="telefono_contacto_comercial" class="form-control form-control-sm" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text" placeholder="Teléfono" onkeypress="return soloNumeros(event)">
                               </div>
                             </div>  
 
@@ -368,7 +368,7 @@
                             <div class="col-12 col-sm-12 col-md-12 col-lg-12 div_campos_pers_jud" style="display: none;">
                               <div class="form-group">
                                 <label for="email_contacto_comercial">Correo Electrónico</label>
-                                <input type="email" name="email_contacto_comercial" class="form-control" id="email_contacto_comercial" placeholder="Correo electrónico" onkeyup="convert_minuscula(this);">
+                                <input type="email" name="email_contacto_comercial" class="form-control form-control-sm" id="email_contacto_comercial" placeholder="Correo electrónico" onkeyup="convert_minuscula(this);">
                               </div>
                             </div>  
 
@@ -497,7 +497,7 @@
                       <div class="col-12 col-md-6 col-lg-6">
                         <div class="form-group">
                           <label for="idbanco">Banco</label>
-                          <select name="idbanco" id="idbanco" class="form-control select2" required>
+                          <select name="idbanco" id="idbanco" class="form-control form-control-sm select2" required>
                           </select>
                         </div>
                       </div>
@@ -506,7 +506,7 @@
                       <div class="col-12 col-md-3 col-lg-4">
                         <div class="form-group">
                           <label for="tipocuenta">Tipo de Cuenta</label>
-                          <select name="tipocuenta" id="tipocuenta"  class="form-control is-valid select2" placeholder="Tipo de Cuenta" aria-invalid="false">
+                          <select name="tipocuenta" id="tipocuenta"  class="form-control form-control-sm is-valid select2" placeholder="Tipo de Cuenta" aria-invalid="false">
                             <option value="C">Corriente</option>
                             <option value="A">Ahorros</option>
                             <option value="D">Detracción</option>
@@ -519,7 +519,7 @@
                       <div class="col-12 col-md-3 col-lg-2">
                         <div class="form-group">
                           <label for="moneda">Moneda</label>
-                          <select name="moneda" id="moneda"  class="form-control is-valid select2" placeholder="Moneda" aria-invalid="false">
+                          <select name="moneda" id="moneda"  class="form-control form-control-sm is-valid select2" placeholder="Moneda" aria-invalid="false">
                             <option value="">Seleccione</option>
                             <option value="01">S/.</option>
                             <option value="02">U$</option>
@@ -531,8 +531,8 @@
                       <div class="col-12 col-md-4 col-lg-5">
                         <div class="form-group">
                           <label for="numero_cuenta">Número de Cuenta</label>
-                          <input type="number" name="numero_cuenta" id="numero_cuenta" class="form-control" maxlength="45" placeholder="Ej: 12345678900" required  onkeypress="return soloNumeros(event)" onkeyup="replica_nrocuenta()">
-                          <input type="hidden" name="numero_cuenta_abono" id="numero_cuenta_abono" class="form-control" maxlength="45" placeholder="Ej: 12345678900" >
+                          <input type="number" name="numero_cuenta" id="numero_cuenta" class="form-control form-control-sm" maxlength="45" placeholder="Ej: 12345678900" required  onkeypress="return soloNumeros(event)" onkeyup="replica_nrocuenta()">
+                          <input type="hidden" name="numero_cuenta_abono" id="numero_cuenta_abono" class="form-control form-control-sm" maxlength="45" placeholder="Ej: 12345678900" >
                         </div>
                       </div>
 
@@ -540,7 +540,7 @@
                       <div class="col-12 col-md-5 col-lg-5">
                         <div class="form-group">
                           <label for="cuenta_interbancaria">CCI</label>
-                          <input type="number" name="cuenta_interbancaria" id="cuenta_interbancaria" class="form-control" maxlength="45" placeholder="Código de Cuenta Interbancaria"  onkeypress="return soloNumeros(event)">
+                          <input type="number" name="cuenta_interbancaria" id="cuenta_interbancaria" class="form-control form-control-sm" maxlength="45" placeholder="Código de Cuenta Interbancaria"  onkeypress="return soloNumeros(event)">
                         </div>
                       </div>
 
@@ -550,7 +550,7 @@
                           <span class="d-inline-block" tabindex="0" data-toggle="tooltip" title="cuenta predeterminada">
                            <label for="predeterminado">Pred?</label>
                           </span>
-                          <select name="predeterminado" id="predeterminado"  class="form-control is-valid select2" placeholder="Cuenta Predeterminada" aria-invalid="false">
+                          <select name="predeterminado" id="predeterminado"  class="form-control form-control-sm is-valid select2" placeholder="Cuenta Predeterminada" aria-invalid="false">
                             <option value="0">No</option>
                             <option value="1">Sí</option>
                           </select>

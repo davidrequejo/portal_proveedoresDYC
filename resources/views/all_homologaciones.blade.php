@@ -22,9 +22,9 @@
 
 
   <style>
-    #tabla-proveedores_filter { width: calc(100% - 10px) !important; display: flex !important; justify-content: space-between !important; }
-    #tabla-proveedores_filter label { width: 100% !important;  }
-    #tabla-proveedores_filter label input { width: 100% !important;   }
+    #tabla-homologaciones_filter { width: calc(100% - 10px) !important; display: flex !important; justify-content: space-between !important; }
+    #tabla-homologaciones_filter label { width: 100% !important;  }
+    #tabla-homologaciones_filter label input { width: 100% !important;   }
 
     /* Indicadores de orden simple (opcional) */
     th.sortable { cursor:pointer; position:relative; }
@@ -165,15 +165,77 @@
             <!-- Small boxes (Stat box) -->
             <div class="row">
 
+              <!-- ./col -->
+              <div class="col-12">
+                <div class="card">
+                  
+                  <div class="card-body pb-1">
+
+                    <div class="row">
+
+                      <div class="col-12 col-sm-6 col-md-3 col-lg-2">
+                        <div class="form-group">
+                          <label for="descripcion"> 
+                            <span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('tipo_compra')"  ><i class="las la-sync-alt"></i></span>
+                            Tipo De Compra </label> 
+                          <select name="tipo_compra" id="tipo_compra" class="form-control fs-h-input is-valid select2" placeholder="Tipo de compra" aria-invalid="false">
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="col-12 col-sm-6 col-md-2 col-lg-2">
+                        <div class="form-group">
+                          <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('fecha_inicio_periodo')" ><i class="las la-sync-alt"></i></span> Inicio Periodo</label>                          
+                          <input type="date" name="fecha_inicio_periodo" class="form-control fs-h-input" id="fecha_inicio_periodo" />
+                        </div>
+                      </div>
+
+                      <div class="col-12 col-sm-6 col-md-2 col-lg-2">
+                        <div class="form-group">
+                          <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('fecha_fin_periodo')" ><i class="las la-sync-alt"></i></span> Fin Periodo</label>    
+                          <input type="date" name="fecha_fin_periodo" class="form-control fs-h-input" id="fecha_fin_periodo" />                      
+                        </div>
+                      </div>
+
+                      <div class="col-12 col-sm-6 col-md-2 col-lg-2">
+                        <div class="form-group">
+                          <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('estado_homologacion')" ><i class="las la-sync-alt"></i></span> Estado Proceso</label>                          
+                          <select name="estado_homologacion" id="estado_homologacion" class="form-control fs-h-input is-valid select2" placeholder="Estado" aria-invalid="false">
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="col-12 col-sm-6 col-md-2 col-lg-2">
+                        <div class="form-group">
+                          <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('id_proveedor')" ><i class="las la-sync-alt"></i></span> Proveedor</label>                          
+                          <select name="id_proveedor" id="id_proveedor" class="form-control fs-h-input is-valid select2" placeholder="Proveedor" aria-invalid="false">
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-12 col-sm-6 col-md-2 col-lg-2">
+                        <div class="form-group">
+                          <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('id_persona_usuario')" ><i class="las la-sync-alt"></i></span> Comprador</label>                          
+                          <select name="id_persona_usuario" id="id_persona_usuario" class="form-control fs-h-input is-valid select2" placeholder="Comprador" aria-invalid="false">
+                          </select>
+                        </div>
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+
               
               <!-- ./col -->
-              <div class="col" id="div-tabla-principal-proyecto">
+              <div class="col-12" id="div-tabla-principal-proyecto">
                 <div class="card">
                   
                   <div class="card-body pb-1">
                     <div class="row mb-2">                    
                       <div class="col">
-                        <input type="search" id="buscar" class="form-control form-control-sm" placeholder="Buscar proyecto...">
+                        <input type="search" id="buscar" class="form-control form-control-sm" placeholder="Buscar Homologación...">
                       </div>
                       <div class="col-auto">
                         <select id="perPage" class="form-select form-select-sm">
@@ -191,18 +253,20 @@
                     
                     <div class="table-responsive ">
                     
-                      <table class="table table-bordered table-hover styletabla" id="tabla-proveedores">
+                      <table class="table table-bordered table-hover styletabla" id="tabla-homologaciones">
                         <thead>
                           <tr>                        
-                            <th style="padding: 8px 10px;">Acciones</th>
-                            <th data-sort="codigo"      class="sortable" style="padding: 8px 10px;">Código S10</th>
-                            <th data-sort="nombre_razonsocial" class="sortable" style="padding: 8px 10px;">Razón social</th>
-                            <th data-sort="tipo_entidad_sunat"     class="sortable" style="padding: 8px 10px;">Tipo Entidad </th>
-                            <th data-sort="abreviatura"     class="sortable" style="padding: 8px 10px;">Tipo de Doc.</th>
-                            <th data-sort="numero_documento"class="sortable" style="padding: 8px 10px;">Nro de Doc.</th>
-                            <th data-sort="celular"   class="sortable" style="padding: 8px 10px;">Teléfono</th>
-                            <th data-sort="email"       class="sortable" style="padding: 8px 10px;">Email</th>
-                            <th data-sort="direccion" class="sortable" style="padding: 8px 10px;">Dirección</th>
+                            <th style="padding: 8px 10px;">Ver</th>
+                            <th data-sort="codigo"      class="sortable" style="padding: 8px 10px;">Proveedor</th>
+                            <th data-sort="tipo_compra" class="sortable" style="padding: 8px 10px;">Tipo Compra</th>
+                            <th data-sort="tipo_entidad_sunat" class="sortable" style="padding: 8px 10px;">Fecha Inicio Proceso </th>
+                            <th data-sort="fecha_i_periodo"     class="sortable" style="padding: 8px 10px;">Fecha Inicio Periodo</th>
+                            <th data-sort="fecha_f_periodo"class="sortable" style="padding: 8px 10px;">Fecha Fin Periodo</th>
+                            <th data-sort="descripcion" class="sortable" style="padding: 8px 10px;">Descripción</th>
+                            <th data-sort="comprador" class="sortable" style="padding: 8px 10px;">Comprador</th>
+                            <th data-sort="view_docs" class="sortable" style="padding: 8px 10px;">Estado</th>
+                            <th data-sort="descargar" class="sortable" style="padding: 8px 10px;">Estado Documentos</th>
+                            <th data-sort="descargar" class="sortable" style="padding: 8px 10px;">Descargar</th>
                           </tr>
                         </thead>
                         <tbody>                     
@@ -851,8 +915,7 @@
 
 
  
-  <script src="{{ asset('assets/js/proveedor.js') }}?version_erp=01.06"></script>
-  <script src="{{ asset('assets/js/proveedor_carga_masiva.js') }}?version_erp=01.06"></script>
+  <script src="{{ asset('assets/js/all_homologaciones.js') }}?version_erp=01.06"></script>
 
   <script>
     $(function() {

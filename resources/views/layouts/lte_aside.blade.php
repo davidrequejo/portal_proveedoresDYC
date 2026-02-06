@@ -52,7 +52,16 @@
             <li class="nav-item">
               <a href="{{ route('proveedor.index') }}" class="nav-link {{ request()->routeIs('proveedor.*') ? 'active' : '' }}">
                 <i class="nav-icon ti ti-user-cog"></i>
-                <p> Proveedor</p>
+                <p> Proveedores</p>
+              </a>
+            </li>
+            @endif
+
+            @if (auth()->user()->perm_proveedor_vista_adm)
+            <li class="nav-item">
+              <a href="{{ route('all_homologaciones.index') }}" class="nav-link {{ request()->routeIs('all_homologaciones.*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-edit"></i>
+                <p>Homologaciones</p>
               </a>
             </li>
             @endif
@@ -62,10 +71,12 @@
             <li class="nav-item">
               <a href="{{ route('actualizardatos.index') }}" class="nav-link {{ request()->routeIs('actualizardatos.*') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-edit"></i>
-                <p> Actualizar Datos</p>
+                <p>Datos Proveedor</p>
               </a>
             </li>
             @endif
+            
+
 
              @if (auth()->user()->perm_proveedor_vista_documentos_client)
             <li class="nav-item">
@@ -73,14 +84,14 @@
                   <a href="{{ route('subir_docs.index') }}"
                     class="nav-link {{ request()->routeIs('subir_docs.*') ? 'active' : '' }}">
                     <i class="nav-icon fas fa-file"></i>
-                    <p>Documentación</p>
+                    <p>Homologación Prov.</p>
                   </a>
               @else
                   <a href="javascript:void(0)"
                     class="nav-link text-muted"
                     onclick="alertaPerfilIncompleto()">
                     <i class="nav-icon fas fa-file"></i>
-                    <p>Documentación</p>
+                    <p>Homologación Prov.</p>
                   </a>
               @endif
             </li>
@@ -90,7 +101,7 @@
             <li class="nav-item">
               <a href="{{ route('cliente.index') }}" class="nav-link {{ request()->routeIs('cliente.*') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-user-tag"></i>
-                <p> Cliente</p>
+                <p> Clientes</p>
               </a>
             </li>
           @endif
@@ -99,7 +110,7 @@
             <li class="nav-item">
               <a href="{{ route('actualizardatoscliente.index') }}" class="nav-link {{ request()->routeIs('actualizardatoscliente.*') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-edit"></i>
-                <p> Cliente</p>
+                <p> Datos Cliente</p>
               </a>
             </li>
           @endif
@@ -121,7 +132,7 @@
                 <li class="nav-item">
                   <a href="{{ route('tipo_estandar.index') }}" class="nav-link {{ request()->routeIs('tipo_estandar.*') ? 'active' : '' }}">
                     <i class="nav-icon fas fa-tenge"></i>
-                    <p>Categoria Proveedor</p>
+                    <p>Tipo de Compra</p>
                   </a>
                 </li>  
               @endif  
@@ -148,7 +159,7 @@
                 <li class="nav-item">
                   <a href="{{ route('persona.index') }}" class="nav-link {{ request()->routeIs('persona.*') ? 'active' : '' }}">
                     <i class="ti ti-users nav-icon"></i>
-                    <p>Trabajadores</p>
+                    <p>Personal</p>
                   </a>
                 </li>
                @endif

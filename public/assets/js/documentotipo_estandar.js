@@ -1,8 +1,7 @@
-    
+  
+const BASE_URL = document.querySelector('meta[name="app-url"]').content;
+const CSRF = document.querySelector('meta[name="csrf-token"]').content;  
 (() => {
-
-  const BASE_URL = document.querySelector('meta[name="app-url"]').content;
-  const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 
   const state1 = {
     page: 1,
@@ -12,12 +11,21 @@
     q: ''
   };
 
-
   $("#guardar_registro_docs").on("click", function (e) { $("#submit-form-docs").submit(); });   
   // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
+  $("#tipo_plantilla").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
+  $("#tipo_plantilla").val("").trigger('change');
+
     // Carga inicial
   tabla_principal_cargar_docstipo();
+
+  // ══════════════════════════════════════════════════════════════════════
+  // ══ F U N C I O N   A G R E G A R   I M A G E N   A P L I C A C I O N E S                                   ══
+  // ══════════════════════════════════════════════════════════════════════
+
+  $("#doc1_i").click(function() {  $('#doc1').trigger('click'); });
+  $("#doc1").change(function(e) {  addImageApplication(e,$("#doc1").attr("id")) });
 
   // Cargar datos
   function tabla_principal_cargar_docstipo(){
@@ -41,6 +49,8 @@
     }
     rows.forEach(r => {
       estado = r.estado_trash == '1'?' <span class="text-center badge badge-new">Activado</span>':'Deshabilitado';
+      donw_tipo_doc = r.tipo_documento == 'Modelo'?` <a type="button" class="btn btn-block btn-xs" href="${BASE_URL}/${r.archivo}" download="Modelo ${r.descripcion ?? ''}"> <i class="fas fa-cloud-download-alt fa-1x color_icon_opt"></i></a>`:'';
+
       $tbl.append(`
         <tr class="fila_docs" data-id="${r.iddocumento_tipo_estandar}">          
           <td class="py-1"> 
@@ -49,7 +59,8 @@
               <button class="btn text-nowrap btn-eliminar-doc" data-id="${r.iddocumento_tipo_estandar}" data-name="${r.descripcion}" data-toggle="tooltip" data-original-title="Ver"><i class="fas fa-trash color_icon_opt"></i></button>
             </div>
           </td>
-          <td class="py-1 text-center" >${String(r.iddocumento_tipo_estandar).padStart(3, '0')}</td>
+          <td class="py-1 text-center" >${r.tipo_documento}</td>
+          <td class="py-1 text-center" >${donw_tipo_doc}</td>
           <td class="py-1 text-nowrap" >${r.descripcion ?? ''}</td>
           <td class="py-1 text-nowrap">${ estado }</td>
           
@@ -142,6 +153,8 @@
     //Mostramos los Materiales
     $("#iddocumento_tipo_estandar").val('');
     $("#descripcion_docs").val('');
+    $("#tipo_plantilla").val("").trigger('change');
+    doc1_eliminar();
 
     // Limpiamos las validaciones
     $(".form-control").removeClass('is-valid');
@@ -154,9 +167,6 @@
 
   function ver_editar_docs(iddocumento_tipo_estandar) {
 
-    console.log('ver_editar_docs ');
-    
-
     $("#cargando-3-formulario").hide();
     $("#cargando-4-formulario").show();
     limpiar_form_docs();
@@ -168,6 +178,19 @@
 
         $("#iddocumento_tipo_estandar").val(e.data.iddocumento_tipo_estandar);
         $("#descripcion_docs").val(e.data.descripcion);
+        $("#tipo_plantilla").val(e.data.tipo_documento).trigger('change');
+
+      //validamoos DOC-1
+      if (e.data.archivo && e.data.archivo.trim() !== "") {
+        $("#doc_old_1").val(e.data.archivo);
+        $("#doc1_nombre").html(`${e.data.descripcion}.` + extrae_extencion(`${e.data.archivo}`) );
+        $("#doc1_ver").html( doc_view_extencion(`${e.data.archivo}`, '', '', '100%', '210') );
+      } else {
+        $("#doc1_ver").html(`<img src="${BASE_URL}/assets/images/default/word_pdf.png" alt="" width="50%">`);
+        $("#doc1_nombre").html('');
+        $("#doc_old_1").val('');
+      }
+
 
 
         $("#cargando-3-formulario").show();
@@ -385,15 +408,19 @@
   // ═══════                                       J Q   F O R M   V A L I D A T I O N S                                                              ═══════
   // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
   $(function () {    
+      // validamos el formulario  
+    $('#tipo_plantilla').on('change', function() { $(this).trigger('blur'); });
 
     $("#form-agregar-docs").validate({
       //ignore: '.select2-input, .select2-focusser',
       rules: {
 
         descripcion_docs:    { required: true, }, 
+        tipo_plantilla :     { required: true, }, 
       },
       messages: {
         descripcion_docs:    { required: "Campo requerido.", },
+        tipo_plantilla:      { required: "Campo requerido.", },
       },
       
       errorElement: "span",
@@ -416,9 +443,12 @@
         guardar_y_editar_docs(e);       
       },
     });
+    $('#tipo_plantilla').rules('add', { required: true, messages: {  required: "Campo requerido" } });
 
 
   });
 
 })();
+  // Eliminamos el DOC
+  function doc1_eliminar() { $("#doc1").val("");	$("#doc1_ver").html('<img src="/assets/images/default/word_pdf.png" alt="" width="50%" >');	$("#doc1_nombre").html(""); }
 

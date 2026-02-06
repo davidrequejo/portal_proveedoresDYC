@@ -126,7 +126,7 @@
     color: #6c757d;
   }
 
-  .form-control {
+  .fs-h-input {
       height: calc(2px + 1.8125rem) !important;
       font-size: 0.875rem;
       line-height: 1.5;

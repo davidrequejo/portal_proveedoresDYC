@@ -26,8 +26,13 @@ class Homologacion  extends Model
     protected $fillable = [
         'idpersona',
         'descripcion',
-        'fecha_inicio',
+        'fecha_inicio_proceso',
         'fecha_fin',
+        'fecha_inicio_periodo_h',
+        'fecha_fin_periodo_h',
+        'user_init_process',
+        'user_fin_process',
+        'estado_homologacion',
         'estado_trash',
         'estado_delete',
         'user_trash',
@@ -41,7 +46,7 @@ class Homologacion  extends Model
     public static function select2Homologacion()
     {
         return DB::table('persona_facha_homologacion as fh')
-            ->select('fh.idpersona_facha_homologacion', 'fh.descripcion','fh.fecha_inicio', 'fh.fecha_fin')
+            ->select('fh.idpersona_facha_homologacion', 'fh.descripcion','fh.fecha_inicio_proceso', 'fh.fecha_fin')
             ->get();
     }
 

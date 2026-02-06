@@ -7,6 +7,7 @@ use App\Helpers\ApiResponse;
 use App\Models\Persona;
 use Illuminate\Support\Facades\DB; 
 use App\Models\Rolpersona;
+use App\Models\Areapersona;
 
 class PersonaController extends Controller
 {
@@ -21,6 +22,7 @@ class PersonaController extends Controller
           // Validar los datos del formulario
           $data = $r->validate([
               'idtipo_persona' => 'required|string',
+              'idarea_persona' => 'required|string',
               'tipo_entidad_sunat' => 'required|string',
               'tipo_documento' => 'required|string',
               'numero_documento' => 'required|string',
@@ -53,6 +55,7 @@ class PersonaController extends Controller
 
             $data = $r->validate([
                 'idtipo_persona' => 'required|string',
+                'idarea_persona' => 'required|string',
                 'tipo_entidad_sunat' => 'required|string',
                 'tipo_documento' => 'required|string',
                 'numero_documento' => 'required|string',
@@ -125,10 +128,12 @@ class PersonaController extends Controller
         // Crear la consulta base
         $query = DB::table('persona as p')
             ->join('tipo_persona as tp', 'p.idtipo_persona', '=', 'tp.idtipo_persona')
+            ->join('area_persona as ap', 'p.idarea_persona', '=', 'ap.idarea_persona')
             ->join('sunat_c06_doc_identidad as doc', 'p.tipo_documento', '=', 'doc.code_sunat')
             ->select(
                 'p.idpersona',
                 'tp.descripcion as tipoPersona',
+                'ap.descripcion as area_persona',
                 'p.tipo_documento',
                 'p.nombre_razonsocial',
                 'p.apellidos_nombrecomercial',
@@ -161,6 +166,7 @@ class PersonaController extends Controller
                     ->orWhereRaw("LOWER(p.departamento) LIKE ?", ["%{$q}%"])
                     ->orWhereRaw("LOWER(p.email) LIKE ?", ["%{$q}%"])
                     ->orWhereRaw("LOWER(p.tipo_entidad_sunat) LIKE ?", ["%{$q}%"])
+                    ->orWhereRaw("LOWER(p.area_persona) LIKE ?", ["%{$q}%"])
                     ->orWhereRaw("LOWER(p.estado) LIKE ?", ["%{$q}%"]);
             });
         }
@@ -188,6 +194,7 @@ class PersonaController extends Controller
                 'departamento'          => $persona->departamento,
                 'email'                 => $persona->email,
                 'tipo_entidad_sunat'    => $persona->tipo_entidad_sunat,
+                'area_persona'          => $persona->area_persona,
                 'estado'                => $persona->estado,
             ];
         });
@@ -214,6 +221,7 @@ class PersonaController extends Controller
             $mostrar_persona = persona::select([
                 'idpersona',
                 'idtipo_persona',
+                'idarea_persona',
                 'tipo_entidad_sunat',
                 'tipo_documento',
                 'numero_documento',
@@ -257,6 +265,27 @@ class PersonaController extends Controller
       }
 
     }
+
+
+        // Método para obtener todos areas personas
+    public function selec2areapersona()
+    {
+      try {
+        $data  = Areapersona::select2areapersona();
+
+        $options = ''; // string para concatenar HTML
+        foreach ($data as $t) {
+            $options .= '<option value="'.$t->idarea_persona.'" >' . e($t->descripcion). '</option>';
+        }
+
+        return ApiResponse::success($options, 'Lista de Areas');
+
+      } catch (\Throwable $e) {
+          return ApiResponse::error($e);
+      }
+
+    }
+    
     
 
 

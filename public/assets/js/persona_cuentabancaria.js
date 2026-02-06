@@ -68,6 +68,7 @@ function renderFilas(rows){
     let estado = r.estado_trash == '1' ? '<span class="badge badge-new">Activo</span>' : '<span class="badge badge-danger">Inactivo</span>';
 
     let tipoCuenta = '';
+    let moneda = '';
     const tipocuenta = (r.estado_revision === null);
 
     switch (r.tipocuenta) {
@@ -78,6 +79,13 @@ function renderFilas(rows){
         case 'D': tipoCuenta = `Detracción`; break;
         case 'S': tipoCuenta = `Cuenta Sueldo`; break;
     }
+
+    
+    switch (r.moneda) {
+        case '01': moneda = `S/.`; break;
+        case '02': moneda = `USD`; break;
+    }
+
 
     $tb.append(`
       <tr class="fila-banco" data-id="${r.idpersona_cuentabancaria}">
@@ -94,8 +102,8 @@ function renderFilas(rows){
         <td>${r.banco}</td>
         <td>${tipoCuenta}</td>
         <td>${r.numero_cuenta ?? ''}</td>
-        <td>${r.predeterminado}</td>
-        <td>${r.moneda}</td>
+        <td>${r.predeterminado == 1 ? 'Sí' : 'No'}</td>
+        <td>${moneda}</td>
         <td>${r.cuenta_interbancaria}</td>
         <td>${r.numero_cuenta_abono}</td>
         <td>${estado}</td>

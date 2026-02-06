@@ -46,7 +46,7 @@
                         </p>
 
                         <p style="margin:0 0 15px;line-height:1.5;">
-                            Desde el área de <strong>Logística</strong> le informamos que los documentos
+                            Le informamos que los documentos
                             correspondientes a su proceso de <strong>homologación</strong>
                             han sido revisados.
                         </p>
@@ -89,7 +89,7 @@
                         <p style="margin:20px 0 0;line-height:1.5;">
                             En caso de que alguno de los documentos presente observaciones, le solicitamos regularizarlas a la brevedad posible a fin de continuar oportunamente con el proceso de homologación.
 
-                            Si requiere orientación, soporte o tiene alguna consulta adicional, no dude en comunicarse con nosotros escribiendo al correo <strong>{{ auth()->user()->persona?->email }}</strong>
+                            Si requiere orientación, soporte o tiene alguna consulta adicional, no dude en comunicarse con nosotros escribiendo al correo <strong>{{ $correoSoporte }}</strong>
                             , donde con gusto lo atenderemos.
 
                             Agradecemos su disposición y colaboración para el cumplimiento de los requisitos establecidos.
@@ -98,8 +98,8 @@
                         <!-- FIRMA -->
                         <p style="margin:25px 0 0;">
                             Atentamente,<br>
-                            <strong>{{ auth()->user()->persona?->nombre_razonsocial }}</strong><br>
-                            Área de Logística
+                            <strong>{{ $nombreSoporte }}</strong>
+                            
                         </p>
 
                     </td>

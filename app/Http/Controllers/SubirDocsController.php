@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\DocsProveedorTipoEstandar;
 use App\Models\PersonaFechaHomologacion;
+use App\Models\Proveedor;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\ApiResponse;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NotificacionDocsActualizadosClienteMail;
 
 class SubirDocsController extends Controller
 {
@@ -118,10 +121,46 @@ class SubirDocsController extends Controller
 						// 4) Guardar cambios
 						$doc->save();
 
+						//despues de guardar quiero verfificar si todo los ducumentos estandar han sido actualizados
+						$idpersona_facha_homologacion = $doc->idpersona_facha_homologacion;
+						$idpersona = $doc->idpersona;	
+						$existe_vacio = DB::table('docsproveedortipoestandar as dpt')
+							->where('dpt.idpersona', $idpersona)
+							->where('dpt.idpersona_facha_homologacion', $idpersona_facha_homologacion)
+							->where(function ($q) {
+								$q->whereNull('dpt.archivo')
+								->orWhere('dpt.archivo', '');
+							})
+							->exists();
 
-            
+						//$docs_completos = !$existe_vacio;
+						if($existe_vacio){
+							//todos los documentos estan completos
+							return ApiResponse::success('Actualizado', 'Documento estandar actualizado correctamente');
+						}else{
+							//deseo traer el nombre de la persona 
+							$persona = Proveedor::where('idpersona', $doc->idpersona)->first();
+							$cliente_proveedor = $persona->nombre_razonsocial;
 
-						return ApiResponse::success('Actualizado', 'Documento estándar actualizado correctamente');
+							//necesito consulta de los compradores
+							/** Enviar correo de notificación a logística */
+							$logistica = DB::table('persona')
+							->join('tipo_persona', 'persona.idtipo_persona', '=', 'tipo_persona.idtipo_persona')
+							->where('persona.idtipo_persona', 6)
+							->where('persona.estado', 1)
+							->where('persona.estado_delete', 1)
+							->select('persona.idpersona', 'persona.nombre_razonsocial', 'persona.email', 'tipo_persona.descripcion')
+							->get();
+
+							foreach ($logistica as $usuarioLogistica) {
+
+								// Enviar el correo con los datos adecuados
+								Mail::to($usuarioLogistica->email)->queue(new NotificacionDocsActualizadosClienteMail($cliente_proveedor) );
+							}  
+
+							return ApiResponse::success('Actualizado', 'Documento estándar actualizado correctamente');        
+
+						}
 
 				} catch (\Throwable $e) {
 						return ApiResponse::error($e);
@@ -146,6 +185,34 @@ class SubirDocsController extends Controller
 				}
 		}
 
+		public function periodo_homologacion_xpersona(Request $r)
+    {        
+        try {
+            $idpersona = $r->user()->idpersona;
+
+            $data =  DB::table('persona_facha_homologacion')
+            ->select(
+                'idpersona_facha_homologacion',
+                'descripcion',
+                'fecha_inicio_proceso',
+                'fecha_fin',
+                'fecha_inicio_periodo_h',
+                'fecha_fin_periodo_h',
+                'estado_homologacion',
+                'estado_trash'
+            )
+            ->where('estado_trash', '1')
+            ->where('estado_delete', '1')
+            ->where('idpersona', $idpersona)
+            ->get();
+
+            return ApiResponse::success($data, 'Cateogria de proveedores obtenidos');
+
+        } catch (\Throwable $e) {
+            return ApiResponse::error($e);
+        }
+    }
+
 	  // listar para tabla tipos de estandar y documentos asociados
     public function listar_docs_tipos_est_xuser(Request $r)
     {
@@ -160,6 +227,8 @@ class SubirDocsController extends Controller
                 ->join( 'documento_tipo_estandar as destts', 'destts.iddocumento_tipo_estandar', '=', 'dtp.iddocumento_tipo_estandar' )
                 ->select(
                     'destts.descripcion',
+                    'destts.tipo_documento',
+                    'destts.archivo as archivo_modelo',
                     'docs.iddocsproveedortipoestandar',
                     'docs.idpersona',
                     'docs.nombreDocumento',
@@ -170,6 +239,7 @@ class SubirDocsController extends Controller
                     'docs.estado_delete'
                 )
                 ->where('pfh.idpersona_facha_homologacion', $idPeriodo)
+				        ->whereIn('destts.tipo_documento', ['Estandar', 'Modelo'])
                 ->where('pfh.estado_trash', '1')
                 ->where('pfh.estado_delete', '1')
 
@@ -177,7 +247,6 @@ class SubirDocsController extends Controller
                 ->when($idpersona, function ($q) use ($idpersona) {
                     $q->where('docs.idpersona', $idpersona);
                 })
-
                 ->get();
 
             return ApiResponse::success($data, 'Documentos obtenidos correctamente');
@@ -188,30 +257,7 @@ class SubirDocsController extends Controller
     }
 
 
-    public function periodo_homologacion_xpersona(Request $r)
-    {        
-        try {
-            $idpersona = $r->user()->idpersona;
 
-            $data =  DB::table('persona_facha_homologacion')
-            ->select(
-                'idpersona_facha_homologacion',
-                'descripcion',
-                'fecha_inicio',
-                'fecha_fin',
-                'estado_trash'
-            )
-            ->where('estado_trash', '1')
-            ->where('estado_delete', '1')
-            ->where('idpersona', $idpersona)
-            ->get();
-
-            return ApiResponse::success($data, 'Cateogria de proveedores obtenidos');
-
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
-        }
-    }
 
     public function descargar_documento_estandar($iddocsproveedortipoestandar)
     {

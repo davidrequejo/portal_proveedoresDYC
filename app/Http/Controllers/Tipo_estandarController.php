@@ -224,7 +224,8 @@ class Tipo_estandarController extends Controller
 
         $options = ''; // string para concatenar HTML
         foreach ($data as $t) {
-            $options .= '<option value="'.$t->iddocumento_tipo_estandar.'" data-nombre="'.$t->descripcion.'">' . e($t->descripcion). ' </option>';
+            $texto = $t->descripcion . "\nTipo: " . $t->tipo_documento; // 👈 clave
+            $options .= '<option value="'.$t->iddocumento_tipo_estandar.'" data-nombre="'.$t->descripcion.'" data-tipo="'.e($t->tipo_documento).'">'. e($texto) .'</option>';
         }
 
         return ApiResponse::success($options, 'Lista de docs obtenidos');

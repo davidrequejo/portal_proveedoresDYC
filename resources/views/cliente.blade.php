@@ -339,8 +339,8 @@
                       <div class="col-12 col-sm-6 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label for="descripcion">Tipo Entidad Sunat</label>                          
-                          <!--<textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
-                          <select name="tipo_entidad_sunat" id="tipo_entidad_sunat" class="form-control is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
+                          <!--<textarea class="form-control form-control-sm" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
+                          <select name="tipo_entidad_sunat" id="tipo_entidad_sunat" class="form-control form-control-sm is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
                             <option value="NATURAL">NATURAL</option>
                             <option value="JURIDICA">JURIDICA</option>
                           </select>
@@ -351,8 +351,8 @@
                       <div class="col-12 col-sm-6 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label for="descripcion">Tipo de documento</label>                          
-                          <!--<textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
-                          <select name="tipo_documento" id="tipo_documento" class="form-control is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
+                          <!--<textarea class="form-control form-control-sm" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
+                          <select name="tipo_documento" id="tipo_documento" class="form-control form-control-sm is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
                             <option value="6">RUC</option>
                           </select>
                         </div>
@@ -377,7 +377,7 @@
                              </span> <span class="valido_novalido"> <span class="badge badge-secondary">Por Verificar</span> </span></label>                          
                            <div class="input-group">
                             
-                              <input type="number" name="numero_documento" class="form-control" id="numero_documento" placeholder="N° de documento" onkeypress="return soloNumeros(event)" maxlength="11" />
+                              <input type="number" name="numero_documento" class="form-control form-control-sm" id="numero_documento" placeholder="N° de documento" onkeypress="return soloNumeros(event)" maxlength="11" />
                               <div class="input-group-append" data-toggle="tooltip" data-original-title="Buscar Reniec/SUNAT" onclick="buscar_sunat_reniec();">
                                 <span class="input-group-text" style="cursor: pointer;">
                                   <i class="fas fa-search text-primary" id="search"></i>
@@ -393,23 +393,23 @@
                       <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                         <div class="form-group">
                           <label for="Nombre_Apellidos">Nombre y Apellidos/Razon Social <sup class="text-danger">*</sup></label>
-                          <input type="text" name="nombre_razonsocial" class="form-control" id="nombre_razonsocial"  />
+                          <input type="text" name="nombre_razonsocial" class="form-control form-control-sm" id="nombre_razonsocial"  />
                         </div>
                       </div> 
                        <!-- Nombre apellidos maternos paternos  -->
                       <div class="col-12 col-sm-12 col-md-7 col-lg-7" style="display: none">
                         <div class="form-group">
                           <label for="Nombre_Apellidos">Nombre <sup class="text-danger">*</sup></label>
-                          <input type="text" name="nombre_persona_natural" class="form-control" id="nombre_persona_natural"  />
-                          <input type="text" name="apellido_paterno_per_natural" class="form-control" id="apellido_paterno_per_natural"  />
-                          <input type="text" name="apellido_materno_per_natural" class="form-control" id="apellido_materno_per_natural"  />
+                          <input type="text" name="nombre_persona_natural" class="form-control form-control-sm" id="nombre_persona_natural"  />
+                          <input type="text" name="apellido_paterno_per_natural" class="form-control form-control-sm" id="apellido_paterno_per_natural"  />
+                          <input type="text" name="apellido_materno_per_natural" class="form-control form-control-sm" id="apellido_materno_per_natural"  />
                         </div>
                       </div> 
                       <!-- Teléfono -->
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label>Teléfono</label>
-                          <input type="text" name="celular" id="celular" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text" onkeypress="return soloNumeros(event)">
+                          <input type="text" name="celular" id="celular" class="form-control form-control-sm" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text" onkeypress="return soloNumeros(event)">
                         </div>
                       </div>
 
@@ -417,14 +417,14 @@
                       <div class="col-12 col-sm-12 col-md-7 col-lg-7">
                         <div class="form-group">
                           <label for="email">Email</label>
-                           <input type="email" name="email" class="form-control" id="email" placeholder="Correo electrónico" onkeyup="convert_minuscula(this);">
+                           <input type="email" name="email" class="form-control form-control-sm" id="email" placeholder="Correo electrónico" onkeyup="convert_minuscula(this);">
                         </div>
                       </div>   
                       <!-- email -->
                       <div class="col-12 col-sm-12 col-md-5 col-lg-5">
                         <div class="form-group">
                           <label for="sitio_web">Sitio web</label>
-                           <input type="url" name="sitio_web" class="form-control" id="sitio_web" placeholder="www.tusitioweb.com">
+                           <input type="url" name="sitio_web" class="form-control form-control-sm" id="sitio_web" placeholder="www.tusitioweb.com">
                         </div>
                       </div>   
 
@@ -432,7 +432,7 @@
                       <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                         <div class="form-group">
                           <label for="direccion">Dirección </label> <br>
-                          <textarea name="direccion" id="direccion" class="form-control" rows="1"></textarea>
+                          <textarea name="direccion" id="direccion" class="form-control form-control-sm" rows="1"></textarea>
                         </div>
                       </div>
 
@@ -440,7 +440,7 @@
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label for="distrito">Distrito</label>
-                          <select name="distrito" id="distrito" class="form-control select2" style="width: 100%;"  > </select>   
+                          <select name="distrito" id="distrito" class="form-control fs-h-input is-valid select2" placeholder="Distrito" aria-invalid="false"> </select>   
                         </div>
                       </div> 
 
@@ -448,7 +448,7 @@
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label for="provincia">Provincia</label>
-                          <input type="text" name="provincia" class="form-control" id="provincia"  readonly/>
+                          <input type="text" name="provincia" class="form-control form-control-sm" id="provincia"  readonly/>
                         </div>
                       </div> 
 
@@ -456,7 +456,7 @@
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label for="departamento">Departamento</label>
-                          <input type="text" name="departamento" class="form-control" id="departamento"  readonly />
+                          <input type="text" name="departamento" class="form-control form-control-sm" id="departamento"  readonly />
                         </div>
                       </div> 
 
@@ -471,13 +471,13 @@
                         
                               <div class="form-group col-md-6">
                                   <label>Usuario</label>
-                                  <input type="text" id="usuario_portal" name="usuario_portal" class="form-control"
+                                  <input type="text" id="usuario_portal" name="usuario_portal" class="form-control form-control-sm"
                                       placeholder="Usuario automático">
                               </div>
 
                               <div class="form-group col-md-6">
                                   <label>Contraseña</label>
-                                  <input type="text" id="clave_portal" name="clave_portal" class="form-control"
+                                  <input type="text" id="clave_portal" name="clave_portal" class="form-control form-control-sm"
                                       placeholder="Contraseña automática">
                               </div>
                           </div> 
@@ -541,7 +541,7 @@
 
                     <div class="col-12">
                       <label for="estado_documentos">Estado de Documento</label>
-                      <select name="estado_documentos_update" id="estado_documentos_update" class="form-control is-valid select2" placeholder="Estado de Documentos" aria-invalid="false">
+                      <select name="estado_documentos_update" id="estado_documentos_update" class="form-control form-control-sm is-valid select2" placeholder="Estado de Documentos" aria-invalid="false">
                         <option value="Aprobado">Aprobado</option>
                         <option value="Rechazado">Observado</option>
                         <option value="Rechazado">Rechazado</option>
@@ -551,7 +551,7 @@
                     <div class="col-12 mt-2">
                       <div class="form-group">
                         <label for="observacion_est_up">Obs </label> <br>
-                        <textarea name="observacion_est_up" id="observacion_est_up" class="form-control" rows="2"></textarea>
+                        <textarea name="observacion_est_up" id="observacion_est_up" class="form-control form-control-sm" rows="2"></textarea>
                       </div>
                     </div>
 
@@ -609,7 +609,7 @@
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                       <div class="form-group">
                         <label for="descripcion">Categoria Proveedor </label>
-                        <select name="idtipoestandarproveedor" id="idtipoestandarproveedor" class="form-control is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
+                        <select name="idtipoestandarproveedor" id="idtipoestandarproveedor" class="form-control form-control-sm is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
                         </select>
                       </div>
                     </div>
@@ -617,14 +617,14 @@
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                       <div class="form-group">
                         <label for="descripcion">Descripción </label>                          
-                         <textarea name="descripcion_homologacion" id="descripcion_homologacion" class="form-control" rows="1" value="Periodo"></textarea>
+                         <textarea name="descripcion_homologacion" id="descripcion_homologacion" class="form-control form-control-sm" rows="1" value="Periodo"></textarea>
                       </div>
                     </div>
 
                     <div class="col-12 col-sm-6 col-md-6 col-lg-6" >
                       <div class="form-group">
                         <label for="descripcion">F. Inicio  </label>                          
-                          <input type="date" name="fecha_inicio_periodo" class="form-control" id="fecha_inicio_periodo" />
+                          <input type="date" name="fecha_inicio_periodo" class="form-control form-control-sm" id="fecha_inicio_periodo" />
                         </select>
                       </div>
                     </div>
@@ -632,7 +632,7 @@
                     <div class="col-12 col-sm-6 col-md-6 col-lg-6" >
                       <div class="form-group">
                         <label for="descripcion"> F. Fin </label>         
-                          <input type="date" name="fecha_fin_periodo" class="form-control" id="fecha_fin_periodo"  />
+                          <input type="date" name="fecha_fin_periodo" class="form-control form-control-sm" id="fecha_fin_periodo"  />
                         </select>
                       </div>
                     </div>

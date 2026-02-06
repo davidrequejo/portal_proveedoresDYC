@@ -32,6 +32,65 @@
     #tabla_documentos thead tr th { padding-top: 2px !important; padding-bottom: 2px !important;}
 
     #tabla_documentos tbody input.form-control { height: 24px !important; padding: 1px 4px !important; font-size: 13px !important;}
+
+    /* Estado normal */
+    /* ===== DROPDOWN ===== */
+
+    /* Permitir salto de línea */
+    .select2-results__option {
+      white-space: pre-line;
+      font-size: 13px;
+      color: #6c757d; /* gris normal */
+    }
+
+    /* Primera línea */
+    .select2-results__option::first-line {
+      font-size: 14px;
+      font-weight: 600;
+      color: inherit;
+    }
+
+    /* Hover (cuando pasas el mouse) */
+    .select2-results__option--highlighted {
+      background-color: #6f42c1; /* morado */
+      color: #ffffff !important;
+    }
+
+    .select2-results__option--highlighted::first-line {
+      color: #ffffff !important;
+    }
+
+    /* 👈 CUANDO YA ESTÁ SELECCIONADO */
+    .select2-results__option[aria-selected="true"] {
+      background-color: #e9ecef !important; /* gris claro */
+      color: #6c757d !important;           /* texto gris */
+    }
+
+    /* Primera línea cuando está seleccionado */
+    .select2-results__option[aria-selected="true"]::first-line {
+      color: #6c757d !important;
+    }
+
+    /* Permitir salto de línea en el tag */
+    .select2-selection__choice {
+      white-space: pre-line;
+    }
+
+    /* Primera línea (documento) */
+    .select2-selection__choice::first-line {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Segunda línea (Tipo) */
+    .select2-selection__choice {
+      font-size: 11px;
+      font-weight: 400;
+    }
+
+
+
+
   </style>
 
 </head>
@@ -207,7 +266,8 @@
                         <thead>
                           <tr>                        
                             <th>Acciones</th>
-                            <th data-sort="codigo"      class="sortable">Código</th>
+                            <th data-sort="codigo" class="sortable">Tipo</th>
+                            <th data-sort="codigo" class="sortable">Descargar</th>
                             <th data-sort="nombre_razonsocial" class="sortable">Descripcion</th>
                             <th data-sort="estado" class="sortable">Estado</th>
                             
@@ -254,7 +314,7 @@
                       <div class="col-12 col-sm-12 col-md-9 col-lg-9">
                         <div class="form-group">
                           <label for="Nombre_Apellidos">Descripción <sup class="text-danger">*</sup></label>
-                          <input type="text" name="descripcion" class="form-control" id="descripcion"  />
+                          <input type="text" name="descripcion" class="form-control fs-h-input" id="descripcion"  />
                         </div>
                       </div>    
 
@@ -264,7 +324,7 @@
                         <div class="form-group">
                           <i class="fas fa-paint-brush"></i>
                           <label for="nroDocumentos">Nro Documentos</label>
-                          <input type="number" name="nroDocumentos" id="nroDocumentos" class="form-control">
+                          <input type="number" name="nroDocumentos" id="nroDocumentos" class="form-control fs-h-input">
                         </div>
                       </div>             
 
@@ -353,7 +413,7 @@
 
           
           <div class="modal fade" id="modal-agregar-docs">
-            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-dialog modal-md modal-dialog-scrollable">
               <div class="modal-content">
                 <div class="modal-header py-2 bg-color-principal">
                   <h4 class="modal-title text-white">Documento</h4>
@@ -375,6 +435,40 @@
                           <textarea name="descripcion_docs" id="descripcion_docs" class="form-control" rows="1"></textarea>
                         </div>
                       </div>    
+
+                      <div class="col-12">
+                        <div class="form-group">
+                          <label for="descripcion">Tipo </label>                          
+                          <select name="tipo_plantilla" id="tipo_plantilla" class="form-control form-control-sm is-valid select2" placeholder="Tipo" aria-invalid="false">
+                            <option value="Estandar">Estandar</option>
+                            <option value="Interno">Interno</option>
+                            <option value="Modelo">Modelo</option>
+                          </select>
+                        </div>
+                      </div>                    
+
+                      <!-- Pdf 1 -->
+                      <div class="col-12 mt-2">
+                        <!-- linea divisoria -->
+                        <div class="col-lg-12 borde-arriba-naranja mt-2"></div>
+                        <div class="row">
+                          <div class="col-md-12 p-t-15px p-b-5px" >
+                            <label for="Presupuesto" class="control-label">Archivo</label>
+                          </div>
+                          <div class="col-6 col-md-6 col-lg-6 col-xl-6 text-center">
+                            <button type="button" class="btn btn-success btn-block btn-xs" id="doc1_i"><i class="fas fa-file-upload"></i> Subir.</button>
+                            <input type="hidden" id="doc_old_1" name="doc_old_1" />
+                            <input style="display: none;" id="doc1" type="file" name="doc1" accept=".pdf, .docx, .doc" class="docpdf" />
+                          </div>
+                          <div class="col-6 col-md-6 col-lg-6 col-xl-6 text-center">
+                            <button type="button" class="btn btn-info btn-block btn-xs" onclick="re_visualizacion(1, '', '');"><i class="fa fa-eye"></i> PDF.</button>
+                          </div>
+                        </div>
+                        <div id="doc1_ver" class="text-center mt-4">
+                          <img src="/assets/images/default/word_pdf.png" alt="" width="50%" />
+                        </div>
+                        <div class="text-center" id="doc1_nombre"><!-- aqui va el nombre del pdf --></div>
+                      </div>
                       
                       <!-- barprogress -->
                       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px;">

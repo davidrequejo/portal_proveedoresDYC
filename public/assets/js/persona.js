@@ -8,9 +8,11 @@ $("#guardar_registro_persona").on("click", function (e) { $("#submit-form-provee
 lista_select2(`${BASE_URL}/select2/obtener`, '#distrito');
 
 lista_select2(`${BASE_URL}/select2/Rolpersona`, '#idtipo_persona');
+lista_select2(`${BASE_URL}/select2/Areapersona`, '#idarea_persona');
 
 $("#distrito").select2({ theme: "bootstrap4", placeholder: "Seleccionar Distrito", allowClear: true, });
 $("#idtipo_persona").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
+$("#idarea_persona").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
 
 $("#tipo_entidad_sunat").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
 $("#tipo_documento").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
@@ -93,8 +95,9 @@ function renderFilas(rows){
         <td class="py-1 text-nowrap" >${r.numero_documento ?? ''}</td>
         <td class="py-1 text-nowrap" >${r.celular ?? ''}</td>
         <td class="py-1 text-nowrap">${r.email ?? ''}</td>
-        <td class="py-1 text-nowrap">${ r.direccion }</td>
+        <td class="py-1" style="max-width: 220px; white-space: normal; overflow-wrap: anywhere; word-break: break-word;">${ r.direccion }</td>
         <td class="py-1 text-nowrap">${ r.tipoPersona }</td>
+        <td class="py-1 text-nowrap">${ r.area_persona }</td>
         <td class="py-1 text-nowrap">${ estado }</td>
         
       </tr>
@@ -180,6 +183,7 @@ function limpiar_form_persona(){
   $("#departamento").val("");
 
   $("#idtipo_persona").val("").trigger('change');
+  $("#idarea_persona").val("").trigger('change');
   $("#tipo_entidad_sunat").val("").trigger('change');
   $("#tipo_documento").val("").trigger('change');
   $("#distrito").val("").trigger('change');
@@ -200,6 +204,7 @@ function ver_editar_persona(idpersona) {
     if (e.status == true) {
       $("#idpersona").val(e.data.idpersona);
       $("#idtipo_persona").val(e.data.idtipo_persona).trigger('change');
+      $("#idarea_persona").val(e.data.idarea_persona).trigger('change');
       $("#tipo_entidad_sunat").val(e.data.tipo_entidad_sunat).trigger('change');
       $("#tipo_documento").val(e.data.tipo_documento).trigger('change');
       $("#numero_documento").val(e.data.numero_documento);
@@ -433,12 +438,16 @@ $(function () {
 
   $('#tipo_entidad_sunat').on('change', function() { $(this).trigger('blur'); });
   $('#tipo_documento').on('change', function() { $(this).trigger('blur'); });
+  $('#idarea_persona').on('change', function() { $(this).trigger('blur'); });
+
+  
 
   $("#form-agregar-proveedor").validate({
     //ignore: '.select2-input, .select2-focusser',
     rules: {
 
       tipo_entidad_sunat:    { required: true, },
+      idarea_persona:    { required: true, },
       tipo_documento:  { required: true, },
       numero_documento:   { required: true, },
       direccion:       { required: true, },
@@ -448,6 +457,7 @@ $(function () {
     },
     messages: {
       tipo_entidad_sunat:    { required: "Campo requerido.", },
+      idarea_persona:    { required: "Campo requerido.", },
       tipo_documento:  { required: "Campo requerido.", },
       numero_documento:   { required: "Campo requerido.", },
       direccion:       { required: "Campo requerido.", },
@@ -479,6 +489,7 @@ $(function () {
 
   $('#tipo_entidad_sunat').rules('add', { required: true, messages: {  required: "Campo requerido" } });
   $('#tipo_documento').rules('add', { required: true, messages: {  required: "Campo requerido" } });
+  $('#idarea_persona').rules('add', { required: true, messages: {  required: "Campo requerido" } });
 
 });
 

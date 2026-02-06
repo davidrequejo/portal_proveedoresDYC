@@ -15,6 +15,8 @@ class DocumentoTipoEstandar extends Model
 
     protected $fillable = [
         'descripcion',
+        'tipo_documento',
+        'archivo',
         'estado_trash',
         'estado_delete',
         'user_trash',
@@ -48,7 +50,7 @@ class DocumentoTipoEstandar extends Model
         return DB::table('documento_tipo_estandar as d')
             ->select(
                 'd.iddocumento_tipo_estandar',
-                'd.descripcion'
+                'd.descripcion','d.tipo_documento'
             )
             ->where('d.estado_trash', '1')
             ->where('d.estado_delete', '1')

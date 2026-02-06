@@ -7,6 +7,10 @@ var email_proveedor_env_correo = null;
 
 let tipo_editar_homologacion =null;
 
+
+
+
+
 //-------------------- Inicializaciones ------------------------------------
 var idfechaperso_homol_edit = null;
 var  descrp_homol_edit = null;
@@ -22,12 +26,18 @@ $("#guardar_registro_actualizar_estado").on("click", function (e) { $("#submit-f
 
 // lista_select2("../ajax/ajax_general.php?op=select2EmpresaACargo", '#empresa_acargo', null);
 
-lista_select2(`${BASE_URL}/select2/obtener`, '#distrito'); 
-lista_select2(`${BASE_URL}/select2/tipoestandar`, '#idtipoestandarproveedor');
+lista_select2(`${BASE_URL}/select2/tipoestandar_all`, '#tipo_compra'); 
+lista_select2(`${BASE_URL}/select2/estado_homologacion_all`, '#estado_homologacion');
+lista_select2(`${BASE_URL}/select2/proveedores_all`, '#id_proveedor');
+lista_select2(`${BASE_URL}/select2/compradores_all`, '#id_persona_usuario');
 
 
-$("#distrito").select2({ theme: "bootstrap4", placeholder: "Seleccionar Distrito", allowClear: true, });
-$("#idtipoestandarproveedor").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
+$("#tipo_compra").select2({ theme: "bootstrap4", placeholder: "Tipo Compra", allowClear: true, });
+$("#estado_homologacion").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
+$("#id_proveedor").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
+$("#id_persona_usuario").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
+
+
 
 $('#tipo_persona').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
 $('#tipo_documento').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
@@ -120,19 +130,38 @@ document.getElementById("btn_generar_credenciales").addEventListener("click", fu
 // ═══════                                       S E C C I O N   T A B L A   P R O Y E C T O                                                        ═══════
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
+let filtrosInicializados = false;
+
+function initFiltros() {
+  $('.select2').each(function () {
+    if (!$(this).data('select2')) {
+      $(this).select2();
+    }
+  });
+
+  filtrosInicializados = true; // ✅ recién aquí
+}
+
 const state = {
   page: 1,
   per_page: 10,
   sort: 'codigo',
   dir: 'asc',
-  q: ''
+  q: '',
+
+  tipo_compra: null,
+  fecha_inicio_periodo: null,
+  fecha_fin_periodo: null,
+  estado_homologacion: null,
+  id_proveedor: null,
+  id_persona_usuario: null
 };
 
 // Cargar datos
 function tabla_principal_cargar(){
-  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');
+  $("#tabla-homologaciones tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');
   
-  $.getJSON(`${BASE_URL}/proveedor/tabla_principal`, state, function(res){
+  $.getJSON(`${BASE_URL}/homologaciones/listar_homologaciones_all`, state, function(res){
 
     console.log(res.data);
     
@@ -144,31 +173,42 @@ function tabla_principal_cargar(){
 
 // Render filas de la tabla
 function renderFilas(rows){
-  const $tb = $("#tabla-proveedores tbody").empty();
+  const $tb = $("#tabla-homologaciones tbody").empty();
   if (!rows || rows.length === 0){
     $tb.append('<tr><td colspan="15" class="text-center text-muted">Sin resultados</td></tr>');
     return;
   }
   rows.forEach(r => {
+    var estado_completo='';
+    var estadoHtml='';
+
+    if (r.todo_aprobado === 1) { estado_completo=`<span class="badge badge-new text-white">Completo</span>`;  } else { estado_completo=`<span class="badge bg-danger">Incompleto</span>`;}
+
+    switch (r.estado_homologacion) {
+        case 'No Iniciado': estadoHtml = `<span class="badge bg-warning text-white">No Iniciada</span>`;   break;
+        case 'Vigente': estadoHtml = `<span class="badge badge-new text-white">Vigente</span>`; break;
+        case 'Vencida': estadoHtml = `<span class="badge bg-secondary text-white">Vencida</span>`; break;
+        default: estadoHtml = `<span class="badge bg-danger">Pendiente.</span>`; 
+    }
 
     $tb.append(`
-      <tr class="fila-proyecto" data-id="${r.idpersona}">          
-        <td class="py-1"> 
+      <tr class="fila-proyecto" data-id="${r.idpersona_facha_homologacion}">          
+        <td class="py-1 text-center"> 
           <div class="btn-group btn-group-sm">
-            <button class="btn btn-xs text-nowrap bnt-editar-proyecto" onclick="ver_editar_proveedor(${r.idpersona})" data-toggle="tooltip" data-original-title="Editar"> <i class="fas fa-pencil-alt color_icon_opt"></i></button>
-            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="lista_homologaciones(${r.idpersona}, '${r.nombre_razonsocial ?? ''}','${r.email ?? ''}')" data-toggle="tooltip" data-original-title="Homologaciones"><i class="fas fa-folder fa-0 color_icon_opt"></i></button>
-            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="eliminar_proveedor(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')" data-toggle="tooltip" data-original-title="Eliminar"><i class="fas fa-trash color_icon_opt"></i></button>
-            <button class="btn btn-xs text-nowrap" onclick="sincronizacions10(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')" data-toggle="tooltip" data-original-title="Sincronizar"><i class="fas fa-globe" style="color: #74C0FC;"></i></button>
+            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="lista_homologaciones(${r.idpersona_facha_homologacion}, '${r.descripcion ?? ''}','${r.email ?? ''}')" data-toggle="tooltip" data-original-title="Ver Homologación"><i class="fas fa-folder fa-0 color_icon_opt"></i></button>
           </div>
         </td>
-        <td class="py-1 text-center"> ${String('000').padStart(3, '0')} </td>
-        <td class="py-1 text-nowrap">${r.nombre_razonsocial ?? ''}</td>
-        <td class="py-1" >${r.tipo_entidad_sunat ?? ''}</td>
-        <td class="py-1" >${r.abreviatura ?? ''}</td>
-        <td class="py-1 text-nowrap">${r.numero_documento ?? ''}</td>
-        <td class="py-1 text-nowrap">${r.celular ?? ''}</td>
-        <td class="py-1 text-nowrap">${r.email ?? ''}</td>
-        <td class="py-1" style="max-width: 220px; white-space: normal; overflow-wrap: anywhere; word-break: break-word;">${ r.direccion } </td>
+        <td class="py-1 text-nowrap">${r.proveedor ?? ''}</td>
+        <td class="py-1" >${r.tipo_estandar ?? ''}</td>
+        <td class="py-1" >${format_d_m_a(r.fecha_inicio_proceso ?? '')}</td>
+        <td class="py-1 text-nowrap">${format_d_m_a(r.fecha_inicio_periodo_h ?? '')}</td>
+        <td class="py-1 text-nowrap">${format_d_m_a(r.fecha_fin_periodo_h ?? '')}</td>
+        <td class="py-1 text-nowrap">${r.descripcion ?? ''}</td>
+        <td class="py-1 text-nowrap">${r.comprador ?? ''}</td>
+        <td class="py-1" style="max-width: 220px; white-space: normal; overflow-wrap: anywhere; word-break: break-word;">${ estadoHtml } </td>
+        <td class="py-1" style="max-width: 220px; white-space: normal; overflow-wrap: anywhere; word-break: break-word;">${estado_completo} </td>
+        <td class="py-1 text-center"><i class="fas fa-cloud-download-alt color_icon_opt"></i> </td>
+        
       </tr>
     `);
     $('[data-toggle="tooltip"]').tooltip(); 
@@ -195,18 +235,18 @@ function renderPaginacion(actual, total){
 
 // Marcar orden visualmente
 function marcarOrden(col, dir){
-  $("#tabla-proveedores thead th.sortable").each(function(){ const $th = $(this);  const c = $th.data('sort');  $th.removeClass('asc desc'); if (c === col) $th.addClass(dir);  });
+  $("#tabla-homologaciones thead th.sortable").each(function(){ const $th = $(this);  const c = $th.data('sort');  $th.removeClass('asc desc'); if (c === col) $th.addClass(dir);  });
 }
 
 // Eventos: click en paginación
 $("#paginacion").on("click", "a.page-link", function(e){  
-  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Buscando...</td></tr>');
+  $("#tabla-homologaciones tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Buscando...</td></tr>');
   e.preventDefault();   const page = parseInt($(this).data("page"), 10); if (!isNaN(page)){ state.page = Math.max(1, page); tabla_principal_cargar(); } 
 });
 
 // Eventos: ordenar al hacer clic en header
-$("#tabla-proveedores thead").on("click", "th.sortable", function(){
-  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Ordenando...</td></tr>');
+$("#tabla-homologaciones thead").on("click", "th.sortable", function(){
+  $("#tabla-homologaciones tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Ordenando...</td></tr>');
   const col = $(this).data("sort"); if (state.sort === col) { state.dir = (state.dir === 'asc') ? 'desc' : 'asc'; } else { state.sort = col;  state.dir  = 'asc'; } state.page = 1;    
   tabla_principal_cargar();
 });
@@ -214,27 +254,99 @@ $("#tabla-proveedores thead").on("click", "th.sortable", function(){
 // Búsqueda con debounce
 let t = null;
 $("#buscar").on("input", function(){
-  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Buscando...</td></tr>');
+  $("#tabla-homologaciones tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Buscando...</td></tr>');
   const val = $(this).val(); clearTimeout(t); t = setTimeout(function(){ state.q = val; state.page = 1; tabla_principal_cargar(); }, 300);
 });
 
 // Cambiar tamaño de página
 $("#perPage").on("change", function(){
-  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');
+  $("#tabla-homologaciones tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');
   state.per_page = parseInt($(this).val(), 10) || 20;  state.page = 1;
   tabla_principal_cargar();
 });
 
-// Carga inicial
-tabla_principal_cargar();
 
 $(".recargar-tabla-proyecto").on("click", function(){
   toastr_info('<i class="ti ti-checks"></i> Actualizando...', 'Los datos se estan actualizado', 500);
-  $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');    
+  $("#tabla-homologaciones tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');    
 
   tabla_principal_cargar();
 });
 
+tabla_principal_cargar();
+let debounceTimer = null;
+
+function solicitarRecarga(resetPage = false) {
+  if (resetPage) state.page = 1;
+
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    tabla_principal_cargar();
+  }, 250);
+}
+
+function actualizarFiltros() {
+  state.tipo_compra = $('#tipo_compra').val();
+  state.fecha_inicio_periodo = $('#fecha_inicio_periodo').val();
+  state.fecha_fin_periodo = $('#fecha_fin_periodo').val();
+  state.estado_homologacion = $('#estado_homologacion').val();
+  state.id_proveedor = $('#id_proveedor').val();
+  state.id_persona_usuario = $('#id_persona_usuario').val();
+
+  solicitarRecarga(true);
+}
+
+$(document)
+  .off('change.filtros')
+  .on('change.filtros', `
+    #tipo_compra,
+    #fecha_inicio_periodo,
+    #fecha_fin_periodo,
+    #estado_homologacion,
+    #id_proveedor,
+    #id_persona_usuario
+  `, function () {
+
+    if (!filtrosInicializados) return; // ⛔ ignora cambios iniciales
+
+    actualizarFiltros();
+  });
+
+function limpiarFiltro(nombre) {
+  switch (nombre) {
+    case 'tipo_compra':
+      $('#tipo_compra').val(null).trigger('change');
+      state.tipo_compra = null;
+      break;
+
+    case 'fecha_inicio_periodo':
+      $('#fecha_inicio_periodo').val('');
+      state.fecha_inicio_periodo = null;
+      break;
+
+    case 'fecha_fin_periodo':
+      $('#fecha_fin_periodo').val('');
+      state.fecha_fin_periodo = null;
+      break;
+
+    case 'estado_homologacion':
+      $('#estado_homologacion').val(null).trigger('change');
+      state.estado_homologacion = null;
+      break;
+
+    case 'id_proveedor':
+      $('#id_proveedor').val(null).trigger('change');
+      state.id_proveedor = null;
+      break;
+
+    case 'id_persona_usuario':
+      $('#id_persona_usuario').val(null).trigger('change');
+      state.id_persona_usuario = null;
+      break;
+  }
+
+  solicitarRecarga(true); // ✅ UNA SOLA VEZ
+}
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 // ═══════                                       S E C C I O N   C R U D   P R O V E E D O R                                                        ═══════
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════

@@ -83,7 +83,7 @@
           <div class="container-fluid">
             <div class="row mb-2">
               <div class="col-sm-6">
-                <h1 class="m-0">Trabajadores</h1>
+                <h1 class="m-0">Personal</h1>
               </div><!-- /.col -->
               <div class="col-sm-6">
                 <div class="float-right">
@@ -125,7 +125,7 @@
                   <div class="card-body pb-1">
                     <div class="row mb-2">                    
                       <div class="col">
-                        <input type="search" id="buscar" class="form-control form-control-sm" placeholder="Buscar proyecto...">
+                        <input type="search" id="buscar" class="form-control   form-control-sm" placeholder="Buscar Persona...">
                       </div>
                       <div class="col-auto">
                         <select id="perPage" class="form-select form-select-sm">
@@ -154,7 +154,8 @@
                             <th data-sort="celular"   class="sortable">Teléfono</th>
                             <th data-sort="email"       class="sortable">Email</th>
                             <th data-sort="direccion" class="sortable">Dirección</th>
-                            <th data-sort="direccion" class="sortable">Rol</th>
+                            <th data-sort="rol" class="sortable">Rol</th>
+                            <th data-sort="area" class="sortable">Área</th>
                             <th data-sort="estado" class="sortable">Estado</th>
                             
                           </tr>
@@ -195,22 +196,27 @@
                       <!-- id persona -->
                       <input type="hidden" name="idpersona" id="idpersona" /> 
 
-                      <div class="col-12 col-sm-6 col-md-4 col-lg-4">
+                      <div class="col-12 col-sm-6 col-md-3 col-lg-3">
                         <div class="form-group">
-                          <label for="descripcion">Rol </label>                          
-                          <!--<textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
-                          <select name="idtipo_persona" id="idtipo_persona" class="form-control is-valid select2" placeholder="Rol" aria-invalid="false">
+                          <label for="descripcion"> Área de Personal</label> 
+                          <select name="idarea_persona" id="idarea_persona" class="form-control form-control-xs  is-valid select2" placeholder="Área" aria-invalid="false">
+                          </select>
+                        </div>
+                      </div>
 
+                      <div class="col-12 col-sm-6 col-md-3 col-lg-3">
+                        <div class="form-group">
+                          <label for="descripcion">Rol</label> 
+                          <select name="idtipo_persona" id="idtipo_persona" class="form-control form-control-xs  is-valid select2" placeholder="Rol" aria-invalid="false">
                           </select>
                         </div>
                       </div>
                       <!-- Tipo Entidad Sunat -->
 
-                      <div class="col-12 col-sm-6 col-md-4 col-lg-4">
+                      <div class="col-12 col-sm-6 col-md-3 col-lg-3">
                         <div class="form-group">
-                          <label for="descripcion">Tipo Entidad Sunat</label>                          
-                          <!--<textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
-                          <select name="tipo_entidad_sunat" id="tipo_entidad_sunat" class="form-control is-valid select2" placeholder="Tipo Entidad" aria-invalid="false">
+                          <label for="descripcion">Tipo Entidad Sunat</label>   
+                          <select name="tipo_entidad_sunat" id="tipo_entidad_sunat" class="form-control form-control-sm  is-valid select2" placeholder="Tipo Entidad" aria-invalid="false">
                             <option value="NATURAL">NATURAL</option>
                             <option value="JURIDICA">JURIDICA</option>
                           </select>
@@ -218,11 +224,10 @@
                       </div>
   
                       <!-- Tipo de documento -->
-                      <div class="col-12 col-sm-6 col-md-4 col-lg-4">
+                      <div class="col-12 col-sm-6 col-md-3 col-lg-3">
                         <div class="form-group">
-                          <label for="descripcion">Tipo de documento</label>                          
-                          <!--<textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
-                          <select name="tipo_documento" id="tipo_documento" class="form-control is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
+                          <label for="descripcion">Tipo de documento</label> 
+                          <select name="tipo_documento" id="tipo_documento" class="form-control form-control-sm is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
                             <option value="1">DNI</option>
                             <option value="6">RUC</option>
                           </select>
@@ -234,7 +239,7 @@
                         <div class="form-group">
                           <label for="descripcion">Nro de documento <sup class="text-danger">*</sup></label>                          
                            <div class="input-group">
-                              <input type="number" name="numero_documento" class="form-control" id="numero_documento" placeholder="N° de documento">
+                              <input type="number" name="numero_documento" class="form-control form-control-sm" id="numero_documento" placeholder="N° de documento">
                               <div class="input-group-append" data-toggle="tooltip" data-original-title="Buscar Reniec/SUNAT" onclick="buscar_sunat_reniec();">
                                 <span class="input-group-text" style="cursor: pointer;">
                                   <i class="fas fa-search text-primary" id="search"></i>
@@ -249,46 +254,45 @@
                       <div class="col-12 col-sm-12 col-md-7 col-lg-7">
                         <div class="form-group">
                           <label for="Nombre_Apellidos">Nombre y Apellidos/Razon Social <sup class="text-danger">*</sup></label>
-                          <input type="text" name="nombre_razonsocial" class="form-control" id="nombre_razonsocial"  />
+                          <input type="text" name="nombre_razonsocial" class="form-control form-control-sm" id="nombre_razonsocial"  />
                         </div>
                       </div> 
                       <!-- Nombre apellidos maternos paternos  -->
                       <div class="col-12 col-sm-12 col-md-7 col-lg-7" style="display: none">
                         <div class="form-group">
                           <label for="Nombre_Apellidos">Nombre <sup class="text-danger">*</sup></label>
-                          <input type="text" name="nombre_persona_natural" class="form-control" id="nombre_persona_natural"  />
-                          <input type="text" name="apellido_paterno_per_natural" class="form-control" id="apellido_paterno_per_natural"  />
-                          <input type="text" name="apellido_materno_per_natural" class="form-control" id="apellido_materno_per_natural"  />
+                          <input type="text" name="nombre_persona_natural" class="form-control form-control-sm" id="nombre_persona_natural"  />
+                          <input type="text" name="apellido_paterno_per_natural" class="form-control form-control-sm" id="apellido_paterno_per_natural"  />
+                          <input type="text" name="apellido_materno_per_natural" class="form-control form-control-sm" id="apellido_materno_per_natural"  />
                         </div>
                       </div> 
                       <!-- email -->
                       <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                         <div class="form-group">
                           <label for="email">Email</label>
-                           <input type="email" name="email" class="form-control" id="email" placeholder="Correo electrónico" onkeyup="convert_minuscula(this);">
+                           <input type="email" name="email" class="form-control form-control-sm " id="email" placeholder="Correo electrónico" onkeyup="convert_minuscula(this);">
                         </div>
                       </div>      
                       <!-- Teléfono -->
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label for="celular">Teléfono</label>
-                          <input type="text" name="celular" id="celular" class="form-control" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text">
+                          <input type="text" name="celular" id="celular" class="form-control form-control-sm " data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text">
                         </div>
                       </div>
                       <!-- Dirección -->
                       <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                         <div class="form-group">
                           <label for="direccion">Dirección </label> <br>
-                          <textarea name="direccion" id="direccion" class="form-control" rows="1"></textarea>
+                          <textarea name="direccion" id="direccion" class="form-control form-control-sm " rows="1"></textarea>
                         </div>
                       </div>
-
                  
                       <!-- Distrito -->
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label for="distrito">Distrito</label>
-                          <select name="distrito" id="distrito" class="form-control select2" style="width: 100%;"  > </select>   
+                          <select name="distrito" id="distrito" class="form-control form-control-sm select2" style="width: 100%;"  > </select>   
                         </div>
                       </div> 
 
@@ -296,7 +300,7 @@
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label for="provincia">Provincia</label>
-                          <input type="text" name="provincia" class="form-control" id="provincia"  readonly/>
+                          <input type="text" name="provincia" class="form-control form-control-sm" id="provincia"  readonly/>
                         </div>
                       </div> 
 
@@ -304,7 +308,7 @@
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label for="departamento">Departamento</label>
-                          <input type="text" name="departamento" class="form-control" id="departamento"  readonly />
+                          <input type="text" name="departamento" class="form-control form-control-sm" id="departamento"  readonly />
                         </div>
                       </div> 
 
@@ -341,79 +345,6 @@
             <!-- /.modal-dialog -->
           </div>
           <!-- /.modal -->
-
-          <div class="modal fade" id="modal-agregar-persona">
-            <div class="modal-dialog modal-lg modal-dialog-scrollable">
-              <div class="modal-content">
-                <div class="modal-header py-2">
-                  <h4 class="modal-title">Presupuestos</h4>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span class="text-danger" aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body">
-                  <div class="table-responsive">
-                    <table class="table table-bordered">
-                      <thead>
-                        <tr>
-                          <th style="width: 10px">#</th>
-                          <th>Task</th>
-                          <th>Progress</th>
-                          <th style="width: 40px">Label</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>1.</td>
-                          <td>Update software</td>
-                          <td>
-                            <div class="progress progress-xs">
-                              <div class="progress-bar progress-bar-danger" style="width: 55%"></div>
-                            </div>
-                          </td>
-                          <td><span class="badge bg-danger">55%</span></td>
-                        </tr>
-                        <tr>
-                          <td>2.</td>
-                          <td>Clean database</td>
-                          <td>
-                            <div class="progress progress-xs">
-                              <div class="progress-bar bg-warning" style="width: 70%"></div>
-                            </div>
-                          </td>
-                          <td><span class="badge bg-warning">70%</span></td>
-                        </tr>
-                        <tr>
-                          <td>3.</td>
-                          <td>Cron job running</td>
-                          <td>
-                            <div class="progress progress-xs progress-striped active">
-                              <div class="progress-bar bg-primary" style="width: 30%"></div>
-                            </div>
-                          </td>
-                          <td><span class="badge bg-primary">30%</span></td>
-                        </tr>
-                        <tr>
-                          <td>4.</td>
-                          <td>Fix and squish bugs</td>
-                          <td>
-                            <div class="progress progress-xs progress-striped active">
-                              <div class="progress-bar bg-success" style="width: 90%"></div>
-                            </div>
-                          </td>
-                          <td><span class="badge bg-success">90%</span></td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>              
-              </div>
-              <!-- /.modal-content -->
-            </div>
-            <!-- /.modal-dialog -->
-          </div>
-          <!-- /.modal -->
-
 
         </section>
         <!-- /.content -->
