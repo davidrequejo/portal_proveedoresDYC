@@ -18,6 +18,7 @@ use App\Http\Controllers\HomologacionController;
 use App\Http\Controllers\DocumentoTipoEstandarController;
 use App\Http\Controllers\NotificacionController; 
 use App\Http\Controllers\AllHomologacionesController; 
+use App\Http\Controllers\AreaPersonaController;
 
 
 Route::get('/', function () {  return redirect()->route('login'); });
@@ -77,11 +78,13 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::get('/homologacion/{id}/mostrar_periodo_homologacion', [HomologacionController::class, 'mostrar_periodo_homologacion'] )->whereNumber('id')->name('homologacion.mostrar_periodo_homologacion'); // mostrar para editar
     Route::put('/homologacion/editar_periodo_homologacion/{id}',[HomologacionController::class, 'editar_periodo_homologacion'] )->whereNumber('id')->name('homologacion.editar_periodo_homologacion'); // editar
     Route::put('/homologacion/establecerfechas_periodo_homologacion/{id}',[HomologacionController::class, 'establecerfechas_periodo_homologacion'] )->whereNumber('id')->name('homologacion.establecerfechas_periodo_homologacion'); // editar
+    Route::put('/eliminar_periodo_h/eliminar_eliminar_periodo_h/{id}', [HomologacionController::class, 'eliminar_eliminar_periodo_h'])->whereNumber('id')->name('homologacion.eliminar_eliminar_periodo_h'); // eliminar
     Route::get('/homologacion/listar_docs_xperiodo_xproveedor', [HomologacionController::class, 'listar_docs_xperiodo_xproveedor'] )->name('homologacion.listar_docs_xperiodo_xproveedor'); // AJAX
     Route::put('/homologacion/actualizar_estado_doc_estandar/{id}', [HomologacionController::class, 'actualizar_estado_doc_estandar'])->whereNumber('id')->name('homologacion.actualizar_estado_doc_estandar'); // editar
     Route::put('/homologacion/cargar_documento_interno_estandar/{id}', [HomologacionController::class, 'cargar_documento_interno_estandar'])->whereNumber('id')->name('homologacion.cargar_documento_interno_estandar'); // editar
     
     Route::post('/homologacion/enviar_correo_notificacion', [HomologacionController::class, 'enviar_correo_notificacion'])->name('homologacion.enviar_correo_notificacion'); // enviar correo notificación
+    Route::get('/homologacion/{id}/ultimo-envio', [HomologacionController::class, 'show_ultimo_envio_notificacion'])->name('homologacion.ultimo-envio');
     Route::resource('homologacion', HomologacionController::class );
 
 
@@ -164,5 +167,41 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
      Route::get('/select2/proveedores_all', [AllHomologacionesController::class, 'select2proveedoreshomologacion']); //  ← select2 
      Route::get('/select2/estado_homologacion_all', [AllHomologacionesController::class, 'select2estadohomologacion']); //  ← select2 
      Route::get('/select2/tipoestandar_all', [AllHomologacionesController::class, 'selec2tipoEstandar']); //  ← select2 
+
+     Route::get( 'homologaciones/descargar-documentos/{id}', [AllHomologacionesController::class, 'descargarDocumentos'])->name('homologaciones.descargar.documentos');
+     Route::get( 'homologaciones/descarga-masiva', [AllHomologacionesController::class, 'descargaMasiva'])->name('homologaciones.descarga.masiva');
+
+     //Route::get('homologaciones/descarga-masiva', [HomologacionController::class, 'descargaMasiva'])->name('homologaciones.descarga-masiva');
+    
+     Route::get('homologaciones/verificar-archivos', [AllHomologacionesController::class, 'verificarArchivos'])->name('homologaciones.verificar-archivos');
+     Route::get('homologaciones/vista-previa', [AllHomologacionesController::class, 'vistaPrevia']);
+
      Route::resource('all_homologaciones', AllHomologacionesController::class);
+
+    //:::::::::::::::::::::::::. AREA PERSONA ::::::::::::::::::::::::::::::
+      Route::post('/area_persona/crear_area_persona', [AreaPersonaController::class, 'crear_area_persona'])->name('area_persona.crear_area_persona'); // crear
+      Route::get('/area_persona/tabla_principal', [AreaPersonaController::class, 'listar_area_persona'])->name('area_persona.listar_area_persona'); // AJAX
+      Route::get('/area_persona/{idarea_persona}/ver-editar', [AreaPersonaController::class, 'mostrar_area_persona'])->whereNumber('idarea_persona')->name('area_persona.mostrar_area_persona'); // mostrar para editar
+      Route::put('/area_persona/editar_area_persona/{idarea_persona}', [AreaPersonaController::class, 'editar_area_persona'])->whereNumber('idarea_persona')->name('area_persona.editar_area_persona'); // editar
+      Route::put('/area_persona/eliminar_area_persona/{idarea_persona}', [AreaPersonaController::class, 'eliminar_area_persona'])->whereNumber('idarea_persona')->name('area_persona.eliminar_area_persona'); // eliminar
+      // Select2
+      Route::get('/area_persona/select2', [AreaPersonaController::class, 'select2_area_persona'])->name('area_persona.select2');
+
+      // (opcional) resource si lo usas como en Banco
+      Route::resource('area_persona', AreaPersonaController::class);
+
+      Route::get('/test-modelo', function() {
+        try {
+            $noti = App\Models\NotificacioncorreoenviadorevisionDocsH::create([
+                'homologacion_id' => 1,
+                'estado' => 'test',
+                'fecha_envio' => now(),
+                'observacion' => 'Test manual'
+            ]);
+            
+            return "✅ Insertado ID: " . $noti->id;
+        } catch (\Exception $e) {
+            return "❌ Error: " . $e->getMessage();
+        }
+    });
 });

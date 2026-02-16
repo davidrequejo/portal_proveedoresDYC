@@ -141,7 +141,7 @@
 
                             <div class="col-12 pb-3">
                               <div class="titulo-separador">
-                                <span class="text-bold text-principal" >Datos Generales Proveedor</span>
+                                <span class="text-bold text-principal" >Datos Generales Cliente</span>
                               </div>
                             </div>
 
@@ -421,7 +421,7 @@
                         <div class="float-right">
 
                           <div class="btn-group btn-agregar-proyecto">
-                            <button type="button" class="btn btn-primary" style="border-color: #063ffc !important;" data-toggle="modal" data-target="#modal-crear_cuentabancaria" onclick=" verificar_tipocuenta();"><i class="nav-icon fas fa-file"></i> Crear nuevo</button>
+                            <button type="button" class="btn btn-primary" style="border-color: #063ffc !important;" data-toggle="modal" data-target="#modal-crear_cuentabancaria" onclick=" verificar_tipocuenta(); limpiar_form_banco();"><i class="nav-icon fas fa-file"></i> Crear nuevo</button>
                           </div>
                         </div>
                         <div class="card-tools m-2"></div>
@@ -567,7 +567,7 @@
 
                 </div>
                 <div class="modal-footer justify-content-between">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="">Cerrar</button>
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="limpiar_form_banco();">Cerrar</button>
                   <span class="text-danger spiner_enviando_correo_cb" style="display: none"> <i class="fas fa-sync fa-spin"></i> Guardando... </span>
                   <button type="button" class="btn btn-primary" id="guardar_registro_cuenta_bank">Guardar</button>
                 </div>
@@ -598,8 +598,8 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/actualizardatoscliente.js') }}?version_erp=01.06"></script>
-  <script src="{{ asset('assets/js/persona_cuentabancaria.js') }}?version_erp=01.06"></script>
+  <script src="{{ asset('assets/js/actualizardatoscliente.js') }}?version_erp=01.07"></script>
+  <script src="{{ asset('assets/js/persona_cuentabancaria.js') }}?version_erp=01.07"></script>
 
   <script>
     $(function() {

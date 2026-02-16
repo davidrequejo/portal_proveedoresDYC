@@ -125,8 +125,12 @@ class SubirDocsController extends Controller
 						$idpersona_facha_homologacion = $doc->idpersona_facha_homologacion;
 						$idpersona = $doc->idpersona;	
 						$existe_vacio = DB::table('docsproveedortipoestandar as dpt')
+							->join( 'persona_facha_homologacion as pfh', 'dpt.idpersona_facha_homologacion', '=', 'pfh.idpersona_facha_homologacion' )
+							->join( 'detalletipoestandarproveedor as dtp', 'dpt.iddetalletipoestandarproveedor', '=', 'dtp.iddetalletipoestandarproveedor' )
+							->join( 'documento_tipo_estandar as destts', 'destts.iddocumento_tipo_estandar', '=', 'dtp.iddocumento_tipo_estandar' )
 							->where('dpt.idpersona', $idpersona)
 							->where('dpt.idpersona_facha_homologacion', $idpersona_facha_homologacion)
+							->whereIn('destts.tipo_documento', ['Estandar', 'Modelo'])
 							->where(function ($q) {
 								$q->whereNull('dpt.archivo')
 								->orWhere('dpt.archivo', '');

@@ -45,18 +45,20 @@
                         </p>
                         <p><strong>Proveedor:</strong> {{ $proveedor }}</p>
 
+                        <p style="line-height:1.5;">
+                            Para más detalles, puedes ingresar al portal correspondiente:
+                        </p>
+
+                        <p style="text-align:center;margin-top:25px;">
+                            <a href="{{ config('app.url') }}"
+                                style="background-color:#2563eb;color:#ffffff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block;width:80%;">
+                                Ingresar al Portal
+                            </a>
+                        </p>
+
 
                     </td>
-                     <p style="line-height:1.5;">
-                        Para más detalles, puedes ingresar al portal correspondiente:
-                    </p>
 
-                    <p style="text-align:center;margin-top:25px;">
-                        <a href="{{ config('app.url') }}"
-                            style="background-color:#2563eb;color:#ffffff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block;width:80%;">
-                            Ingresar al Portal
-                        </a>
-                    </p>
                 </tr>
 
                 <!-- FOOTER -->

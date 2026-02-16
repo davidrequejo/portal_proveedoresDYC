@@ -127,7 +127,7 @@
                   <div class=" col-12 col-sm-12 col-md-6 col-lg-5">
                     <div class="card">
                       <div class="card-header border-0" style="background-color: aliceblue;">
-                        <h3 class="card-title m-2 font-weight-bold text-principal">Información del Proveedor - <span>{{ auth()->user()->tiene_cuenta_bancaria }}</span> - <span>{{ auth()->user()->persona?->estado_completoxproveedor  }}</span></h3>
+                        <h3 class="card-title m-2 font-weight-bold text-principal">Información del Proveedor  <span class="hidden" > - {{ auth()->user()->tiene_cuenta_bancaria }}</span>  <span  class="hidden"> - {{ auth()->user()->persona?->estado_completoxproveedor  }}</span></h3>
                         <div class="card-tools m-2"></div>
                       </div>
                       <div class="modal-body vista_inicial titulo-separador"><i class="fas fa-spinner fa-spin fa-lg " style="color: #e60f00;"></i>  <Span style="color: #e60f00;"> Cargando...</Span> </div>  
@@ -421,7 +421,7 @@
                         <div class="float-right">
 
                           <div class="btn-group btn-agregar-proyecto">
-                            <button type="button" class="btn btn-primary" style="border-color: #063ffc !important;" data-toggle="modal" data-target="#modal-crear_cuentabancaria" onclick="verificar_tipocuenta();"><i class="nav-icon fas fa-file"></i> Crear nuevo</button>
+                            <button type="button" class="btn btn-primary" style="border-color: #063ffc !important;" data-toggle="modal" data-target="#modal-crear_cuentabancaria" onclick="verificar_tipocuenta(); limpiar_form_banco();"><i class="nav-icon fas fa-file"></i> Crear nuevo</button>
                           </div>
                         </div>
                         <div class="card-tools m-2"></div>
@@ -568,7 +568,7 @@
 
                 </div>
                 <div class="modal-footer justify-content-between">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="">Cerrar</button>
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="limpiar_form_banco();">Cerrar</button>
                   <span class="text-danger spiner_enviando_correo_cb" style="display: none"> <i class="fas fa-sync fa-spin"></i> Guardando... </span>
                   <button type="button" class="btn btn-primary " id="guardar_registro_cuenta_bank">Guardar</button>
                 </div>
@@ -622,8 +622,8 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/actualizardatosproveedor.js') }}?version_erp=01.06"></script>
-  <script src="{{ asset('assets/js/persona_cuentabancaria.js') }}?version_erp=01.06"></script>
+  <script src="{{ asset('assets/js/actualizardatosproveedor.js') }}?version_erp=01.07"></script>
+  <script src="{{ asset('assets/js/persona_cuentabancaria.js') }}?version_erp=01.07"></script>
 
   <script>
     $(function() {

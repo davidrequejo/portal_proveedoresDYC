@@ -49,24 +49,6 @@ class ProveedorController extends Controller
           // 1. Crear  proveedor
           $createProveedor = Proveedor::create($data);
 
-          // 2. Crear usuario para el proveedor
-          /*$user = User::create([
-              'idpersona' =>  $createProveedor->idpersona,
-              'name'      => 'PPROVEEDOR', 
-              'email'     => $r->usuario_portal,
-              'password'  => bcrypt($r->clave_portal)
-          ]);
-
-          // 3. Registrar permisos en tabla intermedia
-          if ($user->id   ) {
-
-                  DB::table('usuario_permiso')->insert([
-                      'users_id' => $user->id,
-                      'idpermiso' => '10'
-                  ]);
-              
-          }*/
-
 
           // 2. Crear usuario para el proveedor solo si los campos no son vacíos
           if (!empty($r->usuario_portal) && !empty($r->clave_portal)) {

@@ -144,6 +144,14 @@
                   </a>
                 </li>  
               @endif  
+              @if (auth()->user()->perm_bancos)
+                <li class="nav-item">
+                  <a href="{{ route('area_persona.index') }}" class="nav-link {{ request()->routeIs('area_persona.*') ? 'active' : '' }}">
+                    <i class="nav-icon fab fa-autoprefixer"></i>
+                    <p>Área Personal</p>
+                  </a>
+                </li>  
+              @endif 
        
             </ul>
           </li>

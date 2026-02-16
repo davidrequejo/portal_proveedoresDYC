@@ -10,14 +10,105 @@ use Illuminate\Support\Facades\Validator;
 use App\Mail\ProveedorActualizadoLogisticaMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
+use App\Traits\RegistraLogCompleto; // 👈 1. IMPORTAR
 
 
 class ActualizardatosproveedorController extends Controller
 {
+    use RegistraLogCompleto;   // 👈 2. USAR EL TRAIT
+
     public function index()
     {
        return view('actualizardatos');
     }
+
+    // 👇 3. IMPLEMENTAR EL MÉTODO OBLIGATORIO
+    public function getConfigLog($tabla)
+    {
+        $configs = [
+            // 🔵 TABLA PERSONA (PROVEEDORES)
+            'persona' => [
+                'labels' => [
+                    'nombre_razonsocial' => 'Razón Social',
+                    'nombre_persona_natural' => 'Nombres',
+                    'apellido_paterno_per_natural' => 'Apellido Paterno',
+                    'apellido_materno_per_natural' => 'Apellido Materno',
+                    'sexo' => 'Sexo',
+                    'fecha_nacimiento' => 'Fecha Nacimiento',
+                    'ruc_persona_natural' => 'RUC',
+                    'numero_documento' => 'N° Documento',
+                    'celular' => 'Celular',
+                    'email' => 'Correo',
+                    'direccion' => 'Dirección',
+                ],
+                'formatters' => [
+                    'sexo' => 'sexo',
+                    'fecha_nacimiento' => 'fecha',
+                    'celular' => 'celular',
+                    'numero_documento' => 'documento',
+                    'ruc_persona_natural' => 'documento',
+                    'email' => 'email',
+                ],
+                'ignorar' => ['updated_at', 'user_updated', 'created_at', 'user_created']
+            ],
+            
+            // 🟢 TABLA HOMOLOGACIÓN
+            /*'homologacion' => [
+                'labels' => [
+                    'tipo_compra' => 'Tipo de Compra',
+                    'inicio_proceso' => 'Inicio Proceso',
+                    'fin_periodo' => 'Fin Período',
+                    'estado' => 'Estado',
+                    'descripcion' => 'Descripción',
+                ],
+                'formatters' => [
+                    'inicio_proceso' => 'fecha',
+                    'fin_periodo' => 'fecha_homologacion',
+                    'estado' => 'estado_homologacion',
+                ],
+                'ignorar' => ['updated_at', 'user_updated']
+            ],*/
+            
+            // 🟡 TABLA DOCUMENTOS
+            /*'documentos' => [
+                'labels' => [
+                    'descripcion' => 'Documento',
+                    'estado' => 'Estado',
+                    'tamano' => 'Tamaño',
+                    'tipo' => 'Tipo',
+                ],
+                'formatters' => [
+                    'tamano' => 'tamano_archivo',
+                    'estado' => 'estado_homologacion',
+                    'tipo' => 'tipo_documento',
+                ],
+                'ignorar' => ['updated_at', 'user_updated']
+            ],*/
+            
+            // 🟠 TABLA CUENTAS BANCARIAS
+            /*'cuenta_bancaria' => [
+                'labels' => [
+                    'numero_cuenta' => 'N° Cuenta',
+                    'banco' => 'Banco',
+                    'moneda' => 'Moneda',
+                    'monto_apertura' => 'Monto Apertura',
+                ],
+                'formatters' => [
+                    'numero_cuenta' => 'cuenta_bancaria',
+                    'monto_apertura' => 'monto',
+                    'moneda' => 'moneda',
+                ],
+                'ignorar' => ['updated_at', 'user_updated']
+            ],*/
+        ];
+        
+        return $configs[$tabla] ?? [
+            'labels' => [],
+            'formatters' => [],
+            'ignorar' => ['updated_at', 'user_updated', 'created_at', 'user_created']
+        ];
+    }
+    
 
     public function ver_proveedorupdate($idpersona)
     {
@@ -171,55 +262,33 @@ class ActualizardatosproveedorController extends Controller
 
         // Actualizar proveedor
         $proveedor->update($data);
-
-        // Obtener valores después de la actualización
-        $cambios = $proveedor->getChanges();
-
-        // Etiquetas legibles (opcional pero recomendado)
-        $labels = [
-            'nombre_razonsocial'             => 'razon_social',
-
-            'nombre_persona_natural'         => 'nombre_persona_natural',
-            'apellido_paterno_per_natural'   => 'apellido_paterno_per_natural',
-            'apellido_materno_per_natural'   => 'apellido_materno_per_natural',
-            'sexo'                           => 'sexo',
-            'fecha_nacimiento'               => 'fecha_nacimiento',
-            'Doc. DNI'                       => 'ruc_persona_natural',
-            'tratamiento_pers_natural'       => 'tratamiento_pers_natural',
-            'Documento de Identidad'         => 'numero_documento',
-
-            'email'            => 'email',
-            'celular'            => 'celular',
-            'direccion'          => 'direccion',
-            'departamento'       => 'departamento',
-            'provincia'          => 'provincia',
-            'distrito'           => 'distrito',
-
-        ];
-
-        $observacion = '';
-
-        foreach ($cambios as $campo => $valor) {
-
-            // ignorar campos que no quieres loguear
-            if (!isset($labels[$campo])) { continue; }
-
-            // evitar campos técnicos
-            if (in_array($campo, ['updated_at', 'user_updated'])) { continue; }
-
-            $observacion .= $labels[$campo] . ' : ' . ($valor ?? '-') . "\n";
+                
+        // 🔥 VERIFICAR SI EXISTE LOG
+        $primerLog = Logbd::where('nombre_tabla', 'persona')
+            ->where('id_registrotabla', $proveedor->idpersona)
+            ->doesntExist();
+        
+        if ($primerLog) {
+            // PASA LA TABLA 'persona' Y AUTOMÁTICAMENTE USA SU CONFIG
+            $this->registrarSnapshot(
+                $proveedor,
+                'persona',  // 👈 ESTO BUSCA LA CONFIG
+                $proveedor->idpersona,
+                'REGISTRO_INICIAL_PROVEEDOR'
+            );
+        }else {
+        
+            $cambios = $proveedor->getChanges();
+            $this->registrarCambios(
+                $proveedor,
+                'persona',  // 👈 MISMA TABLA = MISMA CONFIG
+                $proveedor->idpersona,
+                $cambios,
+                'ACTUALIZAR'
+            );
         }
 
-        if (trim($observacion) !== '') {
-            Logbd::create([
-                'nombre_tabla'     => 'persona',
-                'id_registrotabla' => $proveedor->idpersona,
-                'id_user'          => auth()->id(),
-                'observacion'      => trim($observacion),
-                'accion_realizada' => 'Registro Actualizado',
-                'user_created'     => auth()->id(),
-            ]);
-        }
+
 
         /** Enviar correo de notificación a logística */
         $logistica = DB::table('persona')

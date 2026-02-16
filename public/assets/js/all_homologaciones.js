@@ -26,13 +26,13 @@ $("#guardar_registro_actualizar_estado").on("click", function (e) { $("#submit-f
 
 // lista_select2("../ajax/ajax_general.php?op=select2EmpresaACargo", '#empresa_acargo', null);
 
-lista_select2(`${BASE_URL}/select2/tipoestandar_all`, '#tipo_compra'); 
-lista_select2(`${BASE_URL}/select2/estado_homologacion_all`, '#estado_homologacion');
-lista_select2(`${BASE_URL}/select2/proveedores_all`, '#id_proveedor');
-lista_select2(`${BASE_URL}/select2/compradores_all`, '#id_persona_usuario');
+lista_select2(`${BASE_URL}/select2/tipoestandar_all`, '#tipo_compra',null,'.charge_tipo_compra'); 
+lista_select2(`${BASE_URL}/select2/estado_homologacion_all`, '#estado_homologacion',null,'.charge_estado_homologacion');
+lista_select2(`${BASE_URL}/select2/proveedores_all`, '#id_proveedor',null,'.charge_id_proveedor');
+lista_select2(`${BASE_URL}/select2/compradores_all`, '#id_persona_usuario',null,'.charge_id_persona_usuario');
 
 
-$("#tipo_compra").select2({ theme: "bootstrap4", placeholder: "Tipo Compra", allowClear: true, });
+$("#tipo_compra").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
 $("#estado_homologacion").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
 $("#id_proveedor").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
 $("#id_persona_usuario").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
@@ -54,13 +54,17 @@ function show_hide_escenario(flag) {
     $(".btn-agregar-proyecto").show();
     $(".btn-cancelar").hide();
 
-    $(".Nombre_inicial").html(`Proveedores`);
+    $(".Nombre_inicial").html(`Homologaciones`);
+
+    $('.filtros').show();
     
   } else if (flag == 2) {     // Detalle proyecto
     $('#div-tabla-principal-proyecto').hide();
     $("#div-ver-detalle-documentos").show();
     $(".btn-agregar-proyecto").hide();
     $(".btn-cancelar").show();
+
+    $('.filtros').hide();
   } else if (flag == 3) {     //
   } else if (flag == 4) {
     
@@ -130,18 +134,6 @@ document.getElementById("btn_generar_credenciales").addEventListener("click", fu
 // ═══════                                       S E C C I O N   T A B L A   P R O Y E C T O                                                        ═══════
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
-let filtrosInicializados = false;
-
-function initFiltros() {
-  $('.select2').each(function () {
-    if (!$(this).data('select2')) {
-      $(this).select2();
-    }
-  });
-
-  filtrosInicializados = true; // ✅ recién aquí
-}
-
 const state = {
   page: 1,
   per_page: 10,
@@ -159,6 +151,7 @@ const state = {
 
 // Cargar datos
 function tabla_principal_cargar(){
+   
   $("#tabla-homologaciones tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');
   
   $.getJSON(`${BASE_URL}/homologaciones/listar_homologaciones_all`, state, function(res){
@@ -173,6 +166,7 @@ function tabla_principal_cargar(){
 
 // Render filas de la tabla
 function renderFilas(rows){
+
   const $tb = $("#tabla-homologaciones tbody").empty();
   if (!rows || rows.length === 0){
     $tb.append('<tr><td colspan="15" class="text-center text-muted">Sin resultados</td></tr>');
@@ -187,15 +181,15 @@ function renderFilas(rows){
     switch (r.estado_homologacion) {
         case 'No Iniciado': estadoHtml = `<span class="badge bg-warning text-white">No Iniciada</span>`;   break;
         case 'Vigente': estadoHtml = `<span class="badge badge-new text-white">Vigente</span>`; break;
-        case 'Vencida': estadoHtml = `<span class="badge bg-secondary text-white">Vencida</span>`; break;
-        default: estadoHtml = `<span class="badge bg-danger">Pendiente.</span>`; 
+        case 'Vencido': estadoHtml = `<span class="badge bg-secondary text-white">Vencido</span>`; break;
+        default: estadoHtml = `<span class="badge bg-danger">No Iniciada</span>`; 
     }
 
     $tb.append(`
       <tr class="fila-proyecto" data-id="${r.idpersona_facha_homologacion}">          
         <td class="py-1 text-center"> 
           <div class="btn-group btn-group-sm">
-            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="lista_homologaciones(${r.idpersona_facha_homologacion}, '${r.descripcion ?? ''}','${r.email ?? ''}')" data-toggle="tooltip" data-original-title="Ver Homologación"><i class="fas fa-folder fa-0 color_icon_opt"></i></button>
+            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="ver_documentos_x_homologacion(${r.idpersona_facha_homologacion},'${r.tipo_estandar}','${r.proveedor ?? ''}')" ><i class="fas fa-folder fa-0 color_icon_opt"></i></button>
           </div>
         </td>
         <td class="py-1 text-nowrap">${r.proveedor ?? ''}</td>
@@ -207,7 +201,7 @@ function renderFilas(rows){
         <td class="py-1 text-nowrap">${r.comprador ?? ''}</td>
         <td class="py-1" style="max-width: 220px; white-space: normal; overflow-wrap: anywhere; word-break: break-word;">${ estadoHtml } </td>
         <td class="py-1" style="max-width: 220px; white-space: normal; overflow-wrap: anywhere; word-break: break-word;">${estado_completo} </td>
-        <td class="py-1 text-center"><i class="fas fa-cloud-download-alt color_icon_opt"></i> </td>
+        <td class="py-1 text-center"><i class="fas fa-cloud-download-alt descargar_funcion_${r.idpersona_facha_homologacion} color_icon_opt " onclick="descargar_docs_x_homologacion(${r.idpersona_facha_homologacion},'${r.tipo_estandar}','${r.proveedor ?? ''}')"></i> <i class="fas fa-redo-alt fa-spin reload_funcion_${r.idpersona_facha_homologacion} text-danger hidden"></i> </td>
         
       </tr>
     `);
@@ -273,80 +267,55 @@ $(".recargar-tabla-proyecto").on("click", function(){
   tabla_principal_cargar();
 });
 
-tabla_principal_cargar();
-let debounceTimer = null;
-
-function solicitarRecarga(resetPage = false) {
-  if (resetPage) state.page = 1;
-
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(() => {
-    tabla_principal_cargar();
-  }, 250);
+function cargando_search() {
+  if ($('#tabla-homologaciones').length) { } else {
+    $('.buscando_tabla').prepend(`<tr id="tabla-homologaciones"> 
+      <th colspan="20" class="bg-danger " style="text-align: center !important;"><i class="fas fa-spinner fa-pulse fa-sm"></i> Buscando... </th>
+    </tr>`);
+  } 
+  
 }
 
-function actualizarFiltros() {
-  state.tipo_compra = $('#tipo_compra').val();
-  state.fecha_inicio_periodo = $('#fecha_inicio_periodo').val();
-  state.fecha_fin_periodo = $('#fecha_fin_periodo').val();
-  state.estado_homologacion = $('#estado_homologacion').val();
-  state.id_proveedor = $('#id_proveedor').val();
-  state.id_persona_usuario = $('#id_persona_usuario').val();
+function filtros() {  
 
-  solicitarRecarga(true);
+  var tipoestandar_all      = $("#tipo_compra").select2('val');
+  var estado_homologacion   = $("#estado_homologacion").select2('val'); 
+  var id_proveedor          = $("#id_proveedor").select2('val');
+  var id_persona_usuario    = $("#id_persona_usuario").select2('val');
+
+  let fecha_inicio_periodo  = $("#fecha_inicio_periodo").val();
+  let fecha_fin_periodo     = $("#fecha_fin_periodo").val();  
+  
+  if (tipoestandar_all == '' || tipoestandar_all == 0 || tipoestandar_all == null) { tipoestandar_all = ""; nombre_tipoestandar_all = ""; }       // filtro de trabajador  
+  if (estado_homologacion == '' || estado_homologacion == 0 || estado_homologacion == null) { estado_homologacion = ""; nombre_estado_homologacion = ""; }                 // filtro de dia pago  
+  if (id_proveedor == '' || id_proveedor == 0 || id_proveedor == null) { id_proveedor = ""; nombre_id_proveedor = ""; }                                     // filtro de plan
+  if (id_persona_usuario == '' || id_persona_usuario == 0 || id_persona_usuario == null) { id_persona_usuario = ""; nombre_id_persona_usuario = ""; }                                     // filtro de plan
+  if (fecha_inicio_periodo == '' || fecha_inicio_periodo == 0 || fecha_inicio_periodo == null) { fecha_inicio_periodo = ""; nombre_fecha_inicio_periodo = ""; }  // filtro de zona antena
+  if (fecha_fin_periodo == '' || fecha_fin_periodo == 0 || fecha_fin_periodo == null) { fecha_fin_periodo = ""; nombre_fecha_fin_periodo = ""; }  // filtro de zona antena
+
+  state.tipo_compra= tipoestandar_all;
+  state.fecha_inicio_periodo= fecha_inicio_periodo;
+  state.fecha_fin_periodo= fecha_fin_periodo;
+  state.estado_homologacion= estado_homologacion;
+  state.id_proveedor= id_proveedor;
+  state.id_persona_usuario= id_persona_usuario;
+
+  tabla_principal_cargar();
+
 }
 
-$(document)
-  .off('change.filtros')
-  .on('change.filtros', `
-    #tipo_compra,
-    #fecha_inicio_periodo,
-    #fecha_fin_periodo,
-    #estado_homologacion,
-    #id_proveedor,
-    #id_persona_usuario
-  `, function () {
-
-    if (!filtrosInicializados) return; // ⛔ ignora cambios iniciales
-
-    actualizarFiltros();
-  });
-
-function limpiarFiltro(nombre) {
-  switch (nombre) {
-    case 'tipo_compra':
-      $('#tipo_compra').val(null).trigger('change');
-      state.tipo_compra = null;
-      break;
-
-    case 'fecha_inicio_periodo':
-      $('#fecha_inicio_periodo').val('');
-      state.fecha_inicio_periodo = null;
-      break;
-
-    case 'fecha_fin_periodo':
-      $('#fecha_fin_periodo').val('');
-      state.fecha_fin_periodo = null;
-      break;
-
-    case 'estado_homologacion':
-      $('#estado_homologacion').val(null).trigger('change');
-      state.estado_homologacion = null;
-      break;
-
-    case 'id_proveedor':
-      $('#id_proveedor').val(null).trigger('change');
-      state.id_proveedor = null;
-      break;
-
-    case 'id_persona_usuario':
-      $('#id_persona_usuario').val(null).trigger('change');
-      state.id_persona_usuario = null;
-      break;
+function limpiarFiltro(nombre) { 
+  switch (nombre) { 
+    case 'tipo_compra': $('#tipo_compra').val(null).trigger('change'); state.tipo_compra = null; break; 
+    case 'fecha_inicio_periodo': $('#fecha_inicio_periodo').val(''); state.fecha_inicio_periodo = null; break; 
+    case 'fecha_fin_periodo': $('#fecha_fin_periodo').val(''); state.fecha_fin_periodo = null; break; 
+    case 'estado_homologacion': $('#estado_homologacion').val(null).trigger('change'); state.estado_homologacion = null; break; 
+    case 'id_proveedor': $('#id_proveedor').val(null).trigger('change'); state.id_proveedor = null; break; 
+    case 'id_persona_usuario': $('#id_persona_usuario').val(null).trigger('change'); state.id_persona_usuario = null; break; 
   }
 
-  solicitarRecarga(true); // ✅ UNA SOLA VEZ
-}
+  }
+//tabla_principal_cargar();
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 // ═══════                                       S E C C I O N   C R U D   P R O V E E D O R                                                        ═══════
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -553,7 +522,7 @@ function lista_homologaciones(idpersona, nombre_razonsocial, email) {
 
 
   $("#idproveedor").val(idpersona);
-  $(".Nombre_inicial").html(`Proveedor <span class="text-principal hove-negrita"> : ${nombre_razonsocial} </span>`);
+ 
   $(".mostrar_documento_pdf").show();
   $(".tbl_lista_documento_hmolog").hide();
 
@@ -737,9 +706,12 @@ function ver_editar_periodo_h(id,tipo) {
 
 }
 
-function ver_documentos_x_homologacion(id, descripcion) {
+function ver_documentos_x_homologacion(id, descripcion,proveedor) {
+  show_hide_escenario(2);
     idfechaperso_homol_edit = id;
     descrp_homol_edit = descripcion;
+
+  $(".Nombre_inicial").html(`Homologación de <span class="text-principal hove-negrita"> : ${proveedor} </span>`);
 
   $(".text_nombre_periodo_homol").text(`${descripcion}`);
   $(".tbl_lista_documentos").html('<tr><td colspan="10" class="text-center text-muted"><i class="fas fa-sync-alt fa-spin"></i> Cargando ...</td></tr>');
@@ -855,6 +827,96 @@ function ver_documentos_x_homologacion(id, descripcion) {
     }
   }).fail(function (xhr) { ver_errores(xhr);  });
 }
+
+// ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+// ═══════                                       S E C C I O N   DESCARGAR INDIVIDUAL Y MASIVO                                                   ═══════
+// ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+function getCookie(name) {
+    return document.cookie
+        .split('; ')
+        .find(row => row.startsWith(name + '='))
+        ?.split('=')[1];
+}
+
+function deleteCookie(name) {
+    document.cookie = name + '=; Max-Age=0; path=/';
+}
+
+function descargar_docs_x_homologacion(id_homologacion, tipo_estandar, proveedor) {
+
+    if (!id_homologacion) {
+        alert('Homologación no válida');
+        return;
+    }
+
+    const url = `${BASE_URL}/homologaciones/descargar-documentos/${id_homologacion}`;
+    const cookieName = 'descarga_homologacion_ok';
+
+    // referencias a íconos de ESTA fila
+    const $btnDescargar = $(`.descargar_funcion_${id_homologacion}`);
+    const $spinner = $(`.reload_funcion_${id_homologacion}`);
+
+    // limpiar cookie previa
+    deleteCookie(cookieName);
+
+    // UI: ocultar descarga, mostrar spinner
+    $btnDescargar.addClass('hidden');
+    $spinner.removeClass('hidden');
+
+    // iniciar descarga
+    window.location.href = url;
+
+    // esperar señal del backend
+    const interval = setInterval(() => {
+
+        if (getCookie(cookieName)) {
+
+            clearInterval(interval);
+            deleteCookie(cookieName);
+
+            // UI: restaurar íconos
+            $spinner.addClass('hidden');
+            $btnDescargar.removeClass('hidden');
+        }
+
+    }, 200);
+
+    // ⛑️ respaldo de seguridad (por si algo falla)
+    setTimeout(() => {
+        $spinner.addClass('hidden');
+        $btnDescargar.removeClass('hidden');
+    }, 4000);
+}
+
+function descarga_masiva_homologaciones() {
+
+    // copiar solo filtros relevantes
+    const filtros = {
+        tipo_compra: state.tipo_compra,
+        fecha_inicio_periodo: state.fecha_inicio_periodo,
+        fecha_fin_periodo: state.fecha_fin_periodo,
+        estado_homologacion: state.estado_homologacion,
+        id_proveedor: state.id_proveedor,
+        id_persona_usuario: state.id_persona_usuario,
+        q: state.q
+    };
+
+    // limpiar null / undefined
+    Object.keys(filtros).forEach(k => {
+        if (filtros[k] === null || filtros[k] === '') {
+            delete filtros[k];
+        }
+    });
+
+    const params = new URLSearchParams(filtros).toString();
+
+    const url = `${BASE_URL}/homologaciones/descarga-masiva?${params}`;
+
+    //$('#loader-descarga').fadeIn(150);
+    //window.location.href = url;
+    window.open(url, '_blank'); // 👈 nueva pestaña
+}
+
 
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 // ═══════                                       S E C C I O N   ACTUALIZAR ESTADO                                                    ═══════

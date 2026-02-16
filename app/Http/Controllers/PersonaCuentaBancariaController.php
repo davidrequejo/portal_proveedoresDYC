@@ -12,13 +12,49 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NotificacioncuentaBancariaLogisticaMail;
+use App\Traits\RegistraLogCompleto; // 👈 1. IMPORTAR
 
 class PersonaCuentaBancariaController extends Controller
 {
+    use RegistraLogCompleto;   // 👈 2. USAR EL TRAIT
     /*public function index(Request $r)
     {
         return view('PersonaCuentaBancaria');
     }*/
+
+    public function getConfigLog($tabla)
+    {
+        $configs = [
+            // ... tu configuración de 'persona' ...
+            
+            // 🔥 NUEVA CONFIGURACIÓN PARA CUENTAS BANCARIAS
+            'persona_cuentabancaria' => [
+                'labels' => [
+                    'idbanco'              => 'Banco',
+                    'banco_nombre'         => 'Banco',      // Campo virtual
+                    'banco_ids10'          => 'Código S10', // Campo virtual
+                    'tipocuenta'           => 'Tipo Cuenta',
+                    'moneda'               => 'Moneda',
+                    'numero_cuenta'        => 'N° Cuenta',
+                    'numero_cuenta_abono'  => 'N° Cuenta Abono',
+                    'cuenta_interbancaria' => 'CCI',
+                    'predeterminado'       => 'Predeterminado',
+                ],
+                'formatters' => [
+                    'idbanco'        => 'banco_completo',
+                    'tipocuenta'     => 'tipo_cuenta',
+                    'moneda'         => 'moneda_simbolo',
+                    'predeterminado' => 'booleano_si_no',
+                    'numero_cuenta'  => 'cuenta_bancaria',
+                    'numero_cuenta_abono' => 'cuenta_bancaria',
+                    'cuenta_interbancaria' => 'cci',
+                ],
+                'ignorar' => ['updated_at', 'user_updated', 'created_at', 'user_created']
+            ],
+        ];
+        
+        return $configs[$tabla] ?? ['labels' => [], 'formatters' => []];
+    }
 
     /* =========================
      * CREAR
@@ -56,33 +92,17 @@ class PersonaCuentaBancariaController extends Controller
                 'user_created'         => auth()->id() ?? null,
             ]);
 
-            /* ================== LOG ================== */
-            $labels = [
-                'idbanco'              => 'idbanco',
-                'tipocuenta'           => 'tipocuenta',
-                'moneda'               => 'moneda',
-                'numero_cuenta'        => 'numero_cuenta',
-                'numero_cuenta_abono'  => 'numero_cuenta_abono',
-                'cuenta_interbancaria' => 'cuenta_interbancaria',
-                'predeterminado'       => 'predeterminado',
-            ];
+            // Cargar relación con banco
+            $cuenta->load('banco');
 
-            $observacion = '';
+            // Guardar snapshot
+            $this->registrarSnapshot(
+                $cuenta,
+                'persona_cuentabancaria',
+                $cuenta->idpersona_cuentabancaria,
+                'REGISTRO_INICIAL_CUENTA_BANCARIA'
+            );
 
-            foreach ($labels as $campo => $label) {
-                if (isset($cuenta->$campo)) {
-                    $observacion .= $label . ' : ' . ($cuenta->$campo ?? '-') . "\n";
-                }
-            }
-
-            Logbd::create([
-                'nombre_tabla'     => 'persona_cuentabancaria',
-                'id_registrotabla' => $cuenta->idpersona_cuentabancaria,
-                'id_user'          => auth()->id(),
-                'observacion'      => trim($observacion),
-                'accion_realizada' => 'Registro Nuevo',
-                'user_created'     => auth()->id(),
-            ]);
 
             //obtenermos clieente o proveedor
             $cliente_proveedor = Persona::findOrFail($cuenta->idpersona);
@@ -154,33 +174,26 @@ class PersonaCuentaBancariaController extends Controller
 
             // Obtener valores después de la actualización
             $cambios = $cuenta->getChanges();
-            
-            $labels = [
-                'idbanco'              => 'idbanco',
-                'tipocuenta'           => 'tipocuenta',
-                'moneda'               => 'moneda',
-                'numero_cuenta'        => 'numero_cuenta',
-                'numero_cuenta_abono'  => 'numero_cuenta_abono',
-                'cuenta_interbancaria' => 'cuenta_interbancaria',
-                'predeterminado'       => 'Predeterminado',
-            ];
-            $observacion = '';
 
-            foreach ($cambios as $campo => $valor) {
-                if (!isset($labels[$campo])) { continue; }
-                if (in_array($campo, ['updated_at', 'user_updated'])) { continue; }
-                $observacion .= $labels[$campo] . ' : ' . ($valor ?? '-') . "\n";
-            }
+            // Solo proceder si hubo cambios reales
+            if (!empty($cambios)) {
+                // Cargar relación con banco
+                $cuenta->load('banco');
 
-            if (trim($observacion) !== '') {
-                Logbd::create([
-                    'nombre_tabla'     => 'persona_cuentabancaria',
-                    'id_registrotabla' => $cuenta->idpersona_cuentabancaria,
-                    'id_user'          => auth()->id(),
-                    'observacion'      => trim($observacion),
-                    'accion_realizada' => 'Registro Actualizado',
-                    'user_created'     => auth()->id(),
-                ]);
+                // 🔥 AGREGAR CAMPOS VIRTUALES PARA EL LOG (solo si hay cambios)
+                $cambios['idbanco'] = $cuenta->idbanco;
+
+                // También podrías agregar otros campos virtuales si los necesitas
+                // $cambios['banco_nombre'] = $cuenta->banco?->nombre;
+                // $cambios['banco_ids10'] = $cuenta->banco?->codigo_bank_s10;
+
+                $this->registrarCambios(
+                    $cuenta,
+                    'persona_cuentabancaria',
+                    $cuenta->idpersona_cuentabancaria,
+                    $cambios,
+                    'ACTUALIZAR'
+                );
             }
 
 
@@ -230,21 +243,22 @@ class PersonaCuentaBancariaController extends Controller
                 'user_delete'  => auth()->id() ?? null,
             ]);
 
-            /* ================== OBSERVACIÓN ================== */
-            $observacion = "idbanco : {$cuenta->idbanco}\n";
-            $observacion .= "tipocuenta : {$cuenta->tipocuenta}\n";
-            $observacion .= "moneda : {$cuenta->moneda}\n";
-            $observacion .= "numero_cuenta : {$cuenta->numero_cuenta}";
+            $cambios = $cuenta->getChanges();
 
-            /* ================== LOG ================== */
-            Logbd::create([
-                'nombre_tabla'     => 'persona_cuentabancaria',
-                'id_registrotabla' => $cuenta->idpersona_cuentabancaria,
-                'id_user'          => auth()->id(),
-                'observacion'      => $observacion,
-                'accion_realizada' => 'Registro Eliminado',
-                'user_created'     => auth()->id(),
-            ]);
+            // Cargar relación con banco
+            $cuenta->load('banco');
+
+            // 🔥 AGREGAR CAMPOS VIRTUALES PARA EL LOG (solo si hay cambios)
+            $cambios['idbanco'] = $cuenta->idbanco;
+
+
+            $this->registrarCambios(
+                $cuenta,
+                'persona_cuentabancaria',
+                $cuenta->idpersona_cuentabancaria,
+                $cambios,
+                'ELIMINADO'
+            );
 
 
             //obtenermos clieente o proveedor

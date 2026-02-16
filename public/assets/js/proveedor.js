@@ -155,10 +155,10 @@ function renderFilas(rows){
       <tr class="fila-proyecto" data-id="${r.idpersona}">          
         <td class="py-1"> 
           <div class="btn-group btn-group-sm">
-            <button class="btn btn-xs text-nowrap bnt-editar-proyecto" onclick="ver_editar_proveedor(${r.idpersona})" data-toggle="tooltip" data-original-title="Editar"> <i class="fas fa-pencil-alt color_icon_opt"></i></button>
-            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="lista_homologaciones(${r.idpersona}, '${r.nombre_razonsocial ?? ''}','${r.email ?? ''}')" data-toggle="tooltip" data-original-title="Homologaciones"><i class="fas fa-folder fa-0 color_icon_opt"></i></button>
-            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="eliminar_proveedor(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')" data-toggle="tooltip" data-original-title="Eliminar"><i class="fas fa-trash color_icon_opt"></i></button>
-            <button class="btn btn-xs text-nowrap" onclick="sincronizacions10(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')" data-toggle="tooltip" data-original-title="Sincronizar"><i class="fas fa-globe" style="color: #74C0FC;"></i></button>
+            <button class="btn btn-xs text-nowrap bnt-editar-proyecto" onclick="ver_editar_proveedor(${r.idpersona})" > <i class="fas fa-pencil-alt color_icon_opt"></i></button>
+            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="lista_homologaciones(${r.idpersona}, '${r.nombre_razonsocial ?? ''}','${r.email ?? ''}')" ><i class="fas fa-folder fa-0 color_icon_opt"></i></button>
+            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="eliminar_proveedor(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')"><i class="fas fa-trash color_icon_opt"></i></button>
+            <button class="btn btn-xs text-nowrap" onclick="sincronizacions10(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')" ><i class="fas fa-globe" style="color: #74C0FC;"></i></button>
           </div>
         </td>
         <td class="py-1 text-center"> ${String('000').padStart(3, '0')} </td>
@@ -444,6 +444,7 @@ function lista_homologaciones(idpersona, nombre_razonsocial, email) {
   $(".Nombre_inicial").html(`Proveedor <span class="text-principal hove-negrita"> : ${nombre_razonsocial} </span>`);
   $(".mostrar_documento_pdf").show();
   $(".tbl_lista_documento_hmolog").hide();
+  $(".show_view_btn_notificacion").hide();
 
   $(".tbl_lista_documentos").empty('');
   $(".tbl_lista_documentos_internos").empty('');
@@ -468,7 +469,7 @@ function lista_homologaciones(idpersona, nombre_razonsocial, email) {
 
         let estadoHtml = ''; let iconHtml = ''; let editar = ''; let eliminar = ''; aprobar_homologaciob='';
 
-        if (r.estado_homologacion === 'Vencida') { $('.btn_add_homologacion_show_view').show(); } else { $('.btn_add_homologacion_show_view').hide(); }
+        if (r.estado_homologacion === 'Vencida' || r.notificado_15dias=='1') { $('.btn_add_homologacion_show_view').show(); } else { $('.btn_add_homologacion_show_view').hide(); }
         console.log(r.todo_aprobado);
         
         if (r.todo_aprobado === 1) { aprobar_homologaciob='' } else { aprobar_homologaciob='hidden'}
@@ -476,8 +477,8 @@ function lista_homologaciones(idpersona, nombre_razonsocial, email) {
         switch (r.estado_homologacion) {
             case 'No Iniciado': estadoHtml = `<span class="badge bg-warning text-white">No Iniciada</span>`; iconHtml='<i class="fas fa-check-circle text-warning"></i>'; editar =''; eliminar ='';  break;
             case 'Vigente': estadoHtml = `<span class="badge badge-new text-white">Vigente</span>`; iconHtml='<i class="fas fa-check-circle text-principal"></i>'; editar ='hidden'; eliminar ='hidden'; break;
-            case 'Vencida': estadoHtml = `<span class="badge bg-secondary text-white">Vencida</span>`; iconHtml='<i class="fas fa-check-circle text-secondary"></i>'; editar ='hidden'; eliminar ='hidden';break;
-            default: estadoHtml = `<span class="badge bg-danger">Pendiente.</span>`; 
+            case 'Vencido': estadoHtml = `<span class="badge bg-secondary text-white">Vencido</span>`; iconHtml='<i class="fas fa-check-circle text-secondary"></i>'; editar ='hidden'; eliminar ='hidden';break;
+            default: estadoHtml = `<span class="badge bg-danger">No Iniciada</span>`; 
         }
       
         $(".tabla-list-homolog").append(`
@@ -485,9 +486,9 @@ function lista_homologaciones(idpersona, nombre_razonsocial, email) {
             <td class="py-1"> ${String(cont++).padStart(3, '0')} </td>
             <td class="py-1"> 
               <div class="btn-group btn-group-sm">
-                <button class="btn btn-xs text-nowrap ${editar}" onclick="ver_editar_periodo_h(${r.idpersona_facha_homologacion},'editar')" data-toggle="tooltip" data-original-title="Editar"> <i class="fas fa-pencil-alt color_icon_opt"></i></button>
-                <button class="btn btn-xs text-nowrap ${eliminar}" onclick="eliminar_periodo_h(${r.idpersona_facha_homologacion}, '${r.tipo_estandar ?? ''}')" data-toggle="tooltip" data-original-title="Eliminar"><i class="fas fa-trash color_icon_opt"></i></button>
-                <button class="btn btn-xs text-nowrap ${aprobar_homologaciob}" onclick="ver_editar_periodo_h(${r.idpersona_facha_homologacion}, 'establecer_fecha_periodo')" data-toggle="tooltip" data-original-title="Estado">${iconHtml}</button>
+                <button class="btn btn-xs text-nowrap ${editar}" onclick="ver_editar_periodo_h(${r.idpersona_facha_homologacion},'editar')" > <i class="fas fa-pencil-alt color_icon_opt"></i></button>
+                <button class="btn btn-xs text-nowrap ${eliminar}" onclick="eliminar_periodo_h(${r.idpersona_facha_homologacion}, '${r.tipo_estandar ?? ''}')" ><i class="fas fa-trash color_icon_opt"></i></button>
+                <button class="btn btn-xs text-nowrap ${aprobar_homologaciob}" onclick="ver_editar_periodo_h(${r.idpersona_facha_homologacion}, 'establecer_fecha_periodo')" >${iconHtml}</button>
               </div>
             </td>
             <td class="py-1 text-nowrap" >${r.tipo_estandar} </td>
@@ -629,12 +630,16 @@ function ver_documentos_x_homologacion(id, descripcion) {
     idfechaperso_homol_edit = id;
     descrp_homol_edit = descripcion;
 
+  ver_ultimo_envio_notificacion(idfechaperso_homol_edit);
+  $(".fechayestadoenvio").html(``);
+
   $(".text_nombre_periodo_homol").text(`${descripcion}`);
   $(".tbl_lista_documentos").html('<tr><td colspan="10" class="text-center text-muted"><i class="fas fa-sync-alt fa-spin"></i> Cargando ...</td></tr>');
   $(".tbl_lista_documentos_internos").html('<tr><td colspan="10" class="text-center text-muted"><i class="fas fa-sync-alt fa-spin"></i> Cargando ...</td></tr>');
 
   $(".mostrar_documento_pdf").hide();
   $(".tbl_lista_documento_hmolog").show();
+  $(".show_view_btn_notificacion").show();
 
   var cont =1;
 
@@ -736,12 +741,74 @@ function ver_documentos_x_homologacion(id, descripcion) {
         `);
          
       });
+       
     // $("#div-ver-detalle-documentos").html(e.data);
     $('[data-toggle="tooltip"]').tooltip();
     } else {
-      alert("No se encontró el proyecto");
+      alert("No se encontró");
     }
   }).fail(function (xhr) { ver_errores(xhr);  });
+}
+
+
+function eliminar_periodo_h(id, nombres) {
+
+  Swal.fire({
+    title: "¿Está Seguro de eliminar el registro?",
+    html: `<b class="text-danger"><del>${nombres}</del></b>`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#2850a7",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Sí, eliminar!",
+  }).then((result) => {
+
+    if (result.isConfirmed) {
+
+      $.ajax({
+        url: `${BASE_URL}/eliminar_periodo_h/eliminar_eliminar_periodo_h/${id}`,
+        type: "PUT",
+        data: {
+          _token: $('meta[name="csrf-token"]').attr('content') // necesario para PUT
+        },
+        success: function (e) {
+          console.log(e);
+
+          if (e.status === true) {
+            Swal.fire("Eliminado!", "El registro ha sido eliminado.", "success");
+            lista_homologaciones(idpersona_tipo, nombre_razonsocial_tipo, email_proveedor_env_correo);
+          } else {
+            Swal.fire("Error!", e.message, "error");
+          }
+        },
+        error: function (xhr) {
+          Swal.fire("Error!", "Ocurrió un error en el servidor.", "error");
+          console.log(xhr.responseText);
+        }
+      });
+
+    }
+  });
+}
+
+function ver_ultimo_envio_notificacion(id) {
+  $.get(`${BASE_URL}/homologacion/${id}/ultimo-envio`, function(e) {
+    console.log(e);
+    
+
+      if (e.status == true) {
+         const notif = e.data[0];
+         if (e.data[0]==null) {
+          
+         }else{
+
+          $(".fechayestadoenvio").html(`<span class="badge">Fecha : <span class="text-info">${notif.fecha_envio}</span>     Estado:  <span class="text-info">${notif.estado}</span>  </span>`);
+        
+        }
+      }else{
+
+      }
+});
 }
 
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════

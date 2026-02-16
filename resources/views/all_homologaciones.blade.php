@@ -126,27 +126,10 @@
           <div class="container-fluid">
             <div class="row mb-2">
               <div class="col-sm-6">
-                <h4 class="m-0 text-black-50 Nombre_inicial">Proveedores</h4>
+                <h4 class="m-0 text-black-50 Nombre_inicial">Homologaciones </h4>
               </div><!-- /.col -->
               <div class="col-sm-6">
                 <div class="float-right">
-
-                  <div class="btn-group btn-agregar-proyecto">
-                    <button type="button" class="btn" style="border-color: #fcfcfc !important;" ><i class="fas fa-sync" style="color: #246ea2;"></i></button>
-                    <button type="button" class="btn">
-                      <i class="fas fa-bell fa-lg" style="color: #246ea2;"></i>
-                      <sup class="text-danger"><span class="badge badge-danger navbar-badge">3</span></sup>
-          
-                    </button>
-                    <button type="button" class="btn btn-primary" style="border-color: #fcfcfc !important;" data-toggle="modal" data-target="#modal-agregar-proveedor" onclick="limpiar_form_proveedor();" ><i class="ti ti-users-plus"></i> Crear nuevo</button>
-                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="border-color: #fcfcfc !important;">
-                      <span class="sr-only">Toggle Dropdown</span>
-                    </button>
-                    <div class="dropdown-menu" role="menu">
-                      <a class="dropdown-item" href="#" data-toggle="modal" data-target="#modal-agregar-proveedor-masivo"><i class="ti ti-user-up"></i> Carga Masiva</a>
-                      <div class="dropdown-divider my-0"></div>                  
-                    </div>
-                  </div>
 
                   <button type="button" class="btn btn-secondary btn-cancelar m-r-10px" onclick="show_hide_escenario(1);" style="display: none;"><i class="ri-arrow-left-line"></i> Regresar</button>
 
@@ -166,19 +149,19 @@
             <div class="row">
 
               <!-- ./col -->
-              <div class="col-12">
+              <div class="col-12 filtros">
                 <div class="card">
                   
                   <div class="card-body pb-1">
 
                     <div class="row">
 
-                      <div class="col-12 col-sm-6 col-md-3 col-lg-2">
+                      <div class="col-12 col-sm-6 col-md-3 col-lg-1">
                         <div class="form-group">
-                          <label for="descripcion"> 
+                          <label for="descripcion">
                             <span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('tipo_compra')"  ><i class="las la-sync-alt"></i></span>
-                            Tipo De Compra </label> 
-                          <select name="tipo_compra" id="tipo_compra" class="form-control fs-h-input is-valid select2" placeholder="Tipo de compra" aria-invalid="false">
+                            T. Compra </label> 
+                          <select name="tipo_compra" id="tipo_compra" class="form-control fs-h-input is-valid select2" placeholder="Tipo de compra" aria-invalid="false"  onchange="cargando_search(); delay(function(){filtros()}, 50 );">
                           </select>
                         </div>
                       </div>
@@ -186,21 +169,21 @@
                       <div class="col-12 col-sm-6 col-md-2 col-lg-2">
                         <div class="form-group">
                           <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('fecha_inicio_periodo')" ><i class="las la-sync-alt"></i></span> Inicio Periodo</label>                          
-                          <input type="date" name="fecha_inicio_periodo" class="form-control fs-h-input" id="fecha_inicio_periodo" />
+                          <input type="date" name="fecha_inicio_periodo" class="form-control fs-h-input" id="fecha_inicio_periodo" onchange="cargando_search(); delay(function(){filtros()}, 50 );"/>
                         </div>
                       </div>
 
                       <div class="col-12 col-sm-6 col-md-2 col-lg-2">
                         <div class="form-group">
                           <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('fecha_fin_periodo')" ><i class="las la-sync-alt"></i></span> Fin Periodo</label>    
-                          <input type="date" name="fecha_fin_periodo" class="form-control fs-h-input" id="fecha_fin_periodo" />                      
+                          <input type="date" name="fecha_fin_periodo" class="form-control fs-h-input" id="fecha_fin_periodo" onchange="cargando_search(); delay(function(){filtros()}, 50 );" />                      
                         </div>
                       </div>
 
                       <div class="col-12 col-sm-6 col-md-2 col-lg-2">
                         <div class="form-group">
                           <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('estado_homologacion')" ><i class="las la-sync-alt"></i></span> Estado Proceso</label>                          
-                          <select name="estado_homologacion" id="estado_homologacion" class="form-control fs-h-input is-valid select2" placeholder="Estado" aria-invalid="false">
+                          <select name="estado_homologacion" id="estado_homologacion" class="form-control fs-h-input is-valid select2" placeholder="Estado" aria-invalid="false"  onchange="cargando_search(); delay(function(){filtros()}, 50 );">
                           </select>
                         </div>
                       </div>
@@ -208,16 +191,22 @@
                       <div class="col-12 col-sm-6 col-md-2 col-lg-2">
                         <div class="form-group">
                           <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('id_proveedor')" ><i class="las la-sync-alt"></i></span> Proveedor</label>                          
-                          <select name="id_proveedor" id="id_proveedor" class="form-control fs-h-input is-valid select2" placeholder="Proveedor" aria-invalid="false">
+                          <select name="id_proveedor" id="id_proveedor" class="form-control fs-h-input is-valid select2" placeholder="Proveedor" aria-invalid="false"  onchange="cargando_search(); delay(function(){filtros()}, 50 );"> 
                           </select>
                         </div>
                       </div>
                       <div class="col-12 col-sm-6 col-md-2 col-lg-2">
                         <div class="form-group">
                           <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('id_persona_usuario')" ><i class="las la-sync-alt"></i></span> Comprador</label>                          
-                          <select name="id_persona_usuario" id="id_persona_usuario" class="form-control fs-h-input is-valid select2" placeholder="Comprador" aria-invalid="false">
+                          <select name="id_persona_usuario" id="id_persona_usuario" class="form-control fs-h-input is-valid select2" placeholder="Comprador" aria-invalid="false"  onchange="cargando_search(); delay(function(){filtros()}, 50 );">
                           </select>
                         </div>
+                      </div>
+                      <div class="col-12 col-sm-6 col-md-2 col-lg-1">
+                        <label for="descripcion" class="text-white">.<span class="badge bg-info m-r-4px badge-new cursor-pointer"></label>
+                        <a type="button" class="btn btn-info btn-block btn-flat btn-sm" onclick="descarga_masiva_homologaciones();" >                          
+                          <i class="fas fa-cloud-download-alt"></i>
+                          Descargar</a>
                       </div>
 
                     </div>
@@ -289,7 +278,7 @@
                 <!-- Tabla de homologaciones y periodos -->
                 <div class="row verdocumentosxhomologacion">
 
-                  <div class="col-xs-12 col-sm-6 col-lg-6 ">
+                  <div class="col-xs-12 col-sm-6 col-lg-6 hidden">
                     <div class="card">
                       <div class="card-header border-0 ">
                               
@@ -329,7 +318,7 @@
                   <div class="col-xs-12 col-sm-6 col-lg-6 ">
                     <div class="card">
                       <div class="card-header border-0">
-                        <h3 class="card-title m-2 font-weight-bold text-principal">Lista de Documentos : <span class="text_nombre_periodo_homol" style="color: #ff0000 !important;"></span> </h3>
+                        <h3 class="card-title m-2 font-weight-bold text-principal">Documentos Por Verificar </h3>
                         <div class="card-tools m-2"></div>
                       </div>
                       <div class="card-body mostrar_documento_pdf">
@@ -340,10 +329,9 @@
                         </div>
                       </div>
 
-                      <!--DOCUMENTOS INTERNOS-->
+                      <!--DOCUMENTOS Estandar-->
 
                       <div class="card-body table-responsive tbl_lista_documento_hmolog" style="display:none;">
-                        <h6 class="text-principal">Ducumentos Por Verificar</h6>
                         <table class="table table-striped table-hover styletabla">
                           <thead>
                           <tr>
@@ -358,9 +346,37 @@
                           </tbody>
 
                         </table>
-                        <br>
+                        
 
-                        <h6 class="text-principal">Ducumentos Internos</h6>
+                      </div>
+
+                      <div class="modal-footer justify-content-end">
+                        <span class="text-danger spiner_enviando_correo" style="display: none"> <sup>*</sup> <i class="fas fa-sync fa-spin"></i> Enviendo... </span>
+                        <button type="button" class="btn btn-xs btn-outline-secondary enviar_coreo_notificacion_proveeor" onclick="enviar_correo_notificacion();">  <i class="fas fa-mail-bulk fa-lg"></i> Enviar Notificación</button>
+                      </div>
+                    </div>
+                    <!-- /.card -->
+                  </div>
+                  <!-- /.col-md-6 -->
+
+                  
+                  <div class="col-xs-12 col-sm-6 col-lg-6 ">
+                    <div class="card">
+                      <div class="card-header border-0">
+                        <h3 class="card-title m-2 font-weight-bold text-principal">Documentos Internos </h3>
+                        <div class="card-tools m-2"></div>
+                      </div>
+                      <div class="card-body mostrar_documento_pdf">
+                        <div class="alert alert-dismissible bg-color-principal text-white">
+                          <button type="button" class="close" data-dismiss="alert" aria-hidden="true" disabled></button>
+                          <h5><i class="icon fas fa-info"></i> Sin vista previa!</h5>
+                          Para visualizar un documento, haga clic en el ícono <i class="fas fa-eye"></i> ubicado en la fila correspondiente de la tabla del lado izquierdo
+                        </div>
+                      </div>
+
+                      <!--DOCUMENTOS Estandar-->
+
+                      <div class="card-body table-responsive tbl_lista_documento_hmolog" style="display:none;">
 
                         <table class="table table-striped table-hover styletabla ">
                           <thead>
@@ -376,11 +392,6 @@
                           </tbody>
                         </table>
 
-                      </div>
-
-                      <div class="modal-footer justify-content-end">
-                        <span class="text-danger spiner_enviando_correo" style="display: none"> <sup>*</sup> <i class="fas fa-sync fa-spin"></i> Enviendo... </span>
-                        <button type="button" class="btn btn-xs btn-outline-secondary enviar_coreo_notificacion_proveeor" onclick="enviar_correo_notificacion();">  <i class="fas fa-mail-bulk fa-lg"></i> Enviar Notificación</button>
                       </div>
                     </div>
                     <!-- /.card -->
@@ -915,7 +926,7 @@
 
 
  
-  <script src="{{ asset('assets/js/all_homologaciones.js') }}?version_erp=01.06"></script>
+  <script src="{{ asset('assets/js/all_homologaciones.js') }}?version_erp=01.07"></script>
 
   <script>
     $(function() {

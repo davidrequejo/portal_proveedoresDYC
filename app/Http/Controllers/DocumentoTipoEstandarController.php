@@ -89,7 +89,7 @@ class DocumentoTipoEstandarController extends Controller
 
           // Validación
           $r->validate([
-              'descripcion_docs' => 'required|string|max:45',
+              'descripcion_docs' => 'required|string',
               'tipo_plantilla'   => 'string',
           ]);
 

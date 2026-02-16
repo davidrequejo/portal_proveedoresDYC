@@ -42,7 +42,7 @@
                 <tr>
                     <td style="padding:30px;">
 
-                        <p>Hola, equipo de Logística.</p>
+                        <p>Hola, equipo.</p>
 
                         <p style="line-height:1.5;">
                             Se registró una actualización de cuenta bancaria con el siguiente detalle:

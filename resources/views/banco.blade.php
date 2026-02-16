@@ -96,8 +96,8 @@
                 <div class="float-right">
 
                   <div class="btn-group btn-agregar-banco">
-                    <button type="button" class="btn btn-success" style="border-color: #2e6da4 !important;" data-toggle="modal" data-target="#modal-agregar-banco" onclick="limpiar_form_tipoestandar();" ><i class="fas fa-plus-circle"></i> Crear nuevo</button>
-                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" style="border-color: #2e6da4 !important;">
+                    <button type="button" class="btn btn-primary" style="border-color: #2e6da4 !important;" data-toggle="modal" data-target="#modal-agregar-banco" onclick="limpiar_form_banco();" ><i class="fas fa-plus-circle"></i> Crear nuevo</button>
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="border-color: #2e6da4 !important;">
                       <span class="sr-only">Toggle Dropdown</span>
                     </button>
                     <div class="dropdown-menu" role="menu">
@@ -132,7 +132,7 @@
                   <div class="card-body pb-1">
                     <div class="row mb-2">                    
                       <div class="col">
-                        <input type="search" id="buscar" class="form-control form-control-sm" placeholder="Buscar proyecto...">
+                        <input type="search" id="buscar" class="form-control form-control-sm" placeholder="Buscar...">
                       </div>
                       <div class="col-auto">
                         <select id="perPage" class="form-select form-select-sm">
@@ -144,7 +144,7 @@
                         </select>
                       </div>
                       <div class="col-auto">
-                        <button type="button" class="btn btn-sm btn-outline-info recargar-tabla-proyecto" data-toggle="tooltip" data-original-title="Recargar tabla" ><i class="ti ti-refresh"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-info recargar-tabla-banco" data-toggle="tooltip" data-original-title="Recargar tabla" ><i class="ti ti-refresh"></i></button>
                       </div>
                     </div>
                     
@@ -186,7 +186,7 @@
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
               <div class="modal-content">
                 <div class="modal-header py-2">
-                  <h4 class="modal-title">Tipo Estandar</h4>
+                  <h4 class="modal-title">Bancos</h4>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span class="text-danger" aria-hidden="true">&times;</span>
                   </button>
@@ -268,7 +268,7 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/banco.js') }}?version_erp=01.06"></script>
+  <script src="{{ asset('assets/js/banco.js') }}?version_erp=01.07"></script>
 
   <script>
     $(function() {

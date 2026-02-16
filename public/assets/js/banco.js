@@ -62,21 +62,21 @@ function renderFilas(rows){
 
     $tb.append(`
       <tr class="fila-banco" data-id="${r.idbanco}">
-        <td>
+        <td class="py-1 text-center">
           <div class="btn-group btn-group-sm">
-            <button class="btn btn-warning" onclick="ver_editar_banco(${r.idbanco})">
-              <i class="ti ti-edit"></i>
+            <button class="btn" onclick="ver_editar_banco(${r.idbanco})">
+              <i class="fas fa-pencil-alt color_icon_opt"></i>
             </button>
-            <button class="btn btn-danger" onclick="eliminar_banco(${r.idbanco}, '${r.descripcion}')">
-              <i class="ti ti-trash"></i>
+            <button class="btn " onclick="eliminar_banco(${r.idbanco}, '${r.descripcion}')">
+              <i class="fas fa-trash color_icon_opt"></i>
             </button>
           </div>
         </td>
-        <td class="text-center">${String(r.idbanco).padStart(3,'0')}</td>
-        <td>${r.codigo_bank_s10}</td>
-        <td>${r.descripcion}</td>
-        <td>${r.abreviatura ?? ''}</td>
-        <td>${estado}</td>
+        <td class="py-1 text-center">${String(r.idbanco).padStart(3,'0')}</td>
+        <td class="py-1 text-center">${r.codigo_bank_s10}</td>
+        <td class="py-1">${r.descripcion}</td>
+        <td class="py-1 ">${r.abreviatura ?? ''}</td>
+        <td class="py-1 text-center">${estado}</td>
       </tr>
     `);
   });
@@ -135,7 +135,7 @@ $("#perPage").on("change", function(){
 // Carga inicial
 tabla_principal_cargar_banco();
 
-$(".recargar-tabla-proyecto").on("click", function(){
+$(".recargar-tabla-banco").on("click", function(){
   toastr_info('<i class="ti ti-checks"></i> Actualizando...', 'Los datos se estan actualizado', 500);
   $("#tabla-bancos tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');    
 

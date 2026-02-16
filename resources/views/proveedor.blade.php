@@ -132,12 +132,6 @@
                 <div class="float-right">
 
                   <div class="btn-group btn-agregar-proyecto">
-                    <button type="button" class="btn" style="border-color: #fcfcfc !important;" ><i class="fas fa-sync" style="color: #246ea2;"></i></button>
-                    <button type="button" class="btn">
-                      <i class="fas fa-bell fa-lg" style="color: #246ea2;"></i>
-                      <sup class="text-danger"><span class="badge badge-danger navbar-badge">3</span></sup>
-          
-                    </button>
                     <button type="button" class="btn btn-primary" style="border-color: #fcfcfc !important;" data-toggle="modal" data-target="#modal-agregar-proveedor" onclick="limpiar_form_proveedor();" ><i class="ti ti-users-plus"></i> Crear nuevo</button>
                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="border-color: #fcfcfc !important;">
                       <span class="sr-only">Toggle Dropdown</span>
@@ -279,7 +273,7 @@
                       <!--DOCUMENTOS INTERNOS-->
 
                       <div class="card-body table-responsive tbl_lista_documento_hmolog" style="display:none;">
-                        <h6 class="text-principal">Ducumentos Por Verificar</h6>
+                        <h6 class="text-principal">Documentos Por Verificar</h6>
                         <table class="table table-striped table-hover styletabla">
                           <thead>
                           <tr>
@@ -296,7 +290,7 @@
                         </table>
                         <br>
 
-                        <h6 class="text-principal">Ducumentos Internos</h6>
+                        <h6 class="text-principal">Documentos Internos</h6>
 
                         <table class="table table-striped table-hover styletabla ">
                           <thead>
@@ -313,10 +307,14 @@
                         </table>
 
                       </div>
-
-                      <div class="modal-footer justify-content-end">
-                        <span class="text-danger spiner_enviando_correo" style="display: none"> <sup>*</sup> <i class="fas fa-sync fa-spin"></i> Enviendo... </span>
-                        <button type="button" class="btn btn-xs btn-outline-secondary enviar_coreo_notificacion_proveeor" onclick="enviar_correo_notificacion();">  <i class="fas fa-mail-bulk fa-lg"></i> Enviar Notificación</button>
+                      <div class=" show_view_btn_notificacion hidden">
+                        <div class="modal-footer justify-content-end">
+                          <span class="text-principal fechayestadoenvio"></span>
+                          <span class="text-danger spiner_enviando_correo" style="display: none"><i class="fas fa-sync fa-spin"></i> Enviendo... </span>
+                          <button type="button" class="btn btn-xs btn-outline-secondary enviar_coreo_notificacion_proveeor" onclick="enviar_correo_notificacion();">  <i class="fas fa-mail-bulk fa-lg"></i> Enviar Notificación</button>
+                          
+                        
+                        </div>
                       </div>
                     </div>
                     <!-- /.card -->
@@ -327,6 +325,65 @@
 
                 
               </div>
+
+              <!--SINCRONIZACION CON EL S10--->
+              <div class="col-lg-12" id="div-ver-detalle-datos_sincronizacion" >
+                <div class="card">
+                  
+                  <div class="card-body pb-1">
+                    <div class="row mb-2">                    
+
+                      <div class="col-12  col-lg-6">
+                        <table class="table table-bordered table-hover styletabla" id="tabla-datos">
+                          <thead>
+                            <tr>                        
+                              <th style="padding: 8px 10px;">Acciones</th>
+                              <th data-sort="codigo"      class="sortable" style="padding: 8px 10px;">Código S10</th>
+                              <th data-sort="nombre_razonsocial" class="sortable" style="padding: 8px 10px;">Razón social</th>
+                              <th data-sort="tipo_entidad_sunat"     class="sortable" style="padding: 8px 10px;">Tipo Entidad </th>
+                              <th data-sort="abreviatura"     class="sortable" style="padding: 8px 10px;">Tipo de Doc.</th>
+                              <th data-sort="numero_documento"class="sortable" style="padding: 8px 10px;">Nro de Doc.</th>
+                              <th data-sort="celular"   class="sortable" style="padding: 8px 10px;">Teléfono</th>
+                              <th data-sort="email"       class="sortable" style="padding: 8px 10px;">Email</th>
+                              <th data-sort="direccion" class="sortable" style="padding: 8px 10px;">Dirección</th>
+                            </tr>
+                          </thead>
+                          <tbody>                     
+                          </tbody>
+                        </table>
+
+                      </div>
+                      <div class="col-12 col-lg-6">
+                        <table class="table table-bordered table-hover styletabla" id="tabla-cuentas_bancarias">
+                          <thead>
+                            <tr>                        
+                              <th style="padding: 8px 10px;">Acciones</th>
+                              <th data-sort="codigo"      class="sortable" style="padding: 8px 10px;">Código S10</th>
+                              <th data-sort="nombre_razonsocial" class="sortable" style="padding: 8px 10px;">Razón social</th>
+                              <th data-sort="tipo_entidad_sunat"     class="sortable" style="padding: 8px 10px;">Tipo Entidad </th>
+                              <th data-sort="abreviatura"     class="sortable" style="padding: 8px 10px;">Tipo de Doc.</th>
+                              <th data-sort="numero_documento"class="sortable" style="padding: 8px 10px;">Nro de Doc.</th>
+                              <th data-sort="celular"   class="sortable" style="padding: 8px 10px;">Teléfono</th>
+                              <th data-sort="email"       class="sortable" style="padding: 8px 10px;">Email</th>
+                              <th data-sort="direccion" class="sortable" style="padding: 8px 10px;">Dirección</th>
+                            </tr>
+                          </thead>
+                          <tbody>                     
+                          </tbody>
+                        </table>
+
+                      </div>
+
+
+                    </div>
+
+
+                  </div>
+
+                </div>
+              </div>
+
+
             </div>
             <!-- /.row -->
             
@@ -851,8 +908,8 @@
 
 
  
-  <script src="{{ asset('assets/js/proveedor.js') }}?version_erp=01.06"></script>
-  <script src="{{ asset('assets/js/proveedor_carga_masiva.js') }}?version_erp=01.06"></script>
+  <script src="{{ asset('assets/js/proveedor.js') }}?version_erp=01.07"></script>
+  <script src="{{ asset('assets/js/proveedor_carga_masiva.js') }}?version_erp=01.07"></script>
 
   <script>
     $(function() {

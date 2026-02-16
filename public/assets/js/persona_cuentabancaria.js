@@ -8,7 +8,7 @@ lista_select2(`${BASE_URLl}/select2/bancos`, '#idbanco');
 
 $("#idbanco").select2({ theme: "bootstrap4", placeholder: "Selec. Banco", allowClear: true, });
 
-$("#tipocuenta").select2({ theme: "bootstrap4", placeholder: "Tipo Cuenta", allowClear: true, });
+$("#tipocuenta").select2({ theme: "bootstrap4", placeholder: "Selecccionar", allowClear: true, });
 
 $("#moneda").select2({ theme: "bootstrap4", placeholder: "Selec. moneda", allowClear: true, });
 $("#predeterminado").select2({ theme: "bootstrap4", placeholder: "Selec. si es predeterminado", allowClear: true, });
@@ -179,10 +179,10 @@ $(".recargar-tabla-proyecto").on("click", function(){
 
 function limpiar_form_banco(){
   $("#idpersona_cuentabancaria").val('');
-  $("#idbanco").val('');
-  $("#tipocuenta").val('');
-  $("#moneda").val('');
-  $("#predeterminado").val('');
+  $("#idbanco").val('').trigger('change');
+  $("#tipocuenta").val('').trigger('change');
+  $("#moneda").val('').trigger('change');
+  $("#predeterminado").val('').trigger('change');
   $("#numero_cuenta").val('');
   $("#cuenta_interbancaria").val('');
 

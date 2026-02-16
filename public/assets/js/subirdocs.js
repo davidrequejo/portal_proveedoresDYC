@@ -62,7 +62,7 @@ function lista_periodos_homologacion() {
                 <button class="btn btn-secondary text-nowrap " onclick="verdocumentos(${r.idpersona_facha_homologacion}, '${r.descripcion}')" data-toggle="tooltip" data-original-title="Ver Documentos">Ver Documentos <i class="far fa-eye"></i></button>
               </div>            
             </td>
-            <td class="py-1 text-nowrap" >${r.descripcion}</td>
+            <td class="py-1" >${r.descripcion}</td>
             <td class="py-1 text-nowrap" >${r.fecha_inicio_proceso}</td>
             <td class="py-1 text-nowrap" >${r.fecha_fin_periodo_h ??'Por Asignar'}</td>
             <td class="py-1 text-nowrap" >${r.fecha_inicio_periodo_h??'Por Asignar'}</td>            
@@ -222,7 +222,7 @@ function ver_estados_docs_proveedor(idpersona_facha_homologacion) {
         $(".tbl_lista_documentos").append(`
           <tr>
             <td class="py-1 text-center"> ${String(cont++).padStart(3, '0')} </td>
-            <td class="py-1 text-center" ><i class="fas fa-file-pdf fa-lg text-principal"></i> ${r.descripcion ?? ''}</td>
+            <td class="py-1" ><i class="fas fa-file-pdf fa-lg text-principal"></i> ${r.descripcion ?? ''}</td>
             <td class="py-1 text-center" >${estadoHtml} </td>
              <td class="py-1 text-center" >${donw_tipo_doc}</td>
             <td class="py-1 text-center" ><a  class="text-muted" onclick="ver_documento_proveedor('${r.archivo ?? ''}','${r.descripcion ?? ''}')"><i class="fas fa-search text-warning"></i></a></td>

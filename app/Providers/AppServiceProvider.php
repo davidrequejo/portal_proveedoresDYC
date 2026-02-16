@@ -24,4 +24,10 @@ class AppServiceProvider extends ServiceProvider
 
         // Route::middleware('web')   ->group(base_path('routes/web.php'));
     }
+    protected $listen = [
+    // ... otros eventos
+    \App\Events\CorreoHomologacionEnviado::class => [
+        \App\Listeners\RegistrarNotificacionHomologacion::class,
+    ],
+];
 }

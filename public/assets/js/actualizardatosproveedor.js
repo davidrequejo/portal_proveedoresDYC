@@ -72,6 +72,10 @@ function ver_editar_proveedor(){
       let tipoDocumentoTexto = $('#tipo_documento_input1 option:selected').text();
       let tipoentidadTexto = $('#tipo_entidad_sunat option:selected').text();
 
+      if (e.data.proveedor.ruc_persona_natural==null || e.data.proveedor.ruc_persona_natural=='') {
+        $('#numero_documento_input2').val(e.data.proveedor.numero_documento.substring(2, e.data.proveedor.numero_documento.length - 1));
+      }
+
       controlarCampos(tipoDocumentoTexto, tipoentidadTexto);
 
       $(".vista_inicial").hide();
@@ -186,6 +190,8 @@ function editar_datosproveedor(e){
           title: message,
           html: html
         });
+        $(".spiner_enviando_correo").hide();
+        $("#editar_registro_proveedor").show();
       }else {
         ver_errores(xhr);
       }

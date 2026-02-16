@@ -1375,6 +1375,56 @@ function buscar_sunat_reniec(input='') {
             }
           }          
         });
+
+        if (tipo_entidad_sunat=='NATURAL') {
+         // desde la posición 2 (tercer carácter) y quitando el último
+         let dni = dni_ruc.substring(2, dni_ruc.length - 1);
+
+          $.post(`${BASE_URL}/consulta/reniec`, { dni: dni }, function (data, status) {
+
+            //data = JSON.parse(data);  
+
+            if (data == null) {
+
+              $(`#search${input}`).show();
+      
+              $(`#charge${input}`).hide();
+
+              //$(`#nombre_razonsocial${input}`).val(''); $(`#titular_cuenta${input}`).val('');
+      
+              toastr.error("Verifique su conexion a internet o el sistema de BUSQUEDA esta en mantenimiento.");
+              
+            } else {
+              if (data.success == false) {
+
+                $(`#search${input}`).show();
+
+                $(`#charge${input}`).hide();
+
+                toastr.error("Es probable que el sistema de busqueda esta en mantenimiento o los datos no existe en la RENIEC!!!");
+
+              } else {
+
+                $(`#search${input}`).show();
+
+                $(`#charge${input}`).hide();
+
+               //$(`#nombre_razonsocial${input}`).val(data.nombres + " " + data.apellidoPaterno + " " + data.apellidoMaterno);
+                $('#nombre_persona_natural').val(data.nombres);
+                $('#apellido_paterno_per_natural').val(data.apellidoPaterno);
+                $('#apellido_materno_per_natural').val(data.apellidoMaterno);
+
+                $(`#titular_cuenta${input}`).val(data.nombres + " " + data.apellidoPaterno + " " + data.apellidoMaterno);
+
+                toastr.success("Persona encontrada!!!!");
+              }
+            }
+          
+          });         
+          
+        }   
+
+
       } else {
 
         $(`.valido_novalido`).html('<span class="badge badge-danger">NO ENCONTRADO</span>');

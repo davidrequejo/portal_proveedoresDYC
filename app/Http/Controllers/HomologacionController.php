@@ -6,9 +6,12 @@ use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
 use App\Models\Homologacion;
 use App\Models\Proveedor;
+use App\Models\DocsProveedorTipoEstandar;
+use App\Models\RegistrarNotifiHomolog_fph;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use App\Models\DocsProveedorTipoEstandar;
+
 use App\Mail\EstadoDocumentoLogisticaMail;
 use App\Mail\NotificacionDocumentosHomologacionMail;
 use App\Mail\NotificacionNuevaHomologacionMail;
@@ -222,7 +225,7 @@ class HomologacionController extends Controller
 
     }
 
-    public function eliminar_fecha_homologacion(Request $r, int $idfecha_homologacion)
+    public function eliminar_eliminar_periodo_h(Request $r, int $idfecha_homologacion)
     {
         try {
 
@@ -250,26 +253,12 @@ class HomologacionController extends Controller
       try {
           $idpersona = $r->input('idpersona');
 
-            /*$data = DB::table('persona_facha_homologacion as pfh')
-              ->join( 'docsproveedortipoestandar as docs', 'docs.idpersona_facha_homologacion', '=', 'pfh.idpersona_facha_homologacion' )
-              ->join( 'detalletipoestandarproveedor as dtp', 'dtp.iddetalletipoestandarproveedor', '=', 'docs.iddetalletipoestandarproveedor' )
-              ->join( 'tipoestandarproveedor as tep', 'tep.idtipoestandarproveedor', '=', 'dtp.idtipoestandarproveedor' )
-              ->select( 'pfh.idpersona_facha_homologacion', 'pfh.descripcion', 'pfh.fecha_inicio_proceso', 'pfh.fecha_fin', 'pfh.fecha_inicio_periodo_h',
-                  'pfh.fecha_fin_periodo_h', 'pfh.estado_homologacion', 'pfh.estado_trash', 'tep.descripcion as tipo_estandar'
-              )
-              ->where('pfh.estado_trash', '1')
-              ->where('pfh.estado_delete', '1')
-              ->where('pfh.idpersona', $idpersona)
-              ->groupBy( 'pfh.idpersona_facha_homologacion', 'pfh.descripcion', 'pfh.fecha_inicio_proceso', 'pfh.fecha_fin', 'pfh.fecha_inicio_periodo_h',
-                  'pfh.fecha_fin_periodo_h', 'pfh.estado_homologacion', 'pfh.estado_trash', 'tep.descripcion' )
-              ->get();*/
-
           $data = DB::table('persona_facha_homologacion as pfh')
           ->join('docsproveedortipoestandar as docs', 'docs.idpersona_facha_homologacion', '=', 'pfh.idpersona_facha_homologacion')
           ->join('detalletipoestandarproveedor as dtp', 'dtp.iddetalletipoestandarproveedor', '=', 'docs.iddetalletipoestandarproveedor')
           ->join('tipoestandarproveedor as tep', 'tep.idtipoestandarproveedor', '=', 'dtp.idtipoestandarproveedor')
           ->select( 'pfh.idpersona_facha_homologacion', 'pfh.descripcion', 'pfh.fecha_inicio_proceso', 'pfh.fecha_fin', 'pfh.fecha_inicio_periodo_h', 
-              'pfh.fecha_fin_periodo_h', 'pfh.estado_homologacion', 'pfh.estado_trash', 'tep.descripcion as tipo_estandar',
+              'pfh.fecha_fin_periodo_h', 'pfh.estado_homologacion', 'pfh.estado_trash', 'tep.descripcion as tipo_estandar','pfh.notificado_15dias',
               DB::raw(" CASE WHEN COUNT(docs.iddocsproveedortipoestandar) = SUM(CASE WHEN docs.estado_revision = 'Aprobado' THEN 1 ELSE 0 END) THEN 1 ELSE 0 END as todo_aprobado ")
           )
           ->where('pfh.estado_trash', '1')
@@ -284,6 +273,7 @@ class HomologacionController extends Controller
               'pfh.fecha_fin_periodo_h',
               'pfh.estado_homologacion',
               'pfh.estado_trash',
+              'notificado_15dias',
               'tep.descripcion'
           )
           ->get();
@@ -445,11 +435,31 @@ class HomologacionController extends Controller
                     $proveedor,
                     $documentos,
                     $nombreSoporte,
-                    $correoSoporte
+                    $correoSoporte,
+                    $idperiodo_homologacion
                 )
             );
 
             return ApiResponse::success([], 'Correo de notificación enviado al proveedor');
+
+        } catch (\Throwable $e) {
+            return ApiResponse::error($e);
+        }
+    }
+
+    //mostrar ultimo envio de correo
+    public function show_ultimo_envio_notificacion($id)
+    {
+        try {
+        // 🔥 OBTENER LA ÚLTIMA NOTIFICACIÓN ENVIADA
+        $ultimaNotificacion = RegistrarNotifiHomolog_fph::where('idpersona_facha_homologacion', $id)
+            //->where('estado', 'enviado')
+            ->latest('fecha_envio')
+            ->first();
+        
+            return ApiResponse::success([$ultimaNotificacion], 'fecha ultimo envio correo enviado');
+
+            //return ApiResponse::success('Actualizado', 'Estado del documento actualizado correctamente');
 
         } catch (\Throwable $e) {
             return ApiResponse::error($e);
