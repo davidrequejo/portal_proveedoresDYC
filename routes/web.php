@@ -19,6 +19,9 @@ use App\Http\Controllers\DocumentoTipoEstandarController;
 use App\Http\Controllers\NotificacionController; 
 use App\Http\Controllers\AllHomologacionesController; 
 use App\Http\Controllers\AreaPersonaController;
+use App\Http\Controllers\ProveedorLogController;
+use App\Http\Controllers\ApiSincronizarS10;
+
 
 
 Route::get('/', function () {  return redirect()->route('login'); });
@@ -187,6 +190,16 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
       // Select2
       Route::get('/area_persona/select2', [AreaPersonaController::class, 'select2_area_persona'])->name('area_persona.select2');
 
+      //::::::::::::::::::::::. Log proveedor / Cuenta Bancaria ::::::::::::::::::::::: vercuentasbancariaslogproveedor
+      Route::get('/logController/verdatosproveedor/{id?}', [ProveedorLogController::class, 'verdatoslogproveedor'])->name('ProveedorLogController.verdatoslogproveedor');
+        Route::get('/logController/vercuentasbancariasproveedor/{id?}', [ProveedorLogController::class, 'vercuentasbancariaslogproveedor'])->name('ProveedorLogController.vercuentasbancariaslogproveedor');
+
+      //:::::::::::::::::::::::API PARA CONECTAR S10 :::::::::::::::::::::::::::::::::::::::::.
+      Route::post('/proveedores/{proveedor}/sincronizar-s10/{idlogbd?}', [ApiSincronizarS10::class, 'sincronizar'])->name('proveedores.sincronizar');
+      
+      
+       Route::get('/pruebas10api', function () {  return view('pruebas10api');   })->name('pruebas10api');
+
       // (opcional) resource si lo usas como en Banco
       Route::resource('area_persona', AreaPersonaController::class);
 
@@ -203,5 +216,5 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
         } catch (\Exception $e) {
             return "❌ Error: " . $e->getMessage();
         }
-    });
+      });
 });

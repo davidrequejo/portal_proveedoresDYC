@@ -99,7 +99,7 @@ class PersonaCuentaBancariaController extends Controller
             $this->registrarSnapshot(
                 $cuenta,
                 'persona_cuentabancaria',
-                $cuenta->idpersona_cuentabancaria,
+                $cuenta->idpersona,
                 'REGISTRO_INICIAL_CUENTA_BANCARIA'
             );
 
@@ -190,7 +190,7 @@ class PersonaCuentaBancariaController extends Controller
                 $this->registrarCambios(
                     $cuenta,
                     'persona_cuentabancaria',
-                    $cuenta->idpersona_cuentabancaria,
+                    $cuenta->idpersona,
                     $cambios,
                     'ACTUALIZAR'
                 );
@@ -255,7 +255,7 @@ class PersonaCuentaBancariaController extends Controller
             $this->registrarCambios(
                 $cuenta,
                 'persona_cuentabancaria',
-                $cuenta->idpersona_cuentabancaria,
+                $cuenta->idpersona,
                 $cambios,
                 'ELIMINADO'
             );

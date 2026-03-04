@@ -506,7 +506,7 @@
                       <div class="col-12 col-md-3 col-lg-4">
                         <div class="form-group">
                           <label for="tipocuenta">Tipo de Cuenta</label>
-                          <select name="tipocuenta" id="tipocuenta"  class="form-control form-control-sm is-valid select2" placeholder="Tipo de Cuenta" aria-invalid="false">
+                          <select name="tipocuenta" id="tipocuenta"  class="form-control form-control-sm is-valid select2" placeholder="Tipo de Cuenta" aria-invalid="false" onchange="tipocuentarequerid();">
                             <option value="C">Corriente</option>
                             <option value="A">Ahorros</option>
                             <option value="D">Detracción</option>
@@ -540,7 +540,7 @@
                       <div class="col-12 col-md-5 col-lg-5">
                         <div class="form-group">
                           <label for="cuenta_interbancaria">CCI</label>
-                          <input type="number" name="cuenta_interbancaria" id="cuenta_interbancaria" class="form-control form-control-sm" maxlength="45" placeholder="Código de Cuenta Interbancaria"  onkeypress="return soloNumeros(event)">
+                          <input type="number" name="cuenta_interbancaria" id="cuenta_interbancaria" class="form-control form-control-sm" maxlength="45" placeholder="Código de Cuenta Interbancaria"  onkeypress="return soloNumeros(event)" > 
                         </div>
                       </div>
 
@@ -550,7 +550,7 @@
                           <span class="d-inline-block" tabindex="0" data-toggle="tooltip" title="cuenta predeterminada">
                            <label for="predeterminado">Pred?</label>
                           </span>
-                          <select name="predeterminado" id="predeterminado"  class="form-control form-control-sm is-valid select2" placeholder="Cuenta Predeterminada" aria-invalid="false">
+                          <select name="predeterminado" id="predeterminado"  class="form-control form-control-sm is-valid select2" placeholder="Cuenta Predeterminada" aria-invalid="false" readonly>
                             <option value="0">No</option>
                             <option value="1">Sí</option>
                           </select>
@@ -622,8 +622,8 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/actualizardatosproveedor.js') }}?version_erp=01.07"></script>
-  <script src="{{ asset('assets/js/persona_cuentabancaria.js') }}?version_erp=01.07"></script>
+  <script src="{{ asset('assets/js/actualizardatosproveedor.js') }}?version_erp=01.11"></script>
+  <script src="{{ asset('assets/js/persona_cuentabancaria.js') }}?version_erp=01.11"></script>
 
   <script>
     $(function() {

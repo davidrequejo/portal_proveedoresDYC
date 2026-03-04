@@ -23,6 +23,7 @@ class Logbd  extends Model
         'nombre_tabla',
         'id_registrotabla',
         'id_user',
+        'idpersona',
         'observacion',
         'accion_realizada',
         'estado_sincronizacion10',

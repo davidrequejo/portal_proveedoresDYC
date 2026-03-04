@@ -178,7 +178,7 @@ function guardar_y_editar_docs_prov(e) {
 function verdocumentos(idpersona_facha_homologacion,descripcion){ 
   local_idpersona_facha_homologacion = idpersona_facha_homologacion;
   show_hide_escenario(2);
-  $(".nombre_periodo_homologacion").html(`<strong>Perido Homologación : </strong>` +descripcion);
+  $(".nombre_periodo_homologacion").html(`<strong>Período Homologación : </strong>` +descripcion);
   $("#idpersona_facha_homologacion").val(idpersona_facha_homologacion);
   ver_estados_docs_proveedor(idpersona_facha_homologacion);
   

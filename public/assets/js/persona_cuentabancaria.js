@@ -567,5 +567,53 @@ $('#numero_cuenta, #cuenta_interbancaria').on('input', function () {
 function replica_nrocuenta() {   $('#numero_cuenta_abono').val($('#numero_cuenta').val()); }
 
 
-function verificar_tipocuenta() {   if ($('#tipo_entidad_sunat').val() === 'NATURAL') { $('#tipocuenta option[value="D"]').remove();  $('#tipocuenta option[value="C"]').remove(); }else{ $('#tipocuenta option[value="A"]').remove();} };
+function verificar_tipocuenta() {   
+  if ($('#tipo_entidad_sunat').val() === 'NATURAL') { 
+    
+    $('#tipocuenta option[value="D"]').remove();  $('#tipocuenta option[value="C"]').remove(); 
 
+  }else{ 
+    
+    $('#tipocuenta option[value="A"]').remove();} 
+  
+  };
+
+function tipocuentarequerid() {
+    var $campo = $('#cuenta_interbancaria');
+    var esTipoD = $('#tipocuenta').val() === 'D';
+
+    // Atributo HTML5
+    $campo.prop('required', !esTipoD);
+
+    // jQuery Validate: actualizar reglas
+    if (typeof $campo.rules === 'function') {
+        if (esTipoD) {
+            $campo.rules('remove', 'required');
+            $("#predeterminado").val('0').trigger('change'); // Si es tipo D, predeterminado siempre es No
+            $("#predeterminado").attr('readonly', true); // Deshabilitar selección de predeterminado
+
+        } else {
+            $campo.rules('add', { required: true });
+            $("#predeterminado").attr('readonly', false); // Habilitar selección de predeterminado
+            $("#predeterminado").val('').trigger('change'); // Si es tipo D, predeterminado siempre es No
+
+
+        }
+        // Revalidar el campo
+        $campo.valid();
+    }
+
+    // Limpiar solo si es D (porque Detracción no usa CCI)
+    if (esTipoD) {
+        $campo.val('');
+    }
+
+    // Eliminar clases y mensajes de error visuales
+    $campo.removeClass('is-invalid is-valid');
+    $campo.siblings('.error').remove(); // Ajusta según tu HTML
+}
+
+// Ejecutar al cargar la página
+$(document).ready(function() {
+    tipocuentarequerid();
+});

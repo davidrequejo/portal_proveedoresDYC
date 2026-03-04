@@ -41,6 +41,7 @@ trait RegistraLogCompleto
             'nombre_tabla'     => $tabla,
             'id_registrotabla' => $id_registro,
             'id_user'          => Auth::id() ?? 1,
+            'idpersona'        => Auth()->user()->idpersona,
             'observacion'      => json_encode($datosFormateados, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
             'accion_realizada' => $accion,
             'user_created'     => Auth::id() ?? 1,
@@ -83,6 +84,7 @@ trait RegistraLogCompleto
             'nombre_tabla'     => $tabla,
             'id_registrotabla' => $id_registro,
             'id_user'          => Auth::id() ?? 1,
+            'idpersona'        => Auth()->user()->idpersona,
             'observacion'      => json_encode($cambiosFormateados, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
             'accion_realizada' => $accion,
             'user_created'     => Auth::id() ?? 1,
@@ -100,7 +102,7 @@ trait RegistraLogCompleto
         if ($valor === null || $valor === '') return '-';
         
         switch ($formateador) {
-            // 📌 PERSONA / PROVEEDOR
+            // 📌 PERSONA / PROVEEDOR  tipo_entidad_sunat
             case 'sexo': return $valor == 'M' ? 'Masculino' : ($valor == 'F' ? 'Femenino' : $valor);
             case 'fecha': return date('d/m/Y', strtotime($valor));
             //case 'celular': return preg_replace('/(\d{3})(\d{3})(\d{3})/', '$1 $2 $3', $valor);
@@ -119,7 +121,7 @@ trait RegistraLogCompleto
                 // Intentar obtener datos del banco
                 if ($modelo && method_exists($modelo, 'banco') && $modelo->banco) {
                     
-                    $bancoData['nombre'] = $modelo->banco->abreviatura ?? 'No especificado';
+                    $bancoData['nombre'] = $modelo->banco->descripcion ?? 'No especificado';
                     $bancoData['codigo_bank_s10'] = $modelo->banco->codigo_bank_s10 ?? null;
 
                     
@@ -127,7 +129,7 @@ trait RegistraLogCompleto
                     // Fallback: consultar directamente
                     $banco = \DB::table('banco')->where('idbanco', $valor)->first();
                     if ($banco) {
-                        $bancoData['nombre'] = $banco->abreviatura ?? 'No especificado';
+                        $bancoData['nombre'] = $banco->descripcion ?? 'No especificado';
                         $bancoData['codigo_bank_s10'] = $banco->codigo_bank_s10 ?? null;
                     }
                    // var_dump($bancoData);die();
@@ -151,7 +153,7 @@ trait RegistraLogCompleto
             
             // 📌 DOCUMENTOS
             case 'tipo_documento':
-                return $this->formatearTipoDocumento($valor);
+                return $valor == '6' ? 'RUC' : ($valor == '1' ? 'DNI' : $valor);
             case 'tamano_archivo':
                 return $this->formatearBytes($valor);
             

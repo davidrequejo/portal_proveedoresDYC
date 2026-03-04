@@ -45,7 +45,7 @@ class UsuarioController extends Controller{
             $user->syncPermissions($r->permisos);
         }*/
         // 3. Registrar permisos en tabla intermedia
-        if ($r->permisos && count($r->permisos) > 0) {
+        /*if ($r->permisos && count($r->permisos) > 0) {
 
             foreach ($r->permisos as $permiso) {
 
@@ -55,6 +55,29 @@ class UsuarioController extends Controller{
                 ]);
 
             }
+        }*/
+
+        // 3. Registrar permisos en tabla intermedia si el usuario fue creado PROVEEDOR,  CLIENTE, COMPRADOR
+        $permisosPorRol = [
+            'ADMINISTRADOR' => [1, 2, 3, 4, 5, 6, 7, 10],
+            'PROVEEDOR'     => [8, 9],
+            'CLIENTE'       => [11],
+            'COMPRADOR'     => [7,10],
+        ];
+        
+        $permisos = $permisosPorRol[$r->tipoPersona] ?? [];
+
+        if ($user->id) {
+            $data = [];
+
+            foreach ($permisos as $permiso) {
+                $data[] = [
+                    'users_id' => $user->id,
+                    'idpermiso' => $permiso,
+                ];
+            }
+
+            DB::table('usuario_permiso')->insert($data);
         }
 
 

@@ -64,4 +64,24 @@ class PersonaCuentaBancaria extends Model
     {
         return $this->belongsTo(Banco::class, 'idbanco');
     }
+
+    public function proveedor()
+    {
+        return $this->belongsTo(Proveedor::class, 'idpersona', 'idpersona');
+    }
+
+    /* =========================
+     * Métodos personalizados
+     * ========================= */
+
+    /**
+     * Obtener cuentas bancarias activas de una persona.
+     */
+    public static function obtenerCuentasActivasProveedor($idpersona)
+    {
+        return self::where('idpersona', $idpersona)
+                    ->where('estado_trash', '1')
+                    ->where('estado_delete', '1')
+                    ->get();
+    }
 }

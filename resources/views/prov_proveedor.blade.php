@@ -437,7 +437,7 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/persona.js') }}?version_erp=01.07"></script>
+  <script src="{{ asset('assets/js/persona.js') }}?version_erp=01.11"></script>
 
   <script>
     $(function() {

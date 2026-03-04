@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    's10' => [
+        'base_url' => env('API_S10_BASE_URL'),
+        'key'      => env('API_S10_KEY'),
+    ],
+
 ];

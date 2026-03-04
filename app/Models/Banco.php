@@ -44,4 +44,31 @@ class Banco extends Model
             ->orderBy('b.descripcion')
             ->get();
     }
+
+        /**
+     * Obtiene el código de Reniec para un distrito dado.
+     * @param int $idDistrito El ID del distrito
+     * @return string|null El código de Reniec o null si no se encuentra
+     */
+    public static function getCodigos10Idbn($idb)
+    {
+        if (!$idb) {
+            return null;
+        }
+
+        return self::where('idbanco', $idb)
+                    ->value('codigo_bank_s10'); // o 'codigo_bank_s10' según tu campo
+    }
+
+    public static function getabreviaturabn($idb)
+    {
+        if (!$idb) {
+            return null;
+        }
+
+        return self::where('idbanco', $idb)
+                    ->value('abreviatura'); // o 'abreviatura' según tu campo
+    }
+
+
 }

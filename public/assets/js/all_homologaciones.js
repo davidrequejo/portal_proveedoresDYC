@@ -1,8 +1,8 @@
 const BASE_URL = document.querySelector('meta[name="app-url"]').content;
 const CSRF = document.querySelector('meta[name="csrf-token"]').content;
-var idpersona_tipo = null;
+
 var idtipoestandarproveedor_tipo = null;
-var nombre_razonsocial_tipo = null;
+
 var email_proveedor_env_correo = null;
 
 let tipo_editar_homologacion =null;
@@ -10,34 +10,32 @@ let tipo_editar_homologacion =null;
 
 
 
-
 //-------------------- Inicializaciones ------------------------------------
+var idpersona_tipo = null;
 var idfechaperso_homol_edit = null;
-var  descrp_homol_edit = null;
+var descrp_homol_edit = null;
+var nombre_razonsocial_tipo = null;
 
  $('#fecha_inicio_proceso').val(new Date().toISOString().slice(0,10));
  $('#descripcion_homologacion').val(`Periodo - ${new Date().getFullYear()}` );
  
-
-
-$("#guardar_registro_proveedor").on("click", function (e) { $("#submit-form-proveedor").submit(); });   
-$("#guardar_registro_add_homologacion").on("click", function (e) { $("#submit-form-add_homologacion").submit(); });
 $("#guardar_registro_actualizar_estado").on("click", function (e) { $("#submit-form-actualizar_estado").submit(); });
 
 // lista_select2("../ajax/ajax_general.php?op=select2EmpresaACargo", '#empresa_acargo', null);
 
-lista_select2(`${BASE_URL}/select2/tipoestandar_all`, '#tipo_compra',null,'.charge_tipo_compra'); 
-lista_select2(`${BASE_URL}/select2/estado_homologacion_all`, '#estado_homologacion',null,'.charge_estado_homologacion');
-lista_select2(`${BASE_URL}/select2/proveedores_all`, '#id_proveedor',null,'.charge_id_proveedor');
-lista_select2(`${BASE_URL}/select2/compradores_all`, '#id_persona_usuario',null,'.charge_id_persona_usuario');
+lista_select2(`${BASE_URL}/select2/tipoestandar_all`, '#tipo_compra','_auto_','.charge_tipo_compra'); 
+lista_select2(`${BASE_URL}/select2/estado_homologacion_all`, '#estado_homologacion','_auto_','.charge_estado_homologacion');
+lista_select2(`${BASE_URL}/select2/proveedores_all`, '#id_proveedor','_auto_','.charge_id_proveedor');
+lista_select2(`${BASE_URL}/select2/compradores_all`, '#id_persona_usuario','_auto_','.charge_id_persona_usuario');
 
 
 $("#tipo_compra").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
 $("#estado_homologacion").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
+$("#estado_documento").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
 $("#id_proveedor").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
 $("#id_persona_usuario").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
 
-
+$("#estado_documento").val("").trigger('change');
 
 $('#tipo_persona').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
 $('#tipo_documento').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
@@ -46,6 +44,7 @@ $('#tipo_entidad_sunat').select2({ theme: "bootstrap4", placeholder: "Selecione"
 $('#estado_documentos_update').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
 
 $("#estado_documentos_update").val("").trigger('change');
+
 
 function show_hide_escenario(flag) {
   if (flag == 1) {            // Tabla principal
@@ -145,6 +144,7 @@ const state = {
   fecha_inicio_periodo: null,
   fecha_fin_periodo: null,
   estado_homologacion: null,
+  estado_documento: null,
   id_proveedor: null,
   id_persona_usuario: null
 };
@@ -173,23 +173,30 @@ function renderFilas(rows){
     return;
   }
   rows.forEach(r => {
-    var estado_completo='';
     var estadoHtml='';
+    let estado_completo = '';
 
-    if (r.todo_aprobado === 1) { estado_completo=`<span class="badge badge-new text-white">Completo</span>`;  } else { estado_completo=`<span class="badge bg-danger">Incompleto</span>`;}
+    switch (r.estado_documentos) {
+      case 0: estado_completo = `<span class="badge bg-danger text-white">  Pendiente Registro</span>`; break;
+      case 1: estado_completo = `<span class="badge bg-success text-white"> Completo</span>`; break;
+      case 3: estado_completo = `<span class="badge badge-new  text-white"> Parcial Completo</span>`; break;
+      case 2: estado_completo = `<span class="badge bg-warning text-white"> Pendiente de validar</span>`; break;
+      default: estado_completo = `<span class="badge bg-danger text-white">Incompleto</span>`;    
+    }
 
     switch (r.estado_homologacion) {
         case 'No Iniciado': estadoHtml = `<span class="badge bg-warning text-white">No Iniciada</span>`;   break;
         case 'Vigente': estadoHtml = `<span class="badge badge-new text-white">Vigente</span>`; break;
         case 'Vencido': estadoHtml = `<span class="badge bg-secondary text-white">Vencido</span>`; break;
-        default: estadoHtml = `<span class="badge bg-danger">No Iniciada</span>`; 
+        default: estadoHtml = `<span class="badge bg-danger text-white">No Iniciada</span>`; 
     }
 
     $tb.append(`
       <tr class="fila-proyecto" data-id="${r.idpersona_facha_homologacion}">          
         <td class="py-1 text-center"> 
           <div class="btn-group btn-group-sm">
-            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="ver_documentos_x_homologacion(${r.idpersona_facha_homologacion},'${r.tipo_estandar}','${r.proveedor ?? ''}')" ><i class="fas fa-folder fa-0 color_icon_opt"></i></button>
+            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="ver_documentos_x_homologacion(${r.idpersona_facha_homologacion},'${r.tipo_estandar}','${r.proveedor ?? ''}','${r.idpersona}')" ><i class="fas fa-folder fa-0 color_icon_opt"></i></button>
+            <button class="btn btn-xs text-nowrap show_view_homol_eliminar" onclick="eliminar_periodo_h(${r.idpersona_facha_homologacion}, '${r.tipo_estandar ?? ''}')" ><i class="fas fa-trash color_icon_opt"></i></button>
           </div>
         </td>
         <td class="py-1 text-nowrap">${r.proveedor ?? ''}</td>
@@ -207,6 +214,7 @@ function renderFilas(rows){
     `);
     $('[data-toggle="tooltip"]').tooltip(); 
   });
+  if (idTipoPersonauser=='2') { $(".show_view_homol_eliminar").show(); }else{ $(".show_view_homol_eliminar").hide(); };
 }
 
 // Render paginación Bootstrap (ventana de 5 páginas)
@@ -280,6 +288,7 @@ function filtros() {
 
   var tipoestandar_all      = $("#tipo_compra").select2('val');
   var estado_homologacion   = $("#estado_homologacion").select2('val'); 
+  var estado_documento        = $("#estado_documento").select2('val');
   var id_proveedor          = $("#id_proveedor").select2('val');
   var id_persona_usuario    = $("#id_persona_usuario").select2('val');
 
@@ -288,6 +297,7 @@ function filtros() {
   
   if (tipoestandar_all == '' || tipoestandar_all == 0 || tipoestandar_all == null) { tipoestandar_all = ""; nombre_tipoestandar_all = ""; }       // filtro de trabajador  
   if (estado_homologacion == '' || estado_homologacion == 0 || estado_homologacion == null) { estado_homologacion = ""; nombre_estado_homologacion = ""; }                 // filtro de dia pago  
+  if (estado_documento == '' || estado_documento == null) { estado_documento = ""; nombre_estado_documento = ""; }                 // filtro de dia pago
   if (id_proveedor == '' || id_proveedor == 0 || id_proveedor == null) { id_proveedor = ""; nombre_id_proveedor = ""; }                                     // filtro de plan
   if (id_persona_usuario == '' || id_persona_usuario == 0 || id_persona_usuario == null) { id_persona_usuario = ""; nombre_id_persona_usuario = ""; }                                     // filtro de plan
   if (fecha_inicio_periodo == '' || fecha_inicio_periodo == 0 || fecha_inicio_periodo == null) { fecha_inicio_periodo = ""; nombre_fecha_inicio_periodo = ""; }  // filtro de zona antena
@@ -297,6 +307,7 @@ function filtros() {
   state.fecha_inicio_periodo= fecha_inicio_periodo;
   state.fecha_fin_periodo= fecha_fin_periodo;
   state.estado_homologacion= estado_homologacion;
+  state.estado_documento= estado_documento;
   state.id_proveedor= id_proveedor;
   state.id_persona_usuario= id_persona_usuario;
 
@@ -304,200 +315,40 @@ function filtros() {
 
 }
 
+tabla_principal_cargar();
+
 function limpiarFiltro(nombre) { 
   switch (nombre) { 
     case 'tipo_compra': $('#tipo_compra').val(null).trigger('change'); state.tipo_compra = null; break; 
     case 'fecha_inicio_periodo': $('#fecha_inicio_periodo').val(''); state.fecha_inicio_periodo = null; break; 
     case 'fecha_fin_periodo': $('#fecha_fin_periodo').val(''); state.fecha_fin_periodo = null; break; 
     case 'estado_homologacion': $('#estado_homologacion').val(null).trigger('change'); state.estado_homologacion = null; break; 
+    case 'estado_documento': $('#estado_documento').val(null).trigger('change'); state.estado_documento = null; break; 
     case 'id_proveedor': $('#id_proveedor').val(null).trigger('change'); state.id_proveedor = null; break; 
     case 'id_persona_usuario': $('#id_persona_usuario').val(null).trigger('change'); state.id_persona_usuario = null; break; 
   }
 
   }
-//tabla_principal_cargar();
-// ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-// ═══════                                       S E C C I O N   C R U D   P R O V E E D O R                                                        ═══════
-// ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
-function limpiar_form_proveedor(){
-  
-  //Mostramos los Materiales
-  $("#idpersona").val("");
-  $("#numero_documento").val("");
 
-  $("#nombre_razonsocial").val("");
-  $("#nombre_persona_natural").val("");
-  $("#apellido_paterno_per_natural").val("");
-  $("#apellido_materno_per_natural").val("");
+function ver_ultimo_envio_notificacion(id) {
+  $.get(`${BASE_URL}/homologacion/${id}/ultimo-envio`, function(e) {
 
-  $("#celular").val("");
-  $("#email").val("");
-  $("#sitio_web").val("");
-  $("#direccion").val("");
+      if (e.status == true) {
+         const notif = e.data[0];
+         if (e.data[0]==null) {
+          
+         }else{
 
-  $("#provincia").val("");
-  $("#departamento").val("");
-  $("#usuario_portal").val("");
-  $("#clave_portal").val("");
-
-  $("#tipo_entidad_sunat").val("").trigger('change');
-  $("#distrito").val("").trigger('change');
-  $("#estado_sunat").val("").trigger('change');
-  $(".valido_novalido").html(`<span class="badge badge-secondary">Por Verificar</span>`);
-
-  // Limpiamos las validaciones
-  $(".form-control").removeClass('is-valid');
-  $(".form-control").removeClass('is-invalid');
-  $(".error.invalid-feedback").remove();
-}
-
-function ver_editar_proveedor(idpersona) {
-  $("#cargando-1-formulario").hide();
-  $("#cargando-2-formulario").show();
-  limpiar_form_proveedor();
-  $('#modal-agregar-proveedor').modal('show');
-  $.getJSON(`${BASE_URL}/proveedor/${idpersona}/mostrar_proveedor`, function (e) {
-    console.log(e.data);
-
-    if (e.status == true) {
-
-      //$("#fecha_inicio_proceso").val(e.data.proveedor.fecha_inicio_proceso);
-      //$("#fecha_fin_periodo").val(e.data.proveedor.fecha_fin_periodo);
-
-      $("#idpersona").val(e.data.proveedor.idpersona);
-
-      $("#idtipo_persona").val(e.data.proveedor.idtipo_persona);
-      $("#tipo_entidad_sunat").val(e.data.proveedor.tipo_entidad_sunat).trigger('change');
-      $("#tipo_documento").val(e.data.proveedor.tipo_documento).trigger('change');
-      $("#numero_documento").val(e.data.proveedor.numero_documento);
-      $("#nombre_razonsocial").val(e.data.proveedor.nombre_razonsocial);
-      $("#nombre_persona_natural").val(e.data.proveedor.nombre_persona_natural);
-      $("#apellido_paterno_per_natural").val(e.data.proveedor.apellido_paterno_per_natural);
-      $("#apellido_materno_per_natural").val(e.data.proveedor.apellido_materno_per_natural);
-      $("#celular").val(e.data.proveedor.celular);
-      $("#direccion").val(e.data.proveedor.direccion);
-      $("#distrito").val(e.data.proveedor.distrito).trigger('change');
-      $("#provincia").val(e.data.proveedor.provincia);
-      $("#departamento").val(e.data.proveedor.departamento);
-      $("#email").val(e.data.proveedor.email);
-
-      if (e.data.usuario != null) {
-        $("#id").val(e.data.usuario.id);
-        $("#usuario_portal").val(e.data.usuario.email);
-        $("#clave_portal").val(e.data.usuario.clave_portal);
+          $(".fechayestadoenvio").html(`<span class="badge">Fecha : <span class="text-info">${notif.fecha_envio}</span>     Estado:  <span class="text-info">${notif.estado}</span>  </span>`);
+        
+        }
       }else{
-        $("#id").val('');
-        $("#usuario_portal").val('');
-        $("#clave_portal").val('');
+
       }
-
-      $("#estado_sunat").val('ACTIVO').trigger('change');
-
-      $("#cargando-1-formulario").show();
-      $("#cargando-2-formulario").hide();
-    } else {
-      alert("No se encontró el proyecto");
-    }
-  }).fail(function (xhr) { ver_errores(xhr); });
-
+});
 }
 
-function guardar_y_editar_proveedor(e) {
-  // e.preventDefault(); //No se activará la acción predeterminada del evento
-  var formData = new FormData($("#form-agregar-proveedor")[0]);
-
-  var id = $("#idpersona").val();
-  var url_editar_crear = '';
-  if (id == '') {
-    url_editar_crear =  `${BASE_URL}/proveedor/crear_proveedor` ;    
-  } else {
-    url_editar_crear = `${BASE_URL}/proveedor/editar_proveedor/${id}`;
-    formData.append('_method', 'PUT'); // spoof para Laravel
-  }
-  
-
-  $.ajax({
-    url: url_editar_crear,
-    type: "POST",
-    data: formData,
-    contentType: false,
-    processData: false,
-    success: function (e) {
-      try {        
-        if (e.status == true) {          
-          tabla_principal_cargar();
-          limpiar_form_proveedor();
-          Swal.fire("Correcto!", "Guardado correctamente", "success");          
-          $("#modal-agregar-proveedor").modal("hide");           
-        }else{
-          ver_errores(e);				 
-        }
-      } catch (err) { console.log('Error: ', err.message); toastr.error('<h5 class="font-size-16px">Error temporal!!</h5> puede intentalo mas tarde, o comuniquese con <i><a href="tel:+51921305769" >921-305-769</a></i> ─ <i><a href="tel:+51921487276" >921-487-276</a></i>'); } 
-      $("#guardar_registro_proveedor").html('Guardar Cambios').removeClass('disabled');
-    },
-    xhr: function () {
-      var xhr = new window.XMLHttpRequest();
-      xhr.upload.addEventListener("progress", function (evt) {
-        if (evt.lengthComputable) {
-          var percentComplete = (evt.loaded / evt.total)*100; /*console.log(percentComplete + '%');*/
-          $("#barra_progress_proyecto").css({"width": percentComplete+'%'}); $("#barra_progress_proyecto").text(percentComplete.toFixed(2)+" %");
-        }
-      }, false);
-      return xhr;
-    },
-    beforeSend: function () {
-      $("#guardar_registro_proveedor").html('<i class="fas fa-spinner fa-pulse fa-lg"></i>').addClass('disabled');
-      $("#barra_progress_proyecto").css({ width: "0%",  });
-      $("#barra_progress_proyecto").text("0%");
-    },
-    complete: function () {
-      $("#barra_progress_proyecto").css({ width: "0%", });
-      $("#barra_progress_proyecto").text("0%");
-    },
-    error: function (jqXhr) { ver_errores(jqXhr); },
-  });
-}
-
-function eliminar_proveedor(id, nombres) {
-
-  Swal.fire({
-    title: "¿Está Seguro de eliminar el registro?",
-    html: `<b class="text-danger"><del>${nombres}</del></b>`,
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#28a745",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Sí, eliminar!",
-  }).then((result) => {
-
-    if (result.isConfirmed) {
-
-      $.ajax({
-        url: `${BASE_URL}/proveedor/eliminar_proveedor/${id}`,
-        type: "PUT",
-        data: {
-          _token: $('meta[name="csrf-token"]').attr('content') // necesario para PUT
-        },
-        success: function (e) {
-          console.log(e);
-
-          if (e.status === true) {
-            Swal.fire("Eliminado!", "El registro ha sido eliminado.", "success");
-            tabla_principal_cargar();
-          } else {
-            Swal.fire("Error!", e.message, "error");
-          }
-        },
-        error: function (xhr) {
-          Swal.fire("Error!", "Ocurrió un error en el servidor.", "error");
-          console.log(xhr.responseText);
-        }
-      });
-
-    }
-  });
-}
 
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 // ═══════                                                    S E C C I O N   HOMOLOGACIONES                                                        ═══════
@@ -510,8 +361,9 @@ function limpiar_homologacion() {
   $("#fecha_fin_periodo").val("");
 
 }
-
-function lista_homologaciones(idpersona, nombre_razonsocial, email) { 
+//no estamos tulizando
+/*function lista_homologaciones(idpersona, nombre_razonsocial, email) { 
+  
 
   idpersona_tipo = idpersona;
   nombre_razonsocial_tipo = nombre_razonsocial;
@@ -592,7 +444,7 @@ function lista_homologaciones(idpersona, nombre_razonsocial, email) {
     }
   }).fail(function (xhr) { ver_errores(xhr);  });
 
-}
+}*/
 
 function guardar_y_editar_homoloacion(e) {
   // e.preventDefault(); //No se activará la acción predeterminada del evento
@@ -653,63 +505,15 @@ function guardar_y_editar_homoloacion(e) {
   });
 }
 
-function ver_editar_periodo_h(id,tipo) {
-
-  tipo_editar_homologacion = tipo;
-  $("#cargando-5-formulario-homologacion").hide();
-  $("#cargando-6-formulario-homologacion").show();
-  limpiar_homologacion();
-  $('#modal_agregar_homologacion').modal('show');
-
-    if (tipo=='editar') {      
-      $('.div_tipocompra').show();
-      $('.div_descripcion').show();
-      $('.div_finicioproceso').show();
-      $('.div_fechainicioperiodo').hide();
-      $('.div_fechafinperiodo').hide();
-      
-    } else {
-      //$('#fecha_inicio_periodo_h').val(new Date().toISOString().slice(0,10));
-      $('.div_tipocompra').hide();
-      $('.div_descripcion').show();
-      $('.div_finicioproceso').show();
-      $('.div_fechainicioperiodo').show();
-      $('.div_fechafinperiodo').show();
-    }
-
-
-  $.getJSON(`${BASE_URL}/homologacion/${id}/mostrar_periodo_homologacion`, function (e) {
-
-    if (e.status == true) {
-
-      $("#idpersona_facha_homologacion").val(e.data.data_homolog.idpersona_facha_homologacion);
-      $("#idtipoestandarproveedor").val(e.data.idtipoestandarproveedor).trigger('change');
-      $("#descripcion_homologacion").val(e.data.data_homolog.descripcion);
-      $("#fecha_inicio_proceso").val(e.data.data_homolog.fecha_inicio_proceso);
-      $("#fecha_fin_periodo").val(e.data.data_homolog.fecha_fin);
-
-      if (e.data.data_homolog.fecha_inicio_periodo_h!=null) {
-         $("#fecha_inicio_periodo_h").val(e.data.data_homolog.fecha_inicio_periodo_h);
-      } else {
-         $("#fecha_inicio_periodo_h").val(new Date().toISOString().slice(0,10));
-      }
-
-     
-      $("#fecha_fin_periodo_h").val(e.data.data_homolog.fecha_fin_periodo_h);
-
-      $("#cargando-5-formulario").show();
-      $("#cargando-6-formulario").hide();
-    } else {
-      alert("No se encontró el datos");
-    }
-  }).fail(function (xhr) { ver_errores(xhr); });
-
-}
-
-function ver_documentos_x_homologacion(id, descripcion,proveedor) {
+//utilizamod de frente para velos documentos de homologacion y para los documentos de los proveedores, por eso le pasamos el parametro de proveedor
+function ver_documentos_x_homologacion(id, descripcion,proveedor,idpersona) {
+  $(".fechayestadoenvio").html(``);
+  ver_ultimo_envio_notificacion(id);
   show_hide_escenario(2);
-    idfechaperso_homol_edit = id;
-    descrp_homol_edit = descripcion;
+  idfechaperso_homol_edit = id;
+  descrp_homol_edit = descripcion;
+  nombre_razonsocial_tipo = proveedor;
+  idpersona_tipo = idpersona;
 
   $(".Nombre_inicial").html(`Homologación de <span class="text-principal hove-negrita"> : ${proveedor} </span>`);
 
@@ -751,7 +555,7 @@ function ver_documentos_x_homologacion(id, descripcion,proveedor) {
             <td class="py-1 text-center" style="cursor:pointer">
                 ${r.archivo
                     ? `<a class="text-principal"
-                         onclick="ver_documento_proveedor('${BASE_URL}/${r.archivo}','${r.descripcion}')">
+                         onclick="ver_documento_proveedor('${r.archivo}','${r.descripcion}')">
                         <i class="fas fa-search"></i>
                        </a>`
                     : `<a class="text-muted"
@@ -800,7 +604,7 @@ function ver_documentos_x_homologacion(id, descripcion,proveedor) {
             <td class="py-1 text-center" style="cursor:pointer">
                 ${r.archivo
                     ? `<a class="text-principal"
-                         onclick="ver_documento_proveedor('${BASE_URL}/${r.archivo}','${r.descripcion}')">
+                         onclick="ver_documento_proveedor('${r.archivo}','${r.descripcion}')">
                         <i class="fas fa-search"></i>
                        </a>`
                     : `<a class="text-muted"
@@ -812,6 +616,11 @@ function ver_documentos_x_homologacion(id, descripcion,proveedor) {
             <td class="py-1 text-center" >
                     <a class="btn btn-sm"
                       onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','cargar_documento')">
+                      
+                      <i class="fas fa-cloud-upload-alt color_icon_opt"></i>
+                    </a>
+                    <a class="btn btn-sm"
+                      onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','actualizar_estado')">
                       <i class="fas fa-pencil-alt color_icon_opt"></i>
                     </a>
               
@@ -826,6 +635,45 @@ function ver_documentos_x_homologacion(id, descripcion,proveedor) {
       alert("No se encontró el proyecto");
     }
   }).fail(function (xhr) { ver_errores(xhr);  });
+}
+
+function eliminar_periodo_h(id, nombres) {
+
+  Swal.fire({
+    title: "¿Está Seguro de eliminar el registro?",
+    html: `<b class="text-danger"><del>${nombres}</del></b>`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#2850a7",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Sí, eliminar!",
+  }).then((result) => {
+
+    if (result.isConfirmed) {
+
+      $.ajax({
+        url: `${BASE_URL}/eliminar_periodo_h/eliminar_eliminar_periodo_h/${id}`,
+        type: "PUT",
+        data: {
+          _token: $('meta[name="csrf-token"]').attr('content') // necesario para PUT
+        },
+        success: function (e) {
+         
+          if (e.status === true) {
+            Swal.fire("Eliminado!", "El registro ha sido eliminado.", "success");
+            tabla_principal_cargar();
+          } else {
+            Swal.fire("Error!", e.message, "error");
+          }
+        },
+        error: function (xhr) {
+          Swal.fire("Error!", "Ocurrió un error en el servidor.", "error");
+          console.log(xhr.responseText);
+        }
+      });
+
+    }
+  });
 }
 
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -969,10 +817,6 @@ function actualizar_estado_documento(id, idpersona, nombre_documento,archivo,est
 
     $("#estado_documentos_update").val('Aprobado').trigger('change');
 
-    //validamoos DOC-1
-    console.log('archivo');
-    console.log(archivo);
-    
     if (archivo!=='null' ) {
       $("#doc_old_1").val(archivo);
       $("#doc1_nombre").html(``);
@@ -1020,7 +864,8 @@ function guardar_y_editar_act_estado(e) {
     success: function (e) {
       try {        
         if (e.status == true) {          
-          ver_documentos_x_homologacion(idfechaperso_homol_edit, descrp_homol_edit) ;
+          //ver_documentos_x_homologacion(idfechaperso_homol_edit, descrp_homol_edit,idpersona_tipo) ;
+          ver_documentos_x_homologacion(idfechaperso_homol_edit, descrp_homol_edit,nombre_razonsocial_tipo,idpersona_tipo);
           Swal.fire("Correcto!", "Actualizado correctamente", "success");          
           $("#modal-actualizar-estado").modal("hide");           
         }else{
@@ -1052,16 +897,17 @@ function guardar_y_editar_act_estado(e) {
   });
 }
 
-function enviar_correo_notificacion() {  
+function enviar_correo_notificacion() { 
+  
+  console.log(idfechaperso_homol_edit, idpersona_tipo);
+  
   $('.spiner_enviando_correo').show();
   $('.enviar_coreo_notificacion_proveeor').hide();
 
   $.post(`${BASE_URL}/homologacion/enviar_correo_notificacion`,
     {
       idperiodo_homologacion: idfechaperso_homol_edit,
-      idpersona: idpersona_tipo,
-      nombre_razonsocial: nombre_razonsocial_tipo,
-      email: email_proveedor_env_correo
+      idpersona: idpersona_tipo
     },
     function (e) {
       if (e.status == true) {
@@ -1075,6 +921,24 @@ function enviar_correo_notificacion() {
   ).fail(function (xhr) { ver_errores(xhr);  });
 
   
+}
+
+function ver_ultimo_envio_notificacion(id) {
+  $.get(`${BASE_URL}/homologacion/${id}/ultimo-envio`, function(e) {
+
+      if (e.status == true) {
+         const notif = e.data[0];
+         if (e.data[0]==null) {
+          
+         }else{
+
+          $(".fechayestadoenvio").html(`<span class="badge">Fecha : <span class="text-info">${notif.fecha_envio}</span>     Estado:  <span class="text-info">${notif.estado}</span>  </span>`);
+        
+        }
+      }else{
+
+      }
+});
 }
 
 // ══════════════════════════════════════════════════════════════════════════════════

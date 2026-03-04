@@ -48,7 +48,6 @@ function permisos_usuario(){
   
   $.getJSON(`${BASE_URL}/usuario/permisos_crear`, state, function(res){
 
-    console.log(res.data);
 
     // Limpiar contenedor
     $('#permisos_usuario').html('');

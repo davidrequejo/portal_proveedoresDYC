@@ -226,19 +226,15 @@
                         </div>  
                       </div>
 
-                      <div class="card border-info mb-3 col-12">
+                      <div class="card border-info mb-3 col-12 " style="display: none!important;">
                         <div class="card-header bg-color-0202022e font-weight-bold">Permisos </div>
                         <div class="card-body text-secondary">
                           <p class="card-text">Selecccione los permisos Necesarios.</p>
 
                           <div class="row">
-
                             <div class="col-12">
-
                              <div id="permisos_usuario"></div>
-                             </div>
-
-
+                            </div>
                           </div> 
                         </div>
                       </div>

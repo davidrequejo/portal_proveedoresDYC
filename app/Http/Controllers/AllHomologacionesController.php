@@ -27,419 +27,7 @@ class AllHomologacionesController extends Controller
         return view('all_homologaciones');
     }
 
-    public function crear_proveedor(Request $r)
-    {
-       try {
-          // Validar los datos del formulario
-          //              'fecha_inicio_periodo'    => 'required|date',
-          //    'fecha_fin_periodo'       => 'required|date|after:fecha_inicio_periodo',
-          $data = $r->validate([
-              'idtipo_persona'          => 'required|string',
-              'tipo_entidad_sunat'      => 'required|string',
-              'tipo_documento'          => 'required|string',
-              'numero_documento'        => 'required|string',
-              'nombre_razonsocial'      => 'required|string|max:255',
-              'nombre_persona_natural'  => 'nullable|string|max:255',
-              'apellido_paterno_per_natural' => 'nullable|string|max:255',
-              'apellido_materno_per_natural' => 'nullable|string|max:255',
-              'celular'                 => 'required|string|max:15',
-              'direccion'               => 'required|string|max:255',
-              'email'                   => 'required|email',
-              'distrito'                => 'nullable',
-              'provincia'               => 'nullable',
-              'departamento'            => 'nullable',
-              'usuario_portal'          => 'nullable',
-              'clave_portal'            => 'nullable|string|min:6',
-
-          ]);
-          // 1. Crear  proveedor
-          $createProveedor = Proveedor::create($data);
-
-          // 2. Crear usuario para el proveedor
-          /*$user = User::create([
-              'idpersona' =>  $createProveedor->idpersona,
-              'name'      => 'PPROVEEDOR', 
-              'email'     => $r->usuario_portal,
-              'password'  => bcrypt($r->clave_portal)
-          ]);
-
-          // 3. Registrar permisos en tabla intermedia
-          if ($user->id   ) {
-
-                  DB::table('usuario_permiso')->insert([
-                      'users_id' => $user->id,
-                      'idpermiso' => '10'
-                  ]);
-              
-          }*/
-
-
-          // 2. Crear usuario para el proveedor solo si los campos no son vacíos
-          if (!empty($r->usuario_portal) && !empty($r->clave_portal)) {
-
-              $user = User::create([
-                  'idpersona' => $createProveedor->idpersona,
-                  'name'      => 'PPROVEEDOR', 
-                  'email'     => $r->usuario_portal,
-                  'password'  => bcrypt($r->clave_portal),
-              ]);
-
-              // 3. Registrar permisos en tabla intermedia si el usuario fue creado
-              $permisos = [8, 9];
-
-              if ($user->id) {
-                  $data = [];
-
-                  foreach ($permisos as $permiso) {
-                      $data[] = [
-                          'users_id' => $user->id,
-                          'idpermiso' => $permiso,
-                      ];
-                  }
-
-                  DB::table('usuario_permiso')->insert($data);
-              }
-
-              // 4. Enviar correo con credenciales al proveedor
-                // 4.1 obtenener nombre y correo del soporte desde el usuario autenticado
-                $nombreSoporte = auth()->user()->persona?->nombre_razonsocial;
-                $correoSoporte = auth()->user()->persona?->email;
-              try {
-                  Mail::to($createProveedor->email)->queue(
-                      new CredencialesProveedorMail(
-                          nombre: $createProveedor->nombre_razonsocial,
-                          usuario: $r->usuario_portal,
-                          clave: $r->clave_portal,
-                          nombreSoporte: $nombreSoporte,
-                          correoSoporte: $correoSoporte
-                      )
-                  );
-              } catch (\Throwable $e) {
-                  // opcional: log
-                  \Log::error("Error enviando correo proveedor: " . $e->getMessage());
-              }
-
-          }
-
-          return ApiResponse::success([
-                'idpersona' => $createProveedor->idpersona
-            ], 'Proveedor creado correctamente');
-
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
-        }
-    }
-
-    public function editar_proveedor(Request $r, $idpersona)
-    {
-        try {
-
-            // 4.1 obtenener nombre y correo del soporte desde el usuario autenticado
-            $nombreSoporte = auth()->user()->persona?->nombre_razonsocial;
-            $correoSoporte = auth()->user()->persona?->email;
-
-            // 1. Validación
-            $data = $r->validate([
-                'idtipo_persona'              => 'required|string',
-                'tipo_entidad_sunat'          => 'required|string',
-                'tipo_documento'              => 'required|string',
-                'numero_documento'            => 'required|string',
-                'nombre_razonsocial'          => 'required|string|max:255',
-                'nombre_persona_natural'      => 'nullable|string|max:255',
-                'apellido_paterno_per_natural' => 'nullable|string|max:255',
-                'apellido_materno_per_natural' => 'nullable|string|max:255',
-                'celular'                     => 'required|string|max:15',
-                'direccion'                   => 'required|string|max:255',
-                'email'                       => 'required|email',
-                'distrito'                    => 'nullable',
-                'provincia'                   => 'nullable|string',
-                'departamento'                => 'nullable|string',
-                'usuario_portal'              => 'nullable|string',
-                'clave_portal'                => 'nullable|string|min:6', // 👈 CLAVE OPCIONAL
-                'id'                          => 'nullable|integer'       // 👈 ID DEL USUARIO
-            ]);
-
-            // 2. Actualizar proveedor
-            $proveedor = Proveedor::where('idpersona', $idpersona)->firstOrFail();
-            $proveedor->update($data);
-
-            // 3. Actualizar usuario
-            /*$user = User::findOrFail($r->id);
-
-            $user->email = $r->usuario_portal;
-
-            // 👉 SOLO si la clave viene llena
-            if (!empty($r->clave_portal)) {
-                $user->password = bcrypt($r->clave_portal);
-            }
-
-            $user->save();*/
-
-            // 3. Verificar si el ID del usuario fue proporcionado
-            if ($r->id) {
-                // Si el ID fue proporcionado, actualizamos el usuario
-                $user = User::findOrFail($r->id);
-                $user->email = $r->usuario_portal;
-
-                // 👉 SOLO si la clave viene llena
-                if (!empty($r->clave_portal)) {
-                    $user->password = bcrypt($r->clave_portal);
-                }
-
-                $user->save();
-
-              // 2. Enviar correo con credenciales al proveedor
-              try {
-                  Mail::to($r->email)->queue(
-                      new CredencialesProveedorMail(
-                          nombre: $r->nombre_razonsocial,
-                          usuario: $r->usuario_portal,
-                          clave: $r->clave_portal,
-                          nombreSoporte: $nombreSoporte,
-                          correoSoporte: $correoSoporte
-                      )
-                  );
-              } catch (\Throwable $e) {
-                  // opcional: log
-                  \Log::error("Error enviando correo proveedor: " . $e->getMessage());
-              }
-
-            } else {
-              // Si el ID no fue proporcionado, creamos un nuevo usuario
-              $user = User::create([
-                  'idpersona' => $proveedor->idpersona,
-                  'name'      => 'PPROVEEDOR', 
-                  'email'     => $r->usuario_portal,
-                  'password'  => bcrypt($r->clave_portal) // Solo si se proporciona la clave
-              ]);
-
-              // 3. Registrar permisos en tabla intermedia si el usuario fue creado
-              $permisos = [8, 9];
-
-              if ($user->id) {
-
-                $data = [];
-
-                foreach ($permisos as $permiso) {
-                    $data[] = [
-                        'users_id' => $user->id,
-                        'idpermiso' => $permiso,
-                    ];
-                }
-
-                  DB::table('usuario_permiso')->insert($data);
-
-              }
-
-              // 4. Enviar correo con credenciales al proveedor
-              try {
-                  Mail::to($r->email)->queue(
-                      new CredencialesProveedorMail(
-                          nombre: $r->nombre_razonsocial,
-                          usuario: $r->usuario_portal,
-                          clave: $r->clave_portal,
-                          nombreSoporte: $nombreSoporte,
-                          correoSoporte: $correoSoporte
-                      )
-                  );
-              } catch (\Throwable $e) {
-                  // opcional: log
-                  \Log::error("Error enviando correo proveedor: " . $e->getMessage());
-              }
-            }
-
-
-
-            return ApiResponse::success([
-                'idpersona' => $proveedor->idpersona,
-                'users_id'  => $user->id
-            ], 'Proveedor actualizado correctamente');
-
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
-        }
-    }
-
-    public function mostrar_proveedor($idpersona)
-    {
-        try {
-
-            // 1. Buscar proveedor por idpersona
-            $proveedor = Proveedor::where('idpersona', $idpersona)->firstOrFail();
-
-            // 2. Buscar usuario asociado (opcional, si editas usuario)
-            $usuario = User::where('idpersona', $idpersona)->first();
-
-            if (!$usuario) { $usuario = null; }
-
-            return ApiResponse::success([
-                'proveedor' => $proveedor,
-                'usuario'   => $usuario
-            ], 'Proveedor encontrado');
-
-        } catch (\Throwable $e) {
-            return ApiResponse::error($e);
-        }
-    }
-
-    public function eliminar_proveedor($idpersona)
-    {
-        DB::beginTransaction();
-
-        try {
-
-            // 1. Desactivar proveedor
-            $proveedor = Proveedor::where('idpersona', $idpersona)->firstOrFail();
-            $proveedor->estado = 0;
-            $proveedor->save();
-
-            // 2. Desactivar usuario asociado
-            $user = User::where('idpersona', $idpersona)->first();
-
-            if ($user) {
-                $user->estado_trash = 0;
-                $user->save();
-            }
-
-            DB::commit();
-
-            return ApiResponse::success([
-                'idpersona' => $idpersona
-            ], 'Proveedor y usuario desactivados correctamente');
-
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            return ApiResponse::error($e);
-        }
-    }
-
-    public function ImportarProveedoresExcel(Request $request)
-    {
-        try {
-
-            // ===============================
-            // 1️⃣ Validar archivo
-            // ===============================
-            if (!$request->hasFile('file_excel_proveedor_masivo')) {
-                return ApiResponse::validation([], 'Debe seleccionar un archivo Excel');
-            }
-
-            $file = $request->file('file_excel_proveedor_masivo');
-
-            $ext = strtolower($file->getClientOriginalExtension());
-            if (!in_array($ext, ['xlsx', 'xls'])) {
-                return ApiResponse::validation([], 'El archivo debe ser Excel (.xlsx / .xls)');
-            }
-
-            // ===============================
-            // 2️⃣ Leer Excel (FORMA CORRECTA)
-            // ===============================
-            $spreadsheet = IOFactory::load($file->getPathname());
-            $sheet = $spreadsheet->getActiveSheet();
-
-            // ⛔ NO usar keys A,B,C
-            // ✅ Usar índices 0,1,2
-            $rows = $sheet->toArray('', false, false, false);
-
-            $registros = [];
-            $contador  = 0;
-
-            // ===============================
-            // 3️⃣ Recorrer filas
-            // ===============================
-            foreach ($rows as $i => $row) {
-
-                // Saltar encabezado (fila 1)
-                if ($i === 0) {
-                    continue;
-                }
-
-                // Mapear columnas según tu plantilla REAL
-                $tipoEntidadSunat = trim((string) ($row[0] ?? ''));
-                $tipoDocumento    = trim((string) ($row[1] ?? ''));
-                $numeroDocumento  = trim((string) ($row[2] ?? ''));
-                $razonSocial      = trim((string) ($row[3] ?? ''));
-                $nombres          = trim((string) ($row[4] ?? ''));
-                $apePaterno       = trim((string) ($row[5] ?? ''));
-                $apeMaterno       = trim((string) ($row[6] ?? ''));
-                $telefono         = trim((string) ($row[7] ?? ''));
-                $email            = trim((string) ($row[8] ?? ''));
-                $direccion        = trim((string) ($row[9] ?? ''));
-
-                // ===============================
-                // 4️⃣ Validación mínima REAL
-                // ===============================
-                if (
-                    !$tipoEntidadSunat ||
-                    !$tipoDocumento ||
-                    !$numeroDocumento ||
-                    !$razonSocial
-                ) {
-                    continue;
-                }
-
-                // Validación solo para NATURAL
-                if (strtoupper($tipoEntidadSunat) === 'NATURAL') {
-                    if (!$nombres || !$apePaterno) {
-                        continue;
-                    }
-                }
-
-                // ===============================
-                // 5️⃣ Armar registro
-                // ===============================
-                $registros[] = [
-                    'idtipo_persona'               => 3, // fijo
-                    'tipo_entidad_sunat'           => $tipoEntidadSunat,
-                    'tipo_documento'               => $tipoDocumento,
-                    'numero_documento'             => $numeroDocumento,
-                    'nombre_razonsocial'           => $razonSocial,
-                    'nombre_persona_natural'       => $nombres ?: null,
-                    'apellido_paterno_per_natural' => $apePaterno ?: null,
-                    'apellido_materno_per_natural' => $apeMaterno ?: null,
-                    'celular'                      => $telefono ?: null,
-                    'direccion'                    => $direccion ?: null,
-                    'email'                        => $email ?: null,
-                    'created_at'                   => now(),
-                    'updated_at'                   => now(),
-                ];
-
-                $contador++;
-            }
-
-            // ===============================
-            // 6️⃣ Validar si hay datos
-            // ===============================
-            if (count($registros) === 0) {
-                return ApiResponse::validation([], 'El Excel no contiene datos válidos');
-            }
-
-            // ===============================
-            // 7️⃣ Insertar en BD
-            // ===============================
-            DB::beginTransaction();
-
-            foreach (array_chunk($registros, 300) as $chunk) {
-                foreach ($chunk as $item) {
-                    Proveedor::create($item);
-                }
-            }
-
-            DB::commit();
-
-            return ApiResponse::success(
-                null,
-                "Importación exitosa: {$contador} proveedores"
-            );
-
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            return ApiResponse::error($e);
-        }
-    }
-
-
-//-------------------------funciones que estoy utilizando----------------------
+    //-------------------------funciones que estoy utilizando----------------------
 
     public function listar_homologaciones_all(Request $r)
     {
@@ -455,10 +43,11 @@ class AllHomologacionesController extends Controller
         $fecha_inicio_periodo = $r->input('fecha_inicio_periodo');
         $fecha_fin_periodo    = $r->input('fecha_fin_periodo');
         $estado_homologacion  = $r->input('estado_homologacion');
+        $estado_documento     = $r->input('estado_documento');
         $id_proveedor         = $r->input('id_proveedor');
         $id_persona_usuario   = $r->input('id_persona_usuario');
 
-        // Columnas válidas para ordenar
+        // Columnas válidas para ordenar (incluye alias que usaremos)
         $validSorts = [
             'descripcion',
             'fecha_inicio_proceso',
@@ -467,7 +56,8 @@ class AllHomologacionesController extends Controller
             'estado_homologacion',
             'tipo_estandar',
             'proveedor',
-            'comprador'
+            'comprador',
+            'todo_aprobado'
         ];
 
         if (!in_array($sort, $validSorts, true)) {
@@ -476,8 +66,88 @@ class AllHomologacionesController extends Controller
 
         $dir = strtolower($dir) === 'desc' ? 'desc' : 'asc';
 
-        /* ====================== QUERY BASE ====================== */
+        /* ====================== SUBCONSULTA ======================
+        Calcula todo_aprobado considerando SOLO documentos tipo 'Estandar' o 'Modelo'
+        Devuelve idpersona_facha_homologacion y todo_aprobado.
+        */
 
+        // Subquery para tipos distintos de 2 (usa 'Estandar' y 'Modelo')
+        $subqueryEstandar = DB::table('persona_facha_homologacion as pfh')
+            ->join('docsproveedortipoestandar as docs', 'docs.idpersona_facha_homologacion', '=', 'pfh.idpersona_facha_homologacion')
+            ->join('detalletipoestandarproveedor as dtp', 'dtp.iddetalletipoestandarproveedor', '=', 'docs.iddetalletipoestandarproveedor')
+            ->join('documento_tipo_estandar as destts', 'destts.iddocumento_tipo_estandar', '=', 'dtp.iddocumento_tipo_estandar')
+            ->select(
+                'pfh.idpersona_facha_homologacion',
+                DB::raw("
+                    CASE
+                        -- 0: Pendiente Registro (no hay documentos requeridos o todos sin archivo)
+                        WHEN COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND (docs.archivo IS NULL OR docs.archivo = '') THEN 1 END) = COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') THEN 1 END)
+                            OR COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') THEN 1 END) = 0
+                        THEN 0
+                        -- 1: Completo (todos con archivo y todos aprobados)
+                        WHEN COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND docs.archivo IS NOT NULL AND docs.archivo != '' THEN 1 END) = COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') THEN 1 END)
+                            AND COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND docs.estado_revision = 'Aprobado' THEN 1 END) = COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') THEN 1 END)
+                            AND COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') THEN 1 END) > 0
+                        THEN 1
+                        -- 2: Pendiente de validar (todos con archivo, pero ninguno aprobado)
+                        WHEN COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND (docs.archivo IS NULL OR docs.archivo = '') THEN 1 END) = 0
+                            AND COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND docs.estado_revision = 'Aprobado' THEN 1 END) = 0
+                            AND COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') THEN 1 END) > 0
+                        THEN 2
+                        -- 3: Parcialmente completo (al menos un aprobado con archivo y al menos un documento sin archivo)
+                        WHEN COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND docs.archivo IS NOT NULL AND docs.archivo != '' AND docs.estado_revision IN ('Aprobado', 'Actualizado') THEN 1 END) > 0
+                            AND COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND (docs.archivo IS NULL OR docs.archivo = ''  OR docs.estado_revision IN ('Aprobado', 'Actualizado')) THEN 1 END) > 0
+                        THEN 3
+                        ELSE 5
+                    END AS estado_documentos
+                ")
+            )
+            ->where('pfh.estado_trash', '1')
+            ->where('pfh.estado_delete', '1')
+            ->groupBy('pfh.idpersona_facha_homologacion');
+
+        // Subquery para tipo 2 (usa solo 'interno')
+        $subqueryInterno = DB::table('persona_facha_homologacion as pfh')
+            ->join('docsproveedortipoestandar as docs', 'docs.idpersona_facha_homologacion', '=', 'pfh.idpersona_facha_homologacion')
+            ->join('detalletipoestandarproveedor as dtp', 'dtp.iddetalletipoestandarproveedor', '=', 'docs.iddetalletipoestandarproveedor')
+            ->join('documento_tipo_estandar as destts', 'destts.iddocumento_tipo_estandar', '=', 'dtp.iddocumento_tipo_estandar')
+            ->select(
+                'pfh.idpersona_facha_homologacion',
+                DB::raw("
+                    CASE
+                        -- 0: Pendiente Registro (no hay documentos requeridos o todos sin archivo)
+                        WHEN COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND (docs.archivo IS NULL OR docs.archivo = '') THEN 1 END) = COUNT(CASE WHEN destts.tipo_documento = 'Interno' THEN 1 END)
+                            OR COUNT(CASE WHEN destts.tipo_documento = 'Interno' THEN 1 END) = 0
+                        THEN 0
+                        -- 1: Completo (todos con archivo y todos aprobados)
+                        WHEN COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND docs.archivo IS NOT NULL AND docs.archivo != '' THEN 1 END) = COUNT(CASE WHEN destts.tipo_documento = 'Interno' THEN 1 END)
+                            AND COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND docs.estado_revision = 'Aprobado' THEN 1 END) = COUNT(CASE WHEN destts.tipo_documento = 'Interno' THEN 1 END)
+                            AND COUNT(CASE WHEN destts.tipo_documento = 'Interno' THEN 1 END) > 0
+                        THEN 1
+                        -- 2: Pendiente de validar (todos con archivo, pero ninguno aprobado)
+                        WHEN COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND (docs.archivo IS NULL OR docs.archivo = '') THEN 1 END) = 0
+                            AND COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND docs.estado_revision = 'Aprobado' THEN 1 END) = 0
+                            AND COUNT(CASE WHEN destts.tipo_documento = 'Interno' THEN 1 END) > 0
+                        THEN 2
+                        -- 3: Parcialmente completo (al menos un aprobado con archivo y al menos un documento sin archivo)
+                        WHEN COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND docs.archivo IS NOT NULL AND docs.archivo != '' AND docs.estado_revision IN ('Aprobado', 'Actualizado') THEN 1 END) > 0
+                            AND COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND (docs.archivo IS NULL OR docs.archivo = '' OR docs.estado_revision IN ('Aprobado', 'Actualizado')) THEN 1 END) > 0
+                        THEN 3
+                        ELSE 5
+                    END AS estado_documentos
+                ")
+            )
+            ->where('pfh.estado_trash', '1')
+            ->where('pfh.estado_delete', '1')
+            ->groupBy('pfh.idpersona_facha_homologacion');
+
+        /* ====================== CONSULTA PRINCIPAL ======================
+        Incluye TODOS los joins necesarios para obtener los campos descriptivos.
+        Se agrupa por periodo (pfh.idpersona_facha_homologacion) y las columnas que
+        no son agregadas (de pfh, comp, pu) para evitar duplicados.
+        Los campos de tablas con múltiples valores (tep.descripcion) se agregan con MAX.
+        El todo_aprobado viene de la subconsulta y se toma como MAX (es el mismo valor para el grupo).
+        */
         $query = DB::table('persona_facha_homologacion as pfh')
             ->join('docsproveedortipoestandar as docs', 'docs.idpersona_facha_homologacion', '=', 'pfh.idpersona_facha_homologacion')
             ->join('detalletipoestandarproveedor as dtp', 'dtp.iddetalletipoestandarproveedor', '=', 'docs.iddetalletipoestandarproveedor')
@@ -485,6 +155,12 @@ class AllHomologacionesController extends Controller
             ->join('persona as comp', 'comp.idpersona', '=', 'pfh.idpersona')
             ->join('users as u', 'u.id', '=', 'pfh.user_init_process')
             ->join('persona as pu', 'u.idpersona', '=', 'pu.idpersona')
+            ->leftJoinSub($subqueryEstandar, 'aprob_est', function ($join) {
+                $join->on('pfh.idpersona_facha_homologacion', '=', 'aprob_est.idpersona_facha_homologacion');
+            })
+            ->leftJoinSub($subqueryInterno, 'aprob_int', function ($join) {
+                $join->on('pfh.idpersona_facha_homologacion', '=', 'aprob_int.idpersona_facha_homologacion');
+            })
             ->select(
                 'pfh.idpersona_facha_homologacion',
                 'pfh.idpersona',
@@ -494,68 +170,91 @@ class AllHomologacionesController extends Controller
                 'pfh.fecha_fin_periodo_h',
                 'pfh.estado_homologacion',
                 'pfh.estado_trash',
-                'tep.descripcion as tipo_estandar',
+                DB::raw("MAX(tep.descripcion) as tipo_estandar"),               // de todos los documentos del periodo
+                DB::raw("MAX(tep.idtipoestandarproveedor) as idtipoestandarproveedor"), // para filtro
                 'comp.nombre_razonsocial as proveedor',
                 'pu.nombre_razonsocial as comprador',
                 DB::raw("
-                    CASE 
-                        WHEN COUNT(docs.iddocsproveedortipoestandar)
-                          = SUM(CASE WHEN docs.estado_revision = 'Aprobado' THEN 1 ELSE 0 END)
-                        THEN 1 ELSE 0
-                    END as todo_aprobado
+                    CASE
+                        WHEN MAX(tep.idtipoestandarproveedor) = 2 
+                        THEN MAX(COALESCE(aprob_int.estado_documentos, 0))
+                        ELSE MAX(COALESCE(aprob_est.estado_documentos, 0))
+                    END as estado_documentos
                 ")
             )
             ->where('pfh.estado_trash', '1')
-            ->where('pfh.estado_delete', '1');
+            ->where('pfh.estado_delete', '1')
+            ->groupBy(
+                'pfh.idpersona_facha_homologacion',
+                'pfh.idpersona',
+                'pfh.descripcion',
+                'pfh.fecha_inicio_proceso',
+                'pfh.fecha_inicio_periodo_h',
+                'pfh.fecha_fin_periodo_h',
+                'pfh.estado_homologacion',
+                'pfh.estado_trash',
+                'comp.nombre_razonsocial',
+                'pu.nombre_razonsocial'
+            );
 
-        /* ====================== FILTROS ====================== */
-
-        if ($r->filled('tipo_compra')) { $query->where('tep.idtipoestandarproveedor', $tipo_compra); }
-
-        if ($r->filled('estado_homologacion')) { $query->where('pfh.estado_homologacion', $estado_homologacion); }
-
-        if ($r->filled('id_proveedor')) { $query->where('pfh.idpersona', $id_proveedor); }
-
-        if ($r->filled('id_persona_usuario')) { $query->where('pfh.user_init_process', $id_persona_usuario); }
-
-        // Fechas
-        if ($fecha_inicio_periodo && $fecha_fin_periodo) { $query->whereBetween('pfh.fecha_inicio_proceso', [ $fecha_inicio_periodo, $fecha_fin_periodo ]); } 
-        elseif ($fecha_inicio_periodo) { $query->whereDate('pfh.fecha_inicio_proceso', '>=', $fecha_inicio_periodo);
-        } elseif ($fecha_fin_periodo) { $query->whereDate('pfh.fecha_inicio_proceso', '<=', $fecha_fin_periodo); }
-
-        /* ====================== SEARCH GLOBAL ====================== */
-
-        if ($q !== '') {
-            $query->where(function ($w) use ($q) {
-                $w->whereRaw("LOWER(pfh.descripcion) LIKE ?", ["%{$q}%"])
-                  ->orWhereRaw("LOWER(pfh.fecha_inicio_proceso) LIKE ?", ["%{$q}%"])
-                  ->orWhereRaw("LOWER(pfh.fecha_inicio_periodo_h) LIKE ?", ["%{$q}%"])
-                  ->orWhereRaw("LOWER(pfh.fecha_fin_periodo_h) LIKE ?", ["%{$q}%"])
-                  ->orWhereRaw("LOWER(pfh.estado_homologacion) LIKE ?", ["%{$q}%"])
-                  ->orWhereRaw("LOWER(tep.descripcion) LIKE ?", ["%{$q}%"])
-                  ->orWhereRaw("LOWER(comp.nombre_razonsocial) LIKE ?", ["%{$q}%"])
-                  ->orWhereRaw("LOWER(pu.nombre_razonsocial) LIKE ?", ["%{$q}%"]);
-            });
+        /* ====================== FILTROS ESPECÍFICOS ====================== */
+        // Los filtros sobre columnas que están en GROUP BY pueden ir en WHERE.
+        if ($r->filled('estado_homologacion')) {
+            $query->where('pfh.estado_homologacion', $estado_homologacion);
         }
 
-        /* ====================== GROUP + ORDER + PAGINATE ====================== */
+        if ($r->filled('id_proveedor')) {
+            $query->where('pfh.idpersona', $id_proveedor);
+        }
 
-        $query->groupBy(
-            'pfh.idpersona_facha_homologacion',
-            'pfh.idpersona',
-            'pfh.descripcion',
-            'pfh.fecha_inicio_proceso',
-            'pfh.fecha_inicio_periodo_h',
-            'pfh.fecha_fin_periodo_h',
-            'pfh.estado_homologacion',
-            'pfh.estado_trash',
-            'tep.descripcion',
-            'comp.nombre_razonsocial',
-            'pu.nombre_razonsocial'
-        );
+        if ($r->filled('id_persona_usuario')) {
+            $query->where('pfh.user_init_process', $id_persona_usuario);
+        }
 
-        $query->orderBy($sort, $dir);
+        // Fechas
+        if ($fecha_inicio_periodo && $fecha_fin_periodo) {
+            $query->whereBetween('pfh.fecha_inicio_proceso', [$fecha_inicio_periodo, $fecha_fin_periodo]);
+        } elseif ($fecha_inicio_periodo) {
+            $query->whereDate('pfh.fecha_inicio_proceso', '>=', $fecha_inicio_periodo);
+        } elseif ($fecha_fin_periodo) {
+            $query->whereDate('pfh.fecha_inicio_proceso', '<=', $fecha_fin_periodo);
+        }
 
+        /* ====================== FILTROS SOBRE COLUMNAS AGREGADAS ====================== */
+        // Estos deben ir en HAVING.
+
+        // Filtro por tipo de compra (idtipoestandarproveedor)
+        if ($r->filled('tipo_compra')) {
+            $query->havingRaw('idtipoestandarproveedor = ?', [$tipo_compra]);
+        }
+
+        // Filtro por estado de documentos (todo_aprobado)
+        if ($r->filled('estado_documento')) {
+            $query->havingRaw('estado_documentos = ?', [(int) $estado_documento]);
+        }
+
+        /* ====================== BÚSQUEDA GLOBAL ====================== */
+        if (!empty($q) && is_string($q)) {
+            $q = strtolower($q);
+            $query->havingRaw("
+                (LOWER(pfh.descripcion) LIKE ? OR 
+                LOWER(pfh.fecha_inicio_proceso) LIKE ? OR 
+                LOWER(pfh.fecha_inicio_periodo_h) LIKE ? OR 
+                LOWER(pfh.fecha_fin_periodo_h) LIKE ? OR 
+                LOWER(pfh.estado_homologacion) LIKE ? OR 
+                LOWER(tipo_estandar) LIKE ? OR          /* ✅ Usamos el alias, NO tep.tipo_estandar */
+                LOWER(comp.nombre_razonsocial) LIKE ? OR 
+                LOWER(pu.nombre_razonsocial) LIKE ?)",
+                array_fill(0, 8, "%{$q}%")
+            );
+        }
+        /* ====================== ORDENAMIENTO ====================== */
+        // Para ordenar por campos agregados, usamos orderByRaw con el alias.
+        // Para campos no agregados, podemos usar orderBy normal, pero como todos los select
+        // son alias o agregados, usaremos orderByRaw para todos por consistencia.
+        $query->orderByRaw("{$sort} {$dir}");
+
+        /* ====================== PAGINACIÓN ====================== */
         $homologaciones_all = $query->paginate($perPage, ['*'], 'page', $page);
 
         return response()->json([
@@ -578,7 +277,7 @@ class AllHomologacionesController extends Controller
       try {
         $data  = Tipo_estandar::select2tipoestandar();
 
-        $options = ''; // string para concatenar HTML
+        $options = '<option value="" >Seleccionar</option>';
         foreach ($data as $t) {
             $options .= '<option value="'.$t->idtipoestandarproveedor.'" >' . e($t->descripcion). '</option>';
         }
@@ -596,7 +295,7 @@ class AllHomologacionesController extends Controller
       try {
         $data  = PersonaFechaHomologacion::select2estado_homologacion();
 
-        $options = ''; // string para concatenar HTML
+       $options = '<option value="" >Seleccionar</option>';
         foreach ($data as $t) {
             $options .= '<option value="'.$t->estado_homologacion.'" >' . e($t->estado_homologacion). '</option>';
         }
@@ -614,7 +313,7 @@ class AllHomologacionesController extends Controller
       try {
         $data  = PersonaFechaHomologacion::select2proveedor();
 
-        $options = ''; // string para concatenar HTML
+        $options = '<option value="" >Seleccionar</option>';
         foreach ($data as $t) {
             $options .= '<option value="'.$t->idpersona.'" >' . e($t->nombre_razonsocial). ' - ('.e($t->tipodocumento).' '.e($t->numero_documento).')</option>';
         }
@@ -632,7 +331,7 @@ class AllHomologacionesController extends Controller
       try {
         $data  = PersonaFechaHomologacion::select2usuarioproceso();
 
-        $options = ''; // string para concatenar HTML
+        $options = '<option value="" >Seleccionar</option>';
         foreach ($data as $t) {
             $options .= '<option value="'.$t->iduser.'" >' . e($t->nombre_razonsocial).'</option>';
         }
@@ -734,12 +433,9 @@ class AllHomologacionesController extends Controller
         ->deleteFileAfterSend(true);
     }
 
-    //----------------+/
-
-
-     /**
-     * Descarga masiva con estructura: PROVEEDOR / TIPO / FECHA / documentos
-     */
+    /**
+    * Descarga masiva con estructura: PROVEEDOR / TIPO / FECHA / documentos
+    */
     public function descargaMasiva(Request $request)
     {
         set_time_limit(300);
@@ -933,9 +629,6 @@ class AllHomologacionesController extends Controller
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
-
-
-
 
     public function descargaMasivaold(Request $request)
     {

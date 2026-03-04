@@ -26,4 +26,19 @@ class UbigeoDistrito extends Model
             ->select('d.idubigeo_distrito', 'd.nombre as distrito', 'd.codigo_postal', 'p.nombre as provincia', 'dep.nombre as departamento')
             ->get();
     }
+
+    /**
+     * Obtiene el código de Reniec para un distrito dado.
+     * @param int $idDistrito El ID del distrito
+     * @return string|null El código de Reniec o null si no se encuentra
+     */
+    public static function getCodigoReniecById($idDistrito)
+    {
+        if (!$idDistrito) {
+            return null;
+        }
+
+        return self::where('idubigeo_distrito', $idDistrito)
+                    ->value('ubigeo_reniec'); // o 'ubigeo_reniec' según tu campo
+    }
 }

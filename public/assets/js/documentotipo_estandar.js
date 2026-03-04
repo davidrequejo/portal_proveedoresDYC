@@ -48,9 +48,20 @@ const CSRF = document.querySelector('meta[name="csrf-token"]').content;
       return;
     }
     rows.forEach(r => {
-      estado = r.estado_trash == '1'?' <span class="text-center badge badge-new">Activado</span>':'Deshabilitado';
-      donw_tipo_doc = r.tipo_documento == 'Modelo'?` <a type="button" class="btn btn-block btn-xs" href="${BASE_URL}/${r.archivo}" download="Modelo ${r.descripcion ?? ''}"> <i class="fas fa-cloud-download-alt fa-1x color_icon_opt"></i></a>`:'';
 
+      var checkdocumento = '';
+      if (r.tipo_documento == 'Modelo' && r.archivo && r.archivo.trim() !== "") {
+
+        checkdocumento = `<i class="fas fa-check text-success"></i>`;
+      }else if (r.tipo_documento == 'Modelo' && (!r.archivo || r.archivo.trim() === "")) {
+
+        checkdocumento = `<i class="fas fa-times text-danger"></i>`;
+      }
+
+      estado = r.estado_trash == '1'?' <span class="text-center badge badge-new">Activado</span>':'Deshabilitado';
+      donw_tipo_doc = r.tipo_documento == 'Modelo'?` <a type="button" class="btn btn-block btn-xs" href="${BASE_URL}/${r.archivo}" download="Modelo ${r.descripcion ?? ''}"> <i class="fas fa-cloud-download-alt fa-1x color_icon_opt"></i> ${checkdocumento}</a>`:'';
+
+      //checkdocumento = r.archivo && r.archivo.trim() !== "" ? `<i class="fas fa-check text-success"></i>` : `<i class="fas fa-times text-danger"></i>`;
       $tbl.append(`
         <tr class="fila_docs" data-id="${r.iddocumento_tipo_estandar}">          
           <td class="py-1"> 
@@ -60,7 +71,7 @@ const CSRF = document.querySelector('meta[name="csrf-token"]').content;
             </div>
           </td>
           <td class="py-1 text-center" >${r.tipo_documento}</td>
-          <td class="py-1 text-center" >${donw_tipo_doc}</td>
+          <td class="py-1 text-center" >  ${donw_tipo_doc}</td>
           <td class="py-1 text-nowrap" >${r.descripcion ?? ''}</td>
           <td class="py-1 text-nowrap">${ estado }</td>
           

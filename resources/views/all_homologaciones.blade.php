@@ -67,7 +67,6 @@
       display: block;
     }
 
-
   </style>
 
 </head>
@@ -154,62 +153,84 @@
                   
                   <div class="card-body pb-1">
 
-                    <div class="row">
+                    <div class="p-3 " > 
+                      <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-11 col-xl-11">
+                          <div class="activar-scroll-x-auto scroll-sm d-flex flex-nowrap gap-2">                                             
+                            <!-- ::::::::::::::::::::: FILTRO tipo_compra :::::::::::::::::::::: -->
+                            <div style="width: 250px;  min-width: 200px;">
+                              <div class="form-group">
+                                <label for="descripcion">
+                                  <span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('tipo_compra')"  ><i class="las la-sync-alt"></i></span>
+                                  Tipo Compra </label> 
+                                <select name="tipo_compra" id="tipo_compra" class="form-control fs-h-input is-valid select2" placeholder="Tipo de compra" aria-invalid="false"  onchange="cargando_search(); delay(function(){filtros()}, 50 );">
+                                </select>
+                              </div>
+                            </div>
+                            <!-- ::::::::::::::::::::: FILTRO fecha_inicio_periodo :::::::::::::::::::::: -->
+                            <div style="width: 250px;  min-width: 200px;">
+                              <div class="form-group">
+                                <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('fecha_inicio_periodo')" ><i class="las la-sync-alt"></i></span> Inicio Periodo</label>                          
+                                <input type="date" name="fecha_inicio_periodo" class="form-control fs-h-input" id="fecha_inicio_periodo" onchange="cargando_search(); delay(function(){filtros()}, 50 );"/>
+                              </div>
+                            </div>
+                            <!-- ::::::::::::::::::::: FILTRO fecha_fin_periodo :::::::::::::::::::::: -->
+                            <div style="width: 250px;  min-width: 200px;">
+                              <div class="form-group">
+                                <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('fecha_fin_periodo')" ><i class="las la-sync-alt"></i></span> Fin Periodo</label>    
+                                <input type="date" name="fecha_fin_periodo" class="form-control fs-h-input" id="fecha_fin_periodo" onchange="cargando_search(); delay(function(){filtros()}, 50 );" />                      
+                              </div>
+                            </div>
+                            <!-- ::::::::::::::::::::: FILTRO estado_homologacion :::::::::::::::::::::: -->
+                            <div style="width: 250px;  min-width: 200px;">
+                              <div class="form-group">
+                                <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('estado_homologacion')" ><i class="las la-sync-alt"></i></span> Estado Proceso</label>                          
+                                <select name="estado_homologacion" id="estado_homologacion" class="form-control fs-h-input is-valid select2" placeholder="Estado" aria-invalid="false"  onchange="cargando_search(); delay(function(){filtros()}, 50 );">
+                                </select>
+                              </div>
+                            </div>
+                            <!-- ::::::::::::::::::::: FILTRO estado_documento :::::::::::::::::::::: -->
+                            <div style="width: 250px;  min-width: 200px;">
+                              <div class="form-group">
+                                <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('estado_documento')" ><i class="las la-sync-alt"></i></span> Estado Documento</label>                          
+                                <select name="estado_documento" id="estado_documento" class="form-control fs-h-input is-valid select2" placeholder="Estado" aria-invalid="false"  onchange="cargando_search(); delay(function(){filtros()}, 50 );">
+                                  <option value="0" >Pendiente Registro</option>
+                                  <option value="1" >Completo</option>
+                                  <option value="2" >Pendiente de validar</option>
+                                  <option value="3" >Parcialmente completo</option>
 
-                      <div class="col-12 col-sm-6 col-md-3 col-lg-1">
-                        <div class="form-group">
-                          <label for="descripcion">
-                            <span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('tipo_compra')"  ><i class="las la-sync-alt"></i></span>
-                            T. Compra </label> 
-                          <select name="tipo_compra" id="tipo_compra" class="form-control fs-h-input is-valid select2" placeholder="Tipo de compra" aria-invalid="false"  onchange="cargando_search(); delay(function(){filtros()}, 50 );">
-                          </select>
+                                </select>
+                              </div>
+                            </div>
+                            <!-- ::::::::::::::::::::: FILTRO proveedor :::::::::::::::::::::: -->
+                            <div style="width: 250px;  min-width: 200px;">
+                              <div class="form-group">
+                                <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('id_proveedor')" ><i class="las la-sync-alt"></i></span> Proveedor</label>                          
+                                <select name="id_proveedor" id="id_proveedor" class="form-control fs-h-input is-valid select2" placeholder="Proveedor" aria-invalid="false"  onchange="cargando_search(); delay(function(){filtros()}, 50 );"> 
+                                </select>
+                              </div>
+                            </div> 
+                            <!-- ::::::::::::::::::::: FILTRO usuarioo :::::::::::::::::::::: -->
+                            <div style="width: 250px;  min-width: 250px;">
+                              <div class="form-group">
+                                <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('id_persona_usuario')" ><i class="las la-sync-alt"></i></span> Comprador</label>                          
+                                <select name="id_persona_usuario" id="id_persona_usuario" class="form-control fs-h-input is-valid select2" placeholder="Comprador" aria-invalid="false"  onchange="cargando_search(); delay(function(){filtros()}, 50 );">
+                                </select>
+                              </div>
+                            </div>                          
+                          </div> 
                         </div>
-                      </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-1 col-xl-1 d-flex align-items-center justify-content-center">
 
-                      <div class="col-12 col-sm-6 col-md-2 col-lg-2">
-                        <div class="form-group">
-                          <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('fecha_inicio_periodo')" ><i class="las la-sync-alt"></i></span> Inicio Periodo</label>                          
-                          <input type="date" name="fecha_inicio_periodo" class="form-control fs-h-input" id="fecha_inicio_periodo" onchange="cargando_search(); delay(function(){filtros()}, 50 );"/>
-                        </div>
-                      </div>
+                            <a class="btn btn-app bg-info" onclick="descarga_masiva_homologaciones();">
+                              <span class="badge bg-danger"></span>
+                              <i class="fas fa-cloud-download-alt"></i> Descarga Masiva
+                            </a>
 
-                      <div class="col-12 col-sm-6 col-md-2 col-lg-2">
-                        <div class="form-group">
-                          <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('fecha_fin_periodo')" ><i class="las la-sync-alt"></i></span> Fin Periodo</label>    
-                          <input type="date" name="fecha_fin_periodo" class="form-control fs-h-input" id="fecha_fin_periodo" onchange="cargando_search(); delay(function(){filtros()}, 50 );" />                      
                         </div>
-                      </div>
-
-                      <div class="col-12 col-sm-6 col-md-2 col-lg-2">
-                        <div class="form-group">
-                          <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('estado_homologacion')" ><i class="las la-sync-alt"></i></span> Estado Proceso</label>                          
-                          <select name="estado_homologacion" id="estado_homologacion" class="form-control fs-h-input is-valid select2" placeholder="Estado" aria-invalid="false"  onchange="cargando_search(); delay(function(){filtros()}, 50 );">
-                          </select>
-                        </div>
-                      </div>
-
-                      <div class="col-12 col-sm-6 col-md-2 col-lg-2">
-                        <div class="form-group">
-                          <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('id_proveedor')" ><i class="las la-sync-alt"></i></span> Proveedor</label>                          
-                          <select name="id_proveedor" id="id_proveedor" class="form-control fs-h-input is-valid select2" placeholder="Proveedor" aria-invalid="false"  onchange="cargando_search(); delay(function(){filtros()}, 50 );"> 
-                          </select>
-                        </div>
-                      </div>
-                      <div class="col-12 col-sm-6 col-md-2 col-lg-2">
-                        <div class="form-group">
-                          <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('id_persona_usuario')" ><i class="las la-sync-alt"></i></span> Comprador</label>                          
-                          <select name="id_persona_usuario" id="id_persona_usuario" class="form-control fs-h-input is-valid select2" placeholder="Comprador" aria-invalid="false"  onchange="cargando_search(); delay(function(){filtros()}, 50 );">
-                          </select>
-                        </div>
-                      </div>
-                      <div class="col-12 col-sm-6 col-md-2 col-lg-1">
-                        <label for="descripcion" class="text-white">.<span class="badge bg-info m-r-4px badge-new cursor-pointer"></label>
-                        <a type="button" class="btn btn-info btn-block btn-flat btn-sm" onclick="descarga_masiva_homologaciones();" >                          
-                          <i class="fas fa-cloud-download-alt"></i>
-                          Descargar</a>
-                      </div>
-
-                    </div>
+                      </div>                                    
+                                                      
+                    </div>                   
 
                   </div>
 
@@ -351,6 +372,7 @@
                       </div>
 
                       <div class="modal-footer justify-content-end">
+                        <span class="text-principal fechayestadoenvio"></span>
                         <span class="text-danger spiner_enviando_correo" style="display: none"> <sup>*</sup> <i class="fas fa-sync fa-spin"></i> Enviendo... </span>
                         <button type="button" class="btn btn-xs btn-outline-secondary enviar_coreo_notificacion_proveeor" onclick="enviar_correo_notificacion();">  <i class="fas fa-mail-bulk fa-lg"></i> Enviar Notificación</button>
                       </div>
@@ -926,7 +948,7 @@
 
 
  
-  <script src="{{ asset('assets/js/all_homologaciones.js') }}?version_erp=01.07"></script>
+  <script src="{{ asset('assets/js/all_homologaciones.js') }}?version_erp=01.11"></script>
 
   <script>
     $(function() {
@@ -941,6 +963,7 @@
       
       
     });
+    const idTipoPersonauser = {{ auth()->user()->persona->idtipo_persona }};
   </script>
 
 </body>

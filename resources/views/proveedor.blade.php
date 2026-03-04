@@ -148,6 +148,60 @@
 
                 
               </div><!-- /.col -->
+
+                            <!-- ./col -->
+              <div class="col-12 filtros">
+                <div class="card" style="margin-top: 0.5rem !important;">
+                  
+                  <div class="card-body"  style="padding-bottom: 1px; !important;">
+
+                    <div class="p-1 " > 
+                      <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                          <div class="activar-scroll-x-auto scroll-sm d-flex flex-nowrap gap-2">                                             
+                            <!-- ::::::::::::::::::::: FILTRO estado_documento :::::::::::::::::::::: -->
+                            <div style="width: 250px;  min-width: 200px;">
+                              <div class="form-group">
+                                <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('estado_actualizaciondatos_filtro')" ><i class="las la-sync-alt"></i></span> Estado Sincronización</label>                          
+                                <select name="estado_actualizaciondatos_filtro" id="estado_actualizaciondatos_filtro" class="form-control fs-h-input is-valid select2" placeholder="Estado" aria-invalid="false"  onchange="cargando_search(); delay(function(){filtros()}, 50 );">
+                                  <option value="2" >Provedor No Actualizo sus datos </option>
+                                  <option value="0" >Provedor Actualizo sus datos</option>
+                                  <option value="1" >Provedor Sincronizado Con S10</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div style="width: 250px;  min-width: 200px;">
+                              <div class="form-group">
+                                <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('tiene_homologaciones_filtro')" ><i class="las la-sync-alt"></i></span> Tiene Homologación</label>                          
+                                <select name="tiene_homologaciones_filtro" id="tiene_homologaciones_filtro" class="form-control fs-h-input is-valid select2" placeholder="Estado" aria-invalid="false"  onchange="cargando_search(); delay(function(){filtros()}, 50 );">
+                                  <option value="1" >Si</option>
+                                  <option value="2" >No</option>
+                                </select>
+                              </div>
+                            </div>
+
+                            <div style="width: 250px;  min-width: 200px;">
+                              <div class="form-group hidden">
+                                <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('tipo_persona_filtro')" ><i class="las la-sync-alt"></i></span> Tipo Persona</label>                          
+                                <select name="tipo_persona_filtro" id="tipo_persona_filtro" class="form-control fs-h-input is-valid select2" placeholder="Estado" aria-invalid="false"  onchange="cargando_search(); delay(function(){filtros()}, 50 );">
+                                  <option value="NATURAL">NATURAL</option>
+                                  <option value="JURIDICA">JURIDICA</option>
+                                </select>
+                              </div>
+                            </div>
+                         
+                          </div> 
+                        </div>
+                      </div>                                    
+                                                      
+                    </div>                   
+
+                  </div>
+
+                </div>
+              </div>
+
+
             </div><!-- /.row -->
           </div><!-- /.container-fluid -->
         </div>
@@ -179,7 +233,7 @@
                         </select>
                       </div>
                       <div class="col-auto">
-                        <button type="button" class="btn btn-sm btn-outline-info recargar-tabla-proyecto" data-toggle="tooltip" data-original-title="Recargar tabla" ><i class="ti ti-refresh"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-info recargar-tabla-proveedor" data-toggle="tooltip" data-original-title="Recargar tabla" ><i class="ti ti-refresh"></i></button>
                       </div>
                     </div>
                     
@@ -327,52 +381,106 @@
               </div>
 
               <!--SINCRONIZACION CON EL S10--->
-              <div class="col-lg-12" id="div-ver-detalle-datos_sincronizacion" >
+              <div class="col-lg-12 div_sincronizacions10" style="display: none;" >
                 <div class="card">
                   
                   <div class="card-body pb-1">
                     <div class="row mb-2">                    
 
                       <div class="col-12  col-lg-6">
-                        <table class="table table-bordered table-hover styletabla" id="tabla-datos">
-                          <thead>
-                            <tr>                        
-                              <th style="padding: 8px 10px;">Acciones</th>
-                              <th data-sort="codigo"      class="sortable" style="padding: 8px 10px;">Código S10</th>
-                              <th data-sort="nombre_razonsocial" class="sortable" style="padding: 8px 10px;">Razón social</th>
-                              <th data-sort="tipo_entidad_sunat"     class="sortable" style="padding: 8px 10px;">Tipo Entidad </th>
-                              <th data-sort="abreviatura"     class="sortable" style="padding: 8px 10px;">Tipo de Doc.</th>
-                              <th data-sort="numero_documento"class="sortable" style="padding: 8px 10px;">Nro de Doc.</th>
-                              <th data-sort="celular"   class="sortable" style="padding: 8px 10px;">Teléfono</th>
-                              <th data-sort="email"       class="sortable" style="padding: 8px 10px;">Email</th>
-                              <th data-sort="direccion" class="sortable" style="padding: 8px 10px;">Dirección</th>
-                            </tr>
-                          </thead>
-                          <tbody>                     
-                          </tbody>
-                        </table>
+
+                        <div class="card">
+                          <div class="card-header">
+                            <h3 class="card-title">DATOS DEL PROVEEDOR</h3>
+                          </div>
+                          <!-- /.card-header -->
+                          <div class="card-body">
+                            <!-- we are adding the accordion ID so Bootstrap's collapse plugin detects it -->
+                            <div id="accordion" class="lista_cambios_proveedor">
+
+
+                            </div>
+                          </div>
+                          <!-- /.card-body -->
+                        </div>
+
 
                       </div>
-                      <div class="col-12 col-lg-6">
-                        <table class="table table-bordered table-hover styletabla" id="tabla-cuentas_bancarias">
-                          <thead>
-                            <tr>                        
-                              <th style="padding: 8px 10px;">Acciones</th>
-                              <th data-sort="codigo"      class="sortable" style="padding: 8px 10px;">Código S10</th>
-                              <th data-sort="nombre_razonsocial" class="sortable" style="padding: 8px 10px;">Razón social</th>
-                              <th data-sort="tipo_entidad_sunat"     class="sortable" style="padding: 8px 10px;">Tipo Entidad </th>
-                              <th data-sort="abreviatura"     class="sortable" style="padding: 8px 10px;">Tipo de Doc.</th>
-                              <th data-sort="numero_documento"class="sortable" style="padding: 8px 10px;">Nro de Doc.</th>
-                              <th data-sort="celular"   class="sortable" style="padding: 8px 10px;">Teléfono</th>
-                              <th data-sort="email"       class="sortable" style="padding: 8px 10px;">Email</th>
-                              <th data-sort="direccion" class="sortable" style="padding: 8px 10px;">Dirección</th>
-                            </tr>
-                          </thead>
-                          <tbody>                     
-                          </tbody>
-                        </table>
+
+                      <div class="col-12  col-lg-6">
+
+                        <div class="card">
+                          <div class="card-header">
+                            <h3 class="card-title">DATOS CUENTAS BANCARIAS</h3>
+                          </div>
+                          <!-- /.card-header -->
+                          <div class="card-body">
+                            <!-- we are adding the accordion ID so Bootstrap's collapse plugin detects it -->
+                            <div id="accordion" class="lista_cuentas_bancarias_proveedor">
+                              <div class="card">
+                                <div class="card-header">
+                                  <h4 class="card-title w-100">
+                                    <a class="d-block w-100 text-principal text-bold" data-toggle="collapse" href="#collapseOne">
+                                       <i class="fas fa-globe text-danger" ></i> Collapsible Group Item #1
+                                    </a>
+                                  </h4>
+                                </div>
+                                <div id="collapseOne" class="collapse show" data-parent="#accordion">
+                                  <div class="card-body">
+                                    <ul class="nav nav-pills flex-column">
+                                      <li class="nav-item active">
+                                        <p> <i class="far fa-circle text-secondary"></i> Razon Social : David Melvin Requejo Santa cruz </p>
+                                        <p><i class="far fa-circle text-secondary"></i> Tipo Documento: RUC </p>
+                                        <p> <i class="far fa-circle text-secondary"></i> Nro Documento : 10745456015 </p>
+                                        <p> <i class="far fa-circle text-secondary"></i> Razon Social : David Melvin Requejo Santa cruz </p>
+                                        <p><i class="far fa-circle text-secondary"></i> Tipo Documento: RUC </p>
+                                        <p> <i class="far fa-circle text-secondary"></i> Nro Documento : 10745456015 </p>
+                                        <p> <i class="far fa-circle text-secondary"></i> Razon Social : David Melvin Requejo Santa cruz </p>
+                                        <p><i class="far fa-circle text-secondary"></i> Tipo Documento: RUC </p>
+                                        <p> <i class="far fa-circle text-secondary"></i> Nro Documento : 10745456015 </p>
+                                      </li>
+                                    </ul>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="card">
+                                <div class="card-header">
+                                  <h4 class="card-title w-100">
+                                    <a class="d-block w-100 text-principal text-bold" data-toggle="collapse" href="#collapseThree">
+                                      <i class="fas fa-globe text-success" ></i>  Collapsible Group Success
+                                    </a>
+                                  </h4>
+                                </div>
+                                <div id="collapseThree" class="collapse" data-parent="#accordion">
+                                  <div class="card-body">
+                                    <ul class="nav nav-pills flex-column">
+                                      <li class="nav-item active">
+                                        <p> <i class="far fa-circle text-secondary"></i> Razon Social : David Melvin Requejo Santa cruz </p>
+                                        <p><i class="far fa-circle text-secondary"></i> Tipo Documento: RUC </p>
+                                        <p> <i class="far fa-circle text-secondary"></i> Nro Documento : 10745456015 </p>
+                                        <p> <i class="far fa-circle text-secondary"></i> Razon Social : David Melvin Requejo Santa cruz </p>
+                                        <p><i class="far fa-circle text-secondary"></i> Tipo Documento: RUC </p>
+                                        <p> <i class="far fa-circle text-secondary"></i> Nro Documento : 10745456015 </p>
+                                        <p> <i class="far fa-circle text-secondary"></i> Razon Social : David Melvin Requejo Santa cruz </p>
+                                        <p><i class="far fa-circle text-secondary"></i> Tipo Documento: RUC </p>
+                                        <p> <i class="far fa-circle text-secondary"></i> Nro Documento : 10745456015 </p>
+                                      </li>
+                                    </ul>
+                                  </div>
+                                </div>
+                              </div>
+
+                            </div>
+                          </div>
+                          <!-- /.card-body -->
+                        </div>
+
 
                       </div>
+
+
+
 
 
                     </div>
@@ -389,8 +497,7 @@
             
           </div><!-- /.container-fluid -->
 
-
-          <div class="modal fade" id="modal-agregar-proveedor">
+          <div class="modal fade backdrop-filter-3px" id="modal-agregar-proveedor">
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
               <div class="modal-content">
                 <div class="modal-header py-2 bg-color-principal" >
@@ -590,285 +697,280 @@
           </div>
           <!-- /.modal -->
 
-
-        <!-- Modal actualizar estado documento -->  
-        <div class="modal fade show" id="modal-actualizar-estado"  aria-modal="true" role="dialog">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h6 class="modal-title text-bold">Actualizar Estado : <strong class='text-principal nombre_doc_edit'></strong> </h6>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">×</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <form id="form-actualizar-estado" name="form-actualizar-estado" method="POST">
-                  @csrf
-                  <input type="hidden" name="iddocsproveedortipoestandar" id="iddocsproveedortipoestandar" /> 
-                  <input type="hidden" name="idpersonadoc" id="idpersonadoc" /> 
-
-
-                  <div  class="row" id="cargando-3-formulario">
-
-                    <div class="col-12 div_act_est_doc_h_select">
-                      <label for="estado_documentos">Estado de Documento</label>
-                      <select name="estado_documentos_update" id="estado_documentos_update" class="form-control fs-h-input is-valid select2" placeholder="Estado de Documentos" aria-invalid="false">
-                        <option value="Aprobado">Aprobado </option>
-                        <option value="Observado">Observado</option>
-                      </select>
-                    </div>
-
-                    <div class="col-12 mt-2 div_obs_est_up">
-                      <div class="form-group">
-                        <label for="observacion_est_up">Observacion </label> <br>
-                        <textarea name="observacion_est_up" id="observacion_est_up" class="form-control" rows="1"></textarea>
-                      </div>
-                    </div>
-
-                    <!-- Pdf 1 -->
-                    <div class="col-12 mt-2 div_archivo_up hidden" >
-                      <!-- linea divisoria -->
-                      <div class="col-lg-12 borde-arriba-naranja mt-2"></div>
-                      <div class="row">
-                        <div class="col-md-12 p-t-15px p-b-5px" >
-                          <label for="Presupuesto" class="control-label">Archivo</label>
-                        </div>
-                        <div class="col-6 col-md-6 col-lg-6 col-xl-6 text-center">
-                          <button type="button" class="btn btn-success btn-block btn-xs" id="doc1_i"><i class="fas fa-file-upload"></i> Subir.</button>
-                          <input type="hidden" id="doc_old_1" name="doc_old_1" />
-                          <input style="display: none;" id="doc1" type="file" name="doc1" accept=".pdf" class="docpdf" />
-                        </div>
-                        <div class="col-6 col-md-6 col-lg-6 col-xl-6 text-center">
-                          <button type="button" class="btn btn-info btn-block btn-xs" onclick="re_visualizacion(1, '', '');"><i class="fa fa-eye"></i> PDF.</button>
-                        </div>
-                      </div>
-                      <div id="doc1_ver" class="text-center mt-4">
-                        <img src="/assets/svg/pdf.svg" alt="" width="50%" />
-                      </div>
-                      <div class="text-center" id="doc1_nombre"><!-- aqui va el nombre del pdf --></div>
-                    </div>
+          <!-- Modal actualizar estado documento -->  
+          <div class="modal fade show backdrop-filter-3px" id="modal-actualizar-estado"  aria-modal="true" role="dialog">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h6 class="modal-title text-bold">Actualizar Estado : <strong class='text-principal nombre_doc_edit'></strong> </h6>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <form id="form-actualizar-estado" name="form-actualizar-estado" method="POST">
+                    @csrf
+                    <input type="hidden" name="iddocsproveedortipoestandar" id="iddocsproveedortipoestandar" /> 
+                    <input type="hidden" name="idpersonadoc" id="idpersonadoc" /> 
 
 
+                    <div  class="row" id="cargando-3-formulario">
 
-                  </div>
-                  
-                  <!-- barprogress -->
-                  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px;">
-                    <div class="progress" id="barra_progress_act_est_div">
-                      <div id="barra_progress_act_est" class="progress-bar" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: 0%;">
-                        0%
-                      </div>
-                    </div>
-                  </div> 
-
-                  <div class="row" id="cargando-4-formulario" style="display: none;">
-                    <div class="col-lg-12 text-center">
-                      <i class="fas fa-spinner fa-pulse fa-3x"></i><br />
-                      <br />
-                      <h4>Cargando...</h4>
-                    </div>
-                  </div>
-
-                  <button type="submit" style="display: none;" id="submit-form-actualizar_estado">Submit</button>
-                </form>
-              </div>
-              <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" id="guardar_registro_actualizar_estado" ><i class="ti ti-device-floppy"></i> Guardar</button>
-              </div>
-            </div>
-            <!-- /.modal-content -->
-          </div>
-          <!-- /.modal-dialog -->
-        </div>
-
-
-        <!-- Modal agregar homologacion -->
-        <div class="modal fade show" id="modal_agregar_homologacion"  aria-modal="true" role="dialog">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h6 class="modal-title">Agregar/Editar Homologación</h6>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">×</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <form id="form-add_homologacion" name="form-add_homologacion" method="POST">
-                  @csrf
-                  <input type="hidden" name="idpersona_facha_homologacion" id="idpersona_facha_homologacion" /> 
-                  <input type="hidden" name="idproveedor" id="idproveedor" /> 
-
-                  <input type="hidden" name="inputnombre_razonsocial_tipo" id="inputnombre_razonsocial_tipo" />
-                  <input type="hidden" name="inputemail_proveedor_env_correo" id="inputemail_proveedor_env_correo" />
-
-                  <div  class="row" id="cargando-5-formulario">
-
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 div_tipocompra ">
-                      <div class="form-group">
-                        <label for="descripcion">Tipo de Compra </label>
-                        <select name="idtipoestandarproveedor" id="idtipoestandarproveedor" class="form-control fs-h-input is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
+                      <div class="col-12 div_act_est_doc_h_select">
+                        <label for="estado_documentos">Estado de Documento</label>
+                        <select name="estado_documentos_update" id="estado_documentos_update" class="form-control fs-h-input is-valid select2" placeholder="Estado de Documentos" aria-invalid="false">
+                          <option value="Aprobado">Aprobado </option>
+                          <option value="Observado">Observado</option>
                         </select>
                       </div>
-                    </div>
 
-                    <div class="col-12 col-sm-12 col-md-8 col-lg-8 div_descripcion">
-                      <div class="form-group">
-                        <label for="descripcion">Descripción </label>                          
-                         <textarea name="descripcion_homologacion" id="descripcion_homologacion" class="form-control" rows="1"  style=" font-size: small; "></textarea>
+                      <div class="col-12 mt-2 div_obs_est_up">
+                        <div class="form-group">
+                          <label for="observacion_est_up">Observacion </label> <br>
+                          <textarea name="observacion_est_up" id="observacion_est_up" class="form-control" rows="1"></textarea>
+                        </div>
                       </div>
-                    </div>
 
-                    <div class="col-12 col-sm-12 col-md-4 col-lg-4 div_finicioproceso" >
-                      <div class="form-group">
-                        <label for="descripcion">F. Inicio Proceso  </label>                          
-                          <input type="date" name="fecha_inicio_proceso" class="form-control fs-h-input" id="fecha_inicio_proceso" />
+                      <!-- Pdf 1 -->
+                      <div class="col-12 mt-2 div_archivo_up hidden" >
+                        <!-- linea divisoria -->
+                        <div class="col-lg-12 borde-arriba-naranja mt-2"></div>
+                        <div class="row">
+                          <div class="col-md-12 p-t-15px p-b-5px" >
+                            <label for="Presupuesto" class="control-label">Archivo</label>
+                          </div>
+                          <div class="col-6 col-md-6 col-lg-6 col-xl-6 text-center">
+                            <button type="button" class="btn btn-success btn-block btn-xs" id="doc1_i"><i class="fas fa-file-upload"></i> Subir.</button>
+                            <input type="hidden" id="doc_old_1" name="doc_old_1" />
+                            <input style="display: none;" id="doc1" type="file" name="doc1" accept=".pdf" class="docpdf" />
+                          </div>
+                          <div class="col-6 col-md-6 col-lg-6 col-xl-6 text-center">
+                            <button type="button" class="btn btn-info btn-block btn-xs" onclick="re_visualizacion(1, '', '');"><i class="fa fa-eye"></i> PDF.</button>
+                          </div>
+                        </div>
+                        <div id="doc1_ver" class="text-center mt-4">
+                          <img src="/assets/svg/pdf.svg" alt="" width="50%" />
+                        </div>
+                        <div class="text-center" id="doc1_nombre"><!-- aqui va el nombre del pdf --></div>
                       </div>
-                    </div>
 
-                    <div class="col-12 col-sm-12 col-md-6 col-lg-6 div_fechainicioperiodo hidden" >
-                      <div class="form-group">
-                        <label for="descripcion">F. Inicio Periodo Homologación  </label>                          
-                          <input type="date" name="fecha_inicio_periodo_h" class="form-control fs-h-input" id="fecha_inicio_periodo_h" />
-                      </div>
+
+
                     </div>
                     
-                    <div class="col-12 col-sm-12 col-md-6 col-lg-6 div_fechafinperiodo hidden">
-                      <div class="form-group">
-                        <label for="descripcion">F. Inicio Periodo Homologación  </label>                          
-                          <input type="date" name="fecha_fin_periodo_h" class="form-control fs-h-input" id="fecha_fin_periodo_h" />
+                    <!-- barprogress -->
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px;">
+                      <div class="progress" id="barra_progress_act_est_div">
+                        <div id="barra_progress_act_est" class="progress-bar" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: 0%;">
+                          0%
+                        </div>
+                      </div>
+                    </div> 
+
+                    <div class="row" id="cargando-4-formulario" style="display: none;">
+                      <div class="col-lg-12 text-center">
+                        <i class="fas fa-spinner fa-pulse fa-3x"></i><br />
+                        <br />
+                        <h4>Cargando...</h4>
                       </div>
                     </div>
 
-                  </div>
-                  
-                  <!-- barprogress -->
-                  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px;">
-                    <div class="progress" id="barra_progress_act_est_div">
-                      <div id="barra_progress_act_est" class="progress-bar" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: 0%;">
-                        0%
+                    <button type="submit" style="display: none;" id="submit-form-actualizar_estado">Submit</button>
+                  </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                  <button type="button" class="btn btn-primary" id="guardar_registro_actualizar_estado" ><i class="ti ti-device-floppy"></i> Guardar</button>
+                </div>
+              </div>
+              <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+          </div>
+
+          <!-- Modal agregar homologacion -->
+          <div class="modal fade show backdrop-filter-3px" id="modal_agregar_homologacion"  aria-modal="true" role="dialog">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h6 class="modal-title">Agregar/Editar Homologación</h6>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <form id="form-add_homologacion" name="form-add_homologacion" method="POST">
+                    @csrf
+                    <input type="hidden" name="idpersona_facha_homologacion" id="idpersona_facha_homologacion" /> 
+                    <input type="hidden" name="idproveedor" id="idproveedor" /> 
+
+                    <input type="hidden" name="inputnombre_razonsocial_tipo" id="inputnombre_razonsocial_tipo" />
+                    <input type="hidden" name="inputemail_proveedor_env_correo" id="inputemail_proveedor_env_correo" />
+
+                    <div  class="row" id="cargando-5-formulario">
+
+                      <div class="col-12 col-sm-12 col-md-12 col-lg-12 div_tipocompra ">
+                        <div class="form-group">
+                          <label for="descripcion">Tipo de Compra </label>
+                          <select name="idtipoestandarproveedor" id="idtipoestandarproveedor" class="form-control fs-h-input is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="col-12 col-sm-12 col-md-8 col-lg-8 div_descripcion">
+                        <div class="form-group">
+                          <label for="descripcion">Descripción </label>                          
+                          <textarea name="descripcion_homologacion" id="descripcion_homologacion" class="form-control" rows="1"  style=" font-size: small; "></textarea>
+                        </div>
+                      </div>
+
+                      <div class="col-12 col-sm-12 col-md-4 col-lg-4 div_finicioproceso" >
+                        <div class="form-group">
+                          <label for="descripcion">F. Inicio Proceso  </label>                          
+                            <input type="date" name="fecha_inicio_proceso" class="form-control fs-h-input" id="fecha_inicio_proceso" />
+                        </div>
+                      </div>
+
+                      <div class="col-12 col-sm-12 col-md-6 col-lg-6 div_fechainicioperiodo hidden" >
+                        <div class="form-group">
+                          <label for="descripcion">F. Inicio Periodo Homologación  </label>                          
+                            <input type="date" name="fecha_inicio_periodo_h" class="form-control fs-h-input" id="fecha_inicio_periodo_h" />
+                        </div>
+                      </div>
+                      
+                      <div class="col-12 col-sm-12 col-md-6 col-lg-6 div_fechafinperiodo hidden">
+                        <div class="form-group">
+                          <label for="descripcion">F. Inicio Periodo Homologación  </label>                          
+                            <input type="date" name="fecha_fin_periodo_h" class="form-control fs-h-input" id="fecha_fin_periodo_h" />
+                        </div>
+                      </div>
+
+                    </div>
+                    
+                    <!-- barprogress -->
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px;">
+                      <div class="progress" id="barra_progress_act_est_div">
+                        <div id="barra_progress_act_est" class="progress-bar" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: 0%;">
+                          0%
+                        </div>
+                      </div>
+                    </div> 
+
+                    <div class="row" id="cargando-6-formulario" style="display: none;">
+                      <div class="col-lg-12 text-center">
+                        <i class="fas fa-spinner fa-pulse fa-3x"></i><br />
+                        <br />
+                        <h4>Cargando...</h4>
                       </div>
                     </div>
-                  </div> 
 
-                  <div class="row" id="cargando-6-formulario" style="display: none;">
-                    <div class="col-lg-12 text-center">
-                      <i class="fas fa-spinner fa-pulse fa-3x"></i><br />
-                      <br />
-                      <h4>Cargando...</h4>
+                    <button type="submit" style="display: none;" id="submit-form-add_homologacion">Submit</button>
+                  </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                  <button type="button" class="btn btn-primary guardar_registro_add_homologacion" ><i class="ti ti-device-floppy"></i> Guardar</button>
+                </div>
+              </div>
+              <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+          </div>
+
+            <!-- Modal ver documento PDF -->     
+          <div class="modal fade show backdrop-filter-3px" id="modal_ver_documento"  aria-modal="true" role="dialog">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+
+                  <div class="card-header border-0">
+                    <h3 class="card-title m-2 font-weight-bold text-black-50">Nombre Documento : <span class="nombre_documento_pdf" style="color: #ff0000 !important;"></span> </h3>
+                    <div class="card-tools m-2"></div>
+                  </div>
+
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div class="modal-body ver_documento_modal">
+
+                </div>
+                <div class="modal-footer justify-content-end">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                </div>
+              </div>
+              <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+          </div>
+
+          <!--Carga Masiva de Proveedores-->
+          <div class="modal fade backdrop-filter-3px" id="modal-agregar-proveedor-masivo">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+              <div class="modal-content">
+
+                <!-- HEADER -->
+                <div class="modal-header py-2 bg-color-principal">
+                  <h4 class="modal-title text-white text-bold">Importación de Proveedores</h4>
+                  <button type="button" class="close" data-dismiss="modal">
+                    <span class="text-white">&times;</span>
+                  </button>
+                </div>
+
+                <!-- BODY -->
+                <div class="modal-body">
+
+                  <!-- INDICADOR PASOS -->
+                  <div class="step-indicator mb-3">
+                    <div class="step active" data-step="1">1. Plantilla</div>
+                    <div class="step" data-step="2">2. Importar Excel</div>
+                  </div>
+
+                  <!-- PASO 1 -->
+                  <div class="step-content active" data-step="1">
+                    <div class="form-group">
+                      <label>Click para:</label>
+                      <a href="{{ asset('assets/plantilla-excel/Plabtilla-importar-proveedor.xlsx') }}" download="Plantilla-Proveedor">Descargar plantilla excel</a>
                     </div>
+
+                    <div class="alert alert-warning">
+                      <strong>Atención:</strong> Use la plantilla sin modificar columnas.
+                    </div>
+
+                    <button class="btn btn-primary btn-next">Siguiente</button>
                   </div>
 
-                  <button type="submit" style="display: none;" id="submit-form-add_homologacion">Submit</button>
-                </form>
-              </div>
-              <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" id="guardar_registro_add_homologacion" ><i class="ti ti-device-floppy"></i> Guardar</button>
+                  <!-- PASO 2 -->
+                  <div class="step-content" data-step="2">
+                    <div class="form-group">
+
+                      <input type="file" class="filepond"  name="file_excel_proveedor_masivo" id="input-plantilla-excel"   data-allow-reorder="true"  data-max-files="1"  >
+                            
+                    </div>
+
+                    <button class="btn btn-secondary btn-prev">Anterior</button>
+                  </div>
+
+                  <!-- PROGRESS -->
+                  <div class="progress mt-3 d-none" id="barra_progress_importar_proveedor_div">
+                    <div id="barra_progress_importar_proveedor"
+                        class="progress-bar"
+                        style="width:0%">0%</div>
+                  </div>
+
+                </div>
+
+                <!-- FOOTER -->
+                <div class="modal-footer d-none" id="div-btn-importar-proveedor">
+                  <button class="btn btn-outline-danger btn-sm" data-dismiss="modal">Cerrar</button>
+                  <button class="btn btn-success btn-sm" id="guardar_registro_importar_proveedor">
+                    Importar
+                  </button>
+                </div>
+
               </div>
             </div>
-            <!-- /.modal-content -->
           </div>
-          <!-- /.modal-dialog -->
-        </div>
-
-
-          <!-- Modal ver documento PDF -->     
-        <div class="modal fade show" id="modal_ver_documento"  aria-modal="true" role="dialog">
-          <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-              <div class="modal-header">
-
-                <div class="card-header border-0">
-                  <h3 class="card-title m-2 font-weight-bold text-black-50">Nombre Documento : <span class="nombre_documento_pdf" style="color: #ff0000 !important;"></span> </h3>
-                  <div class="card-tools m-2"></div>
-                </div>
-
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">×</span>
-                </button>
-              </div>
-              <div class="modal-body ver_documento_modal">
-
-              </div>
-              <div class="modal-footer justify-content-end">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-              </div>
-            </div>
-            <!-- /.modal-content -->
-          </div>
-          <!-- /.modal-dialog -->
-        </div>
-
-
-        <!--Carga Masiva de Proveedores-->
-        <div class="modal fade" id="modal-agregar-proveedor-masivo">
-          <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content">
-
-              <!-- HEADER -->
-              <div class="modal-header py-2 bg-color-principal">
-                <h4 class="modal-title text-white text-bold">Importación de Proveedores</h4>
-                <button type="button" class="close" data-dismiss="modal">
-                  <span class="text-white">&times;</span>
-                </button>
-              </div>
-
-              <!-- BODY -->
-              <div class="modal-body">
-
-                <!-- INDICADOR PASOS -->
-                <div class="step-indicator mb-3">
-                  <div class="step active" data-step="1">1. Plantilla</div>
-                  <div class="step" data-step="2">2. Importar Excel</div>
-                </div>
-
-                <!-- PASO 1 -->
-                <div class="step-content active" data-step="1">
-                  <div class="form-group">
-                    <label>Click para:</label>
-                    <a href="{{ asset('assets/plantilla-excel/Plabtilla-importar-proveedor.xlsx') }}" download="Plantilla-Proveedor">Descargar plantilla excel</a>
-                  </div>
-
-                  <div class="alert alert-warning">
-                    <strong>Atención:</strong> Use la plantilla sin modificar columnas.
-                  </div>
-
-                  <button class="btn btn-primary btn-next">Siguiente</button>
-                </div>
-
-                <!-- PASO 2 -->
-                <div class="step-content" data-step="2">
-                  <div class="form-group">
-
-                    <input type="file" class="filepond"  name="file_excel_proveedor_masivo" id="input-plantilla-excel"   data-allow-reorder="true"  data-max-files="1"  >
-                          
-                  </div>
-
-                  <button class="btn btn-secondary btn-prev">Anterior</button>
-                </div>
-
-                <!-- PROGRESS -->
-                <div class="progress mt-3 d-none" id="barra_progress_importar_proveedor_div">
-                  <div id="barra_progress_importar_proveedor"
-                      class="progress-bar"
-                      style="width:0%">0%</div>
-                </div>
-
-              </div>
-
-              <!-- FOOTER -->
-              <div class="modal-footer d-none" id="div-btn-importar-proveedor">
-                <button class="btn btn-outline-danger btn-sm" data-dismiss="modal">Cerrar</button>
-                <button class="btn btn-success btn-sm" id="guardar_registro_importar_proveedor">
-                  Importar
-                </button>
-              </div>
-
-            </div>
-          </div>
-        </div>
-
 
         </section>
         <!-- /.content -->
@@ -908,8 +1010,10 @@
 
 
  
-  <script src="{{ asset('assets/js/proveedor.js') }}?version_erp=01.07"></script>
-  <script src="{{ asset('assets/js/proveedor_carga_masiva.js') }}?version_erp=01.07"></script>
+  <script src="{{ asset('assets/js/proveedor.js') }}?version_erp=01.11"></script>
+  <script src="{{ asset('assets/js/proveedor_carga_masiva.js') }}?version_erp=01.11"></script>
+  <script src="{{ asset('assets/js/sincronizacions10.js') }}?version_erp=01.11"></script>
+  
 
   <script>
     $(function() {
@@ -921,9 +1025,11 @@
     });
     // Input file
     bsCustomFileInput.init();
-      
-      
+     
     });
+
+    const idTipoPersonauser = {{ auth()->user()->persona->idtipo_persona }};
+
   </script>
 
 </body>

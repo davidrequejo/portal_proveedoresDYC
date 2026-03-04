@@ -4,130 +4,55 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
-use App\Models\Proveedor;
 use App\Models\Logbd;
-use Illuminate\Support\Facades\Validator;
-use App\Mail\ProveedorActualizadoLogisticaMail;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
-use App\Traits\RegistraLogCompleto; // 👈 1. IMPORTAR
 
-
-class ActualizardatosproveedorController extends Controller
+class ProveedorLogController extends Controller
 {
-    use RegistraLogCompleto;   // 👈 2. USAR EL TRAIT
 
-    public function index()
-    {
-       return view('actualizardatos');
-    }
-
-    // 👇 3. IMPLEMENTAR EL MÉTODO OBLIGATORIO
-    public function getConfigLog($tabla)
-    {
-        $configs = [
-            // 🔵 TABLA PERSONA (PROVEEDORES)
-            'persona' => [
-                'labels' => [
-                    'nombre_razonsocial' => 'Razón Social',
-                    'nombre_persona_natural' => 'Nombres',
-                    'apellido_paterno_per_natural' => 'Apellido Paterno',
-                    'apellido_materno_per_natural' => 'Apellido Materno',
-                    'sexo' => 'Sexo',
-                    'fecha_nacimiento' => 'Fecha Nacimiento',
-                    'tipo_documento' => 'Tipo Documento',
-                    'numero_documento' => 'N° Documento',
-                    'celular' => 'Celular',
-                    'email' => 'Correo',
-                    'direccion' => 'Dirección',
-                    'tipo_entidad_sunat' => 'Tipo Persona',
-                    'codigo_s10' => 'Código S10',
-                    'ruc_persona_natural' => 'DNI Persona Natural',
-
-                ],
-                'formatters' => [
-                    'sexo' => 'sexo',
-                    'fecha_nacimiento' => 'fecha',
-                    'celular' => 'celular',
-                    'numero_documento' => 'documento',
-                    'ruc_persona_natural' => 'documento',
-                    'email' => 'email',
-                    'tipo_documento' => 'tipo_documento',
-                ],
-                'ignorar' => ['updated_at', 'user_updated', 'created_at', 'user_created']
-            ],
-            
-            // 🟢 TABLA HOMOLOGACIÓN
-            /*'homologacion' => [
-                'labels' => [
-                    'tipo_compra' => 'Tipo de Compra',
-                    'inicio_proceso' => 'Inicio Proceso',
-                    'fin_periodo' => 'Fin Período',
-                    'estado' => 'Estado',
-                    'descripcion' => 'Descripción',
-                ],
-                'formatters' => [
-                    'inicio_proceso' => 'fecha',
-                    'fin_periodo' => 'fecha_homologacion',
-                    'estado' => 'estado_homologacion',
-                ],
-                'ignorar' => ['updated_at', 'user_updated']
-            ],*/
-            
-            // 🟡 TABLA DOCUMENTOS
-            /*'documentos' => [
-                'labels' => [
-                    'descripcion' => 'Documento',
-                    'estado' => 'Estado',
-                    'tamano' => 'Tamaño',
-                    'tipo' => 'Tipo',
-                ],
-                'formatters' => [
-                    'tamano' => 'tamano_archivo',
-                    'estado' => 'estado_homologacion',
-                    'tipo' => 'tipo_documento',
-                ],
-                'ignorar' => ['updated_at', 'user_updated']
-            ],*/
-            
-            // 🟠 TABLA CUENTAS BANCARIAS
-            /*'cuenta_bancaria' => [
-                'labels' => [
-                    'numero_cuenta' => 'N° Cuenta',
-                    'banco' => 'Banco',
-                    'moneda' => 'Moneda',
-                    'monto_apertura' => 'Monto Apertura',
-                ],
-                'formatters' => [
-                    'numero_cuenta' => 'cuenta_bancaria',
-                    'monto_apertura' => 'monto',
-                    'moneda' => 'moneda',
-                ],
-                'ignorar' => ['updated_at', 'user_updated']
-            ],*/
-        ];
-        
-        return $configs[$tabla] ?? [
-            'labels' => [],
-            'formatters' => [],
-            'ignorar' => ['updated_at', 'user_updated', 'created_at', 'user_created']
-        ];
-    }
-    
-
-    public function ver_proveedorupdate($idpersona)
+    public function verdatoslogproveedor($idpersona)
     {
         try {
 
-            // 1. Buscar proveedor por idpersona
-            $proveedor = Proveedor::where('idpersona', $idpersona)->firstOrFail();
+            // 1. Buscar log por idpersona
+            $verdatos = Logbd::where('nombre_tabla', 'persona')
+                 ->where('id_registrotabla', $idpersona)
+                  ->orderBy('idlogbd', 'DESC')
+                 ->get();
 
-            return ApiResponse::success([ 'proveedor' => $proveedor, ], 'Proveedor encontrado');
+            //cuentas bancarias
+            $verdatos_cuentas = Logbd::where('nombre_tabla', 'persona_cuentabancaria')
+                ->where('id_registrotabla', $idpersona)
+                ->orderBy('idlogbd', 'DESC')
+                ->get();
+
+            return ApiResponse::success([ 'ver_datos' => $verdatos, 'cuentasbancarias' => $verdatos_cuentas, ], 'Datos encontrados');
 
         } catch (\Throwable $e) {
             return ApiResponse::error($e);
         }
     }
+
+
+    public function vercuentasbancariaslogproveedor($idpersona)
+    {
+        try {
+
+            // 1. Buscar log por idpersona
+            $verdatos = Logbd::where('nombre_tabla', 'persona_cuentabancaria')
+                 ->where('id_registrotabla', $idpersona)
+                  ->orderBy('idlogbd', 'DESC')
+                 ->get();
+
+            return ApiResponse::success([ 'ver_datos' => $verdatos, ], 'Datos encontrados');
+
+        } catch (\Throwable $e) {
+            return ApiResponse::error($e);
+        }
+    }
+
+
+
 
     public function editarProveedor(Request $request)
     {
@@ -319,5 +244,5 @@ class ActualizardatosproveedorController extends Controller
         ], 'Proveedor actualizado correctamente');
     }
 
-    
+
 }

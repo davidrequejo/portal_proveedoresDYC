@@ -547,7 +547,7 @@ class HomologacionController extends Controller
           * 3️⃣ Armar data update
           * ========================= */
           $dataUpdate = [
-              'estado_revision'    => $r->input('estado_documentos_update'),
+              'estado_revision'    =>'Actualizado',
               'observacion' => $r->input('observacion_est_up'),
               'user_updated'   => auth()->id() ?? null,
           ];

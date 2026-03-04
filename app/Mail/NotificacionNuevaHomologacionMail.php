@@ -28,7 +28,7 @@ class NotificacionNuevaHomologacionMail extends Mailable implements ShouldQueue
     }
     public function build()
     {
-        return $this->subject('Se Creado Una Nueva Homologación')
+        return $this->subject('Se ha creado una nueva homologación')
             ->view('emails.notificacion_nueva_homologacion');
     }
 }

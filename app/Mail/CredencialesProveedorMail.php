@@ -25,7 +25,7 @@ class CredencialesProveedorMail extends Mailable implements ShouldQueue
 
     public function build()
     {
-        return $this->subject('Acceso al Portal de Proveedores')
+        return $this->subject('Acceso al Portal de Homologación de Proveedores')
             ->markdown('emails.proveedor.credenciales');
     }
 }

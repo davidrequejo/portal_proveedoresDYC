@@ -17,7 +17,7 @@ var  descrp_homol_edit = null;
 
 
 $("#guardar_registro_proveedor").on("click", function (e) { $("#submit-form-proveedor").submit(); });   
-$("#guardar_registro_add_homologacion").on("click", function (e) { $("#submit-form-add_homologacion").submit(); });
+$(".guardar_registro_add_homologacion").on("click", function (e) { $("#submit-form-add_homologacion").submit(); });
 $("#guardar_registro_actualizar_estado").on("click", function (e) { $("#submit-form-actualizar_estado").submit(); });
 
 // lista_select2("../ajax/ajax_general.php?op=select2EmpresaACargo", '#empresa_acargo', null);
@@ -37,11 +37,24 @@ $('#estado_documentos_update').select2({ theme: "bootstrap4", placeholder: "Sele
 
 $("#estado_documentos_update").val("").trigger('change');
 
+//-------------------- FILTROS ------------------------------------
+$("#estado_actualizaciondatos_filtro").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
+$("#tiene_homologaciones_filtro").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
+$("#tipo_persona_filtro").select2({ theme: "bootstrap4", placeholder: "Seleccionar", allowClear: true, });
+
+$("#estado_actualizaciondatos_filtro").val("").trigger('change');
+$("#tiene_homologaciones_filtro").val("").trigger('change');
+$("#tipo_persona_filtro").val("").trigger('change');
+
+//-------------------- Funciones ------------------------------------
+
+
 function show_hide_escenario(flag) {
   if (flag == 1) {            // Tabla principal
     $('#div-tabla-principal-proyecto').show();
     $("#div-ver-detalle-documentos").hide();
     $(".btn-agregar-proyecto").show();
+    $(".div_sincronizacions10").hide();
     $(".btn-cancelar").hide();
 
     $(".Nombre_inicial").html(`Proveedores`);
@@ -50,8 +63,14 @@ function show_hide_escenario(flag) {
     $('#div-tabla-principal-proyecto').hide();
     $("#div-ver-detalle-documentos").show();
     $(".btn-agregar-proyecto").hide();
+    $(".div_sincronizacions10").hide();
     $(".btn-cancelar").show();
-  } else if (flag == 3) {     //
+  } else if (flag == 3) {  
+    $('#div-tabla-principal-proyecto').hide();
+    $("#div-ver-detalle-documentos").hide();
+    $(".div_sincronizacions10").show();
+    $(".btn-agregar-proyecto").hide();
+    $(".btn-cancelar").show();   
   } else if (flag == 4) {
     
   }
@@ -62,7 +81,6 @@ $('#estado_sunat').on('change', function () {
   const estado = $(this).val();
   $('#guardar_registro_proveedor').toggle(estado === 'ACTIVO');
 });
-
 
 $(document).ready(function() {
     // Cuando el valor del select cambia
@@ -125,7 +143,11 @@ const state = {
   per_page: 10,
   sort: 'codigo',
   dir: 'asc',
-  q: ''
+  q: '',
+
+  estado_actualizaciondatos_filtro: null,
+  tiene_homologaciones_filtro: null,
+  tipo_persona_filtro: null
 };
 
 // Cargar datos
@@ -150,29 +172,53 @@ function renderFilas(rows){
     return;
   }
   rows.forEach(r => {
+    var totalHomologaciones = r.total_homologaciones != 0 ? `<span class="badge badge-info"> ${r.total_homologaciones}</span>` : '<span class="badge badge-warning"> 0</span> ';
+    let est_sub_sync = '';
+
+    switch (r.estado_sincronizacion) {
+      case 0:
+        est_sub_sync = '<span class="dot-sync pendiente"></span>'; // 🔴
+        break;
+
+      case 1:
+        est_sub_sync = '<span class="dot-sync ok"></span>';        // 🟢
+        break;
+
+      case 2:
+        est_sub_sync = '<span class="dot-sync none"></span>';      // ⚪
+        break;
+
+      default:
+        est_sub_sync = '';
+    }
 
     $tb.append(`
       <tr class="fila-proyecto" data-id="${r.idpersona}">          
         <td class="py-1"> 
           <div class="btn-group btn-group-sm">
             <button class="btn btn-xs text-nowrap bnt-editar-proyecto" onclick="ver_editar_proveedor(${r.idpersona})" > <i class="fas fa-pencil-alt color_icon_opt"></i></button>
-            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="lista_homologaciones(${r.idpersona}, '${r.nombre_razonsocial ?? ''}','${r.email ?? ''}')" ><i class="fas fa-folder fa-0 color_icon_opt"></i></button>
-            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="eliminar_proveedor(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')"><i class="fas fa-trash color_icon_opt"></i></button>
-            <button class="btn btn-xs text-nowrap" onclick="sincronizacions10(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')" ><i class="fas fa-globe" style="color: #74C0FC;"></i></button>
+            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="lista_homologaciones(${r.idpersona}, '${r.nombre_razonsocial ?? ''}','${r.email ?? ''}')" ><i class="fas fa-folder fa-0 color_icon_opt"> <sup>${totalHomologaciones}</sup> </i></button>
+            <button class="btn btn-xs text-nowrap bn-ver-proyecto hidden show_view_eliminar" onclick="eliminar_proveedor(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')"><i class="fas fa-trash color_icon_opt"></i></button>
+            <button class="btn btn-xs text-nowrap" onclick="sincronizacions10(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')" ><i class="fas fa-globe color_icon_opt">
+            <sup>${est_sub_sync}</sup></i> 
+            
+             </button>
           </div>
         </td>
-        <td class="py-1 text-center"> ${String('000').padStart(3, '0')} </td>
-        <td class="py-1 text-nowrap">${r.nombre_razonsocial ?? ''}</td>
+        <td class="py-1 text-center"> ${r.codigo_s10 ?? ''} </td>
+        <td class="py-1" style="max-width: 220px; white-space: normal; overflow-wrap: anywhere; word-break: break-word;">${r.nombre_razonsocial ?? ''}</td>
         <td class="py-1" >${r.tipo_entidad_sunat ?? ''}</td>
         <td class="py-1" >${r.abreviatura ?? ''}</td>
         <td class="py-1 text-nowrap">${r.numero_documento ?? ''}</td>
         <td class="py-1 text-nowrap">${r.celular ?? ''}</td>
         <td class="py-1 text-nowrap">${r.email ?? ''}</td>
-        <td class="py-1" style="max-width: 220px; white-space: normal; overflow-wrap: anywhere; word-break: break-word;">${ r.direccion } </td>
+        <td class="py-1" style="max-width: 220px; white-space: normal; overflow-wrap: anywhere; word-break: break-word;">${ r.direccion ?? ''} </td>
       </tr>
     `);
     $('[data-toggle="tooltip"]').tooltip(); 
   });
+
+  if (idTipoPersonauser=='2') { $(".show_view_eliminar").show(); }else{ $(".show_view_eliminar").hide(); }
 }
 
 // Render paginación Bootstrap (ventana de 5 páginas)
@@ -225,15 +271,58 @@ $("#perPage").on("change", function(){
   tabla_principal_cargar();
 });
 
-// Carga inicial
-tabla_principal_cargar();
-
-$(".recargar-tabla-proyecto").on("click", function(){
+$(".recargar-tabla-proveedor").on("click", function(){
   toastr_info('<i class="ti ti-checks"></i> Actualizando...', 'Los datos se estan actualizado', 500);
   $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');    
 
   tabla_principal_cargar();
 });
+
+function cargando_search() {
+  if ($('#tabla-proveedores').length) { } else {
+    $('.buscando_tabla').prepend(`<tr id="tabla-proveedores"> 
+      <th colspan="20" class="bg-danger " style="text-align: center !important;"><i class="fas fa-spinner fa-pulse fa-sm"></i> Buscando... </th>
+    </tr>`);
+  } 
+  
+}
+
+function filtros() {  
+
+  var estado_actualizaciondatos_filtro = $("#estado_actualizaciondatos_filtro").select2('val');
+  var tiene_homologaciones_filtro      = $("#tiene_homologaciones_filtro").select2('val'); 
+  var tipo_persona_filtro              = $("#tipo_persona_filtro").select2('val');
+
+  if (estado_actualizaciondatos_filtro == '' ||  estado_actualizaciondatos_filtro == null) { estado_actualizaciondatos_filtro = ""; nombre_estado_actualizaciondatos_filtro = ""; }       // filtro de trabajador  
+  if (tiene_homologaciones_filtro == '' ||  tiene_homologaciones_filtro == null) { tiene_homologaciones_filtro = ""; nombre_tiene_homologaciones_filtro = ""; }                 // filtro de dia pago  
+  if (tipo_persona_filtro == '' || tipo_persona_filtro == null) { tipo_persona_filtro = ""; nombre_tipo_persona_filtro = ""; }                 // filtro de dia pago
+
+  state.estado_actualizaciondatos_filtro= estado_actualizaciondatos_filtro;
+  state.tiene_homologaciones_filtro= tiene_homologaciones_filtro;
+  state.tipo_persona_filtro= tipo_persona_filtro;
+
+  tabla_principal_cargar();
+
+}
+
+
+// Carga inicial
+tabla_principal_cargar();
+
+function limpiarFiltro(nombre) { 
+  switch (nombre) { 
+    case 'estado_actualizaciondatos_filtro': $('#estado_actualizaciondatos_filtro').val(null).trigger('change'); state.estado_actualizaciondatos_filtro = null; break; 
+    case 'tiene_homologaciones_filtro': $('#tiene_homologaciones_filtro').val(''); state.tiene_homologaciones_filtro = null; break; 
+    case 'tipo_persona_filtro': $('#tipo_persona_filtro').val(''); state.tipo_persona_filtro = null; break; 
+  }
+
+}
+
+
+
+
+
+      
 
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 // ═══════                                       S E C C I O N   C R U D   P R O V E E D O R                                                        ═══════
@@ -265,6 +354,12 @@ function limpiar_form_proveedor(){
   $("#estado_sunat").val("").trigger('change');
   $(".valido_novalido").html(`<span class="badge badge-secondary">Por Verificar</span>`);
 
+  $("#btn_generar_credenciales").show();
+
+  $("#usuario_portal").attr('readonly', false);
+  $("#clave_portal").attr('readonly', false);
+        
+
   // Limpiamos las validaciones
   $(".form-control").removeClass('is-valid');
   $(".form-control").removeClass('is-invalid');
@@ -277,7 +372,7 @@ function ver_editar_proveedor(idpersona) {
   limpiar_form_proveedor();
   $('#modal-agregar-proveedor').modal('show');
   $.getJSON(`${BASE_URL}/proveedor/${idpersona}/mostrar_proveedor`, function (e) {
-    console.log(e.data);
+
 
     if (e.status == true) {
 
@@ -312,6 +407,18 @@ function ver_editar_proveedor(idpersona) {
       }
 
       $("#estado_sunat").val('ACTIVO').trigger('change');
+
+      if (idTipoPersonauser=='2') {
+        $("#btn_generar_credenciales").show();
+
+        $("#usuario_portal").attr('readonly', false);
+        $("#clave_portal").attr('readonly', false);
+        
+      }else{
+        $("#btn_generar_credenciales").hide();
+        $("#usuario_portal").attr('readonly', true);
+        $("#clave_portal").attr('readonly', true);
+      }
 
       $("#cargando-1-formulario").show();
       $("#cargando-2-formulario").hide();
@@ -374,7 +481,31 @@ function guardar_y_editar_proveedor(e) {
       $("#barra_progress_proyecto").css({ width: "0%", });
       $("#barra_progress_proyecto").text("0%");
     },
-    error: function (jqXhr) { ver_errores(jqXhr); },
+    error: function (xhr) { 
+      if (xhr.status == 422 || xhr.status === 404) {
+
+        let errors = xhr.responseJSON.data;
+        let message = xhr.responseJSON.message;
+        let html = '<ul style="text-align:left">';
+
+        Object.values(errors).forEach(msgs => {
+          msgs.forEach(msg => {
+            html += `<li>${msg}</li>`;
+          });
+        });
+
+        html += '</ul>';
+
+        Swal.fire({
+          icon: 'warning',
+          title: message,
+          html: html
+        });
+        $("#guardar_registro_proveedor").html('Guardar Cambios').removeClass('disabled');
+      }else {
+        ver_errores(xhr);
+      }
+     },
   });
 }
 
@@ -461,7 +592,7 @@ function lista_homologaciones(idpersona, nombre_razonsocial, email) {
 
     if (e.status == true) {
 
-      if (Array.isArray(e.data) && e.data.length === 0) { $('.btn_add_homologacion_show_view').show(); } else { $('.btn_add_homologacion_show_view').hide(); }
+     //if (Array.isArray(e.data) && e.data.length === 0) { $('.btn_add_homologacion_show_view').show(); } else { $('.btn_add_homologacion_show_view').hide(); }
       
       $(".tabla-list-homolog").empty('');
 
@@ -469,8 +600,8 @@ function lista_homologaciones(idpersona, nombre_razonsocial, email) {
 
         let estadoHtml = ''; let iconHtml = ''; let editar = ''; let eliminar = ''; aprobar_homologaciob='';
 
-        if (r.estado_homologacion === 'Vencida' || r.notificado_15dias=='1') { $('.btn_add_homologacion_show_view').show(); } else { $('.btn_add_homologacion_show_view').hide(); }
-        console.log(r.todo_aprobado);
+        //if (r.estado_homologacion === 'Vencida' || r.notificado_15dias=='1') { $('.btn_add_homologacion_show_view').show(); } else { $('.btn_add_homologacion_show_view').hide(); }
+
         
         if (r.todo_aprobado === 1) { aprobar_homologaciob='' } else { aprobar_homologaciob='hidden'}
 
@@ -486,8 +617,8 @@ function lista_homologaciones(idpersona, nombre_razonsocial, email) {
             <td class="py-1"> ${String(cont++).padStart(3, '0')} </td>
             <td class="py-1"> 
               <div class="btn-group btn-group-sm">
-                <button class="btn btn-xs text-nowrap ${editar}" onclick="ver_editar_periodo_h(${r.idpersona_facha_homologacion},'editar')" > <i class="fas fa-pencil-alt color_icon_opt"></i></button>
-                <button class="btn btn-xs text-nowrap ${eliminar}" onclick="eliminar_periodo_h(${r.idpersona_facha_homologacion}, '${r.tipo_estandar ?? ''}')" ><i class="fas fa-trash color_icon_opt"></i></button>
+                <button class="btn btn-xs text-nowrap ${editar} show_view_homol_eliminar" onclick="ver_editar_periodo_h(${r.idpersona_facha_homologacion},'editar')" > <i class="fas fa-pencil-alt color_icon_opt"></i></button>
+                <button class="btn btn-xs text-nowrap ${eliminar} show_view_homol_eliminar" onclick="eliminar_periodo_h(${r.idpersona_facha_homologacion}, '${r.tipo_estandar ?? ''}')" ><i class="fas fa-trash color_icon_opt"></i></button>
                 <button class="btn btn-xs text-nowrap ${aprobar_homologaciob}" onclick="ver_editar_periodo_h(${r.idpersona_facha_homologacion}, 'establecer_fecha_periodo')" >${iconHtml}</button>
               </div>
             </td>
@@ -505,7 +636,8 @@ function lista_homologaciones(idpersona, nombre_razonsocial, email) {
         `);
         ; 
       });
-      $('[data-toggle="tooltip"]').tooltip()
+      $('[data-toggle="tooltip"]').tooltip();
+        if (idTipoPersonauser=='2') { $(".show_view_homol_eliminar").show(); }else{ $(".show_view_homol_eliminar").hide(); };
     
     } else {
       alert("No se encontró el proyecto");
@@ -548,7 +680,7 @@ function guardar_y_editar_homoloacion(e) {
           ver_errores(e);				 
         }
       } catch (err) { console.log('Error: ', err.message); toastr.error('<h5 class="font-size-16px">Error temporal!!</h5> puede intentalo mas tarde, o comuniquese con <i><a href="tel:+51921305769" >921-305-769</a></i> ─ <i><a href="tel:+51921487276" >921-487-276</a></i>'); } 
-      $("#guardar_registro_actualizar_estado").html('Guardar Cambios').removeClass('disabled');
+      $(".guardar_registro_add_homologacion").html('Guardar Cambios').removeClass('disabled');
     },
     xhr: function () {
       var xhr = new window.XMLHttpRequest();
@@ -561,7 +693,7 @@ function guardar_y_editar_homoloacion(e) {
       return xhr;
     },
     beforeSend: function () {
-      $("#guardar_registro_actualizar_estado").html('<i class="fas fa-spinner fa-pulse fa-lg"></i>').addClass('disabled');
+      $(".guardar_registro_add_homologacion").html('<i class="fas fa-spinner fa-pulse fa-lg"></i>').addClass('disabled');
       $("#barra_progress_act_est").css({ width: "0%",  });
       $("#barra_progress_act_est").text("0%");
     },
@@ -672,7 +804,7 @@ function ver_documentos_x_homologacion(id, descripcion) {
             <td class="py-1 text-center" style="cursor:pointer">
                 ${r.archivo
                     ? `<a class="text-principal"
-                         onclick="ver_documento_proveedor('${BASE_URL}/${r.archivo}','${r.descripcion}')">
+                         onclick="ver_documento_proveedor('${r.archivo}','${r.descripcion}')">
                         <i class="fas fa-search"></i>
                        </a>`
                     : `<a class="text-muted"
@@ -721,7 +853,7 @@ function ver_documentos_x_homologacion(id, descripcion) {
             <td class="py-1 text-center" style="cursor:pointer">
                 ${r.archivo
                     ? `<a class="text-principal"
-                         onclick="ver_documento_proveedor('${BASE_URL}/${r.archivo}','${r.descripcion}')">
+                         onclick="ver_documento_proveedor('${r.archivo}','${r.descripcion}')">
                         <i class="fas fa-search"></i>
                        </a>`
                     : `<a class="text-muted"
@@ -733,6 +865,11 @@ function ver_documentos_x_homologacion(id, descripcion) {
             <td class="py-1 text-center" >
                     <a class="btn btn-sm"
                       onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','cargar_documento')">
+                      
+                      <i class="fas fa-cloud-upload-alt color_icon_opt"></i>
+                    </a>
+                    <a class="btn btn-sm"
+                      onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','actualizar_estado')">
                       <i class="fas fa-pencil-alt color_icon_opt"></i>
                     </a>
               
@@ -793,8 +930,6 @@ function eliminar_periodo_h(id, nombres) {
 
 function ver_ultimo_envio_notificacion(id) {
   $.get(`${BASE_URL}/homologacion/${id}/ultimo-envio`, function(e) {
-    console.log(e);
-    
 
       if (e.status == true) {
          const notif = e.data[0];

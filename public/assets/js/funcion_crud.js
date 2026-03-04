@@ -39,6 +39,8 @@ function lista_select2(url, nombre_input, id_tabla = null, span_charge = null) {
         $(nombre_input).html(e.data); 
         if ( !id_tabla || id_tabla == "NaN" || id_tabla == "" || id_tabla == null || id_tabla == "Infinity" || id_tabla === undefined) {
           $(nombre_input).val(null).trigger("change");
+        }else if( id_tabla == '_auto_'){ 
+
         } else {
           $(nombre_input).val(id_tabla).trigger("change");  
         }
@@ -49,6 +51,7 @@ function lista_select2(url, nombre_input, id_tabla = null, span_charge = null) {
     } catch (err) { console.log('Error: ', err.message); toastr.error('<h5 class="font-size-16px">Error temporal!!</h5> puede intentalo mas tarde, o comuniquese con <i><a href="tel:+51921305769" >921-305-769</a></i> ─ <i><a href="tel:+51921487276" >921-487-276</a></i>'); }      
   }).fail( function(e) { ver_errores(e); } );
 }
+
 
 
 function crud_guardar_editar_card_xhr( url, formData, name_progress, table_reload_1, table_reload_2 = false, table_reload_3 = false, table_reload_4 = false, table_reload_5 = false, table_reload_6 = false, table_reload_7 = false, table_reload_8 = false, table_reload_9 = false) {

@@ -149,6 +149,40 @@
     box-shadow: none;
 }
 
+.backdrop-filter-3px{backdrop-filter: blur(4px) !important;}
+
+.dot-sync{
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.dot-sync{ width:8px;height:8px;border-radius:50%;display:inline-block; }
+.pendiente{ background: #adb5bd; }
+.ok{ background:#28a745; }
+.none{ background:#dc3545; }
+
+
+
+.activar-scroll-x-auto {
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    padding-bottom: 10px;
+    position: relative;
+}
+
+.activar-scroll-x-auto > div{
+  flex: 0 0 auto; /* no se achican, no se rompen */
+}
+
+
 /*  ══════════════════════════════════════════ - E S T Y L O   P A R A   T A B L A - ══════════════════════════════════════════ */
 
 .styletabla thead th { font-size: small !important; background-color: #0202022e !important }
