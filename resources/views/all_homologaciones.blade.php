@@ -948,7 +948,7 @@
 
 
  
-  <script src="{{ asset('assets/js/all_homologaciones.js') }}?version_erp=01.11"></script>
+  <script src="{{ asset('assets/js/all_homologaciones.js') }}?version_erp=01.12"></script>
 
   <script>
     $(function() {

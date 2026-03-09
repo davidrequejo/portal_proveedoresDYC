@@ -196,6 +196,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
       //:::::::::::::::::::::::API PARA CONECTAR S10 :::::::::::::::::::::::::::::::::::::::::.
       Route::post('/proveedores/{proveedor}/sincronizar-s10/{idlogbd?}', [ApiSincronizarS10::class, 'sincronizar'])->name('proveedores.sincronizar');
+      Route::post('/proveedores/{proveedor}/sincronizarcb-s10/{idlogbd?}', [ApiSincronizarS10::class, 'sincronizarCuentasBancarias'])->name('proveedores.sincronizarCuentasBancarias');
       
       
        Route::get('/pruebas10api', function () {  return view('pruebas10api');   })->name('pruebas10api');

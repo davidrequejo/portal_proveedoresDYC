@@ -13,7 +13,7 @@ class UbigeoDistrito extends Model
 
     protected $fillable = [
         'idubigeo_distrito', 'idubigeo_provincia', 'idubigeo_departamento', 'nombre', 
-        'codigo_postal', 'ubigeo_reniec', 'ubigeo_inei', 'superficie', 'altitud', 
+        'codigo_postal', 'ubigeo_reniec', 'codlugars10', 'ubigeo_inei', 'superficie', 'altitud', 
         'latitud', 'longitud', 'frontera', 'estado'
     ];
 
@@ -39,6 +39,6 @@ class UbigeoDistrito extends Model
         }
 
         return self::where('idubigeo_distrito', $idDistrito)
-                    ->value('ubigeo_reniec'); // o 'ubigeo_reniec' según tu campo
+                    ->value('codlugars10'); // o 'ubigcodlugars10eo_reniec' según tu campo
     }
 }

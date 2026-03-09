@@ -425,7 +425,7 @@ class ProveedorController extends Controller
             return ApiResponse::error($e);
         }
     }*/
-public function Listar_Proveedores(Request $r)
+    public function Listar_Proveedores(Request $r)
     {
         // Parámetros de entrada
         $perPage = (int) $r->input('per_page', 20);
@@ -615,7 +615,7 @@ public function Listar_Proveedores(Request $r)
     // Método para obtener todos roles personas
     public function selec2tipoEstandar()
     {
-      try {
+    try {
         $data  = Tipo_estandar::select2tipoestandar();
 
         $options = ''; // string para concatenar HTML
@@ -625,15 +625,15 @@ public function Listar_Proveedores(Request $r)
 
         return ApiResponse::success($options, 'Tipo Estandar obtenida');
 
-      } catch (\Throwable $e) {
-          return ApiResponse::error($e);
-      }
+    } catch (\Throwable $e) {
+        return ApiResponse::error($e);
+    }
 
     }
 
     public function selec2periodohomologacion()
     {
-      try {
+    try {
         $data  = FechaHomologacion::select2Homologacion();
 
         $options = ''; // string para concatenar HTML
@@ -643,9 +643,9 @@ public function Listar_Proveedores(Request $r)
 
         return ApiResponse::success($options, 'Lista Homologaciones obtenida');
 
-      } catch (\Throwable $e) {
-          return ApiResponse::error($e);
-      }
+    } catch (\Throwable $e) {
+        return ApiResponse::error($e);
+    }
 
     }
 

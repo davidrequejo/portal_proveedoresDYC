@@ -807,8 +807,8 @@
 
 
  
-  <script src="{{ asset('assets/js/cliente.js') }}?version_erp=01.11"></script>
-  <script src="{{ asset('assets/js/cliente_carga_masiva.js') }}?version_erp=01.11"></script>
+  <script src="{{ asset('assets/js/cliente.js') }}?version_erp=01.12"></script>
+  <script src="{{ asset('assets/js/cliente_carga_masiva.js') }}?version_erp=01.12"></script>
 
   <script>
     $(function() {

@@ -2,9 +2,11 @@
 const CSRFF = document.querySelector('meta[name="csrf-token"]').content;
 
 let idpersona_sincronizacion = '';
+let razonsocial_sincronizacion = '';
 
 function sincronizacions10(idpersona, nombre_razonsocial) {
     idpersona_sincronizacion = idpersona;
+    razonsocial_sincronizacion = nombre_razonsocial;
     show_hide_escenario(3);
     $(".lista_cambios_proveedor").empty();
     $(".lista_cuentas_bancarias_proveedor").empty();
@@ -114,8 +116,7 @@ function renderLogsProveedor(logsArray) {
                             <li class="nav-item active">
                                 ${detallesHtml}
                             </li>
-                            <li class="nav-item active">
-                               <a class="btn btn-sm btn-principal mt-2 btn_sincronizars10" onclick="sincronizarproveedors10('${log.id_registrotabla}','${log.idlogbd}')">Sincronizar Con S10 </a>
+                            <li class="nav-item active">                              
                                <a class="btn btn-sm btn-${log.estado_sincronizacions10 == 0 ? "warning" : "success"} mt-2">${estadoTexto} </a>
                             </li>
                         </ul>
@@ -130,6 +131,8 @@ function renderLogsProveedor(logsArray) {
 
 // Función para renderizar las cuentas bancarias (cuentasbancarias)
 function renderCuentasBancarias(cuentasArray) {
+    console.log(cuentasArray);
+    
     $(".lista_cuentas_bancarias_proveedor").empty();
 
     if (!cuentasArray || cuentasArray.length === 0) {
@@ -223,8 +226,7 @@ function renderCuentasBancarias(cuentasArray) {
                             <li class="nav-item active">
                                 ${detallesHtml}
                             </li>
-                            <li class="nav-item active">
-                               <a class="btn btn-sm btn-primary mt-2" onclick="sincronizarCuentabancarias10('${cuenta.id_registrotabla}','${cuenta.idlogbd}')">Sincronizar Con S10</a>
+                            <li class="nav-item active">                               
                                <a class="btn btn-sm btn-${cuenta.estado_sincronizacions10 == 0 ? "warning" : "success"} mt-2">${estadoTexto} </a>
                             </li>
                         </ul>
@@ -243,7 +245,9 @@ $.ajaxSetup({
     },
 });
 
-function sincronizarproveedors10(id_registrotabla, idlogbd) {
+function sincronizarproveedors10() {
+    id_registrotabla = idpersona_sincronizacion;
+    idlogbd = '';
 
     $(".btn_sincronizars10").html('Sincronizando...').addClass('disabled');
     if (!id_registrotabla) {
@@ -271,7 +275,7 @@ function sincronizarproveedors10(id_registrotabla, idlogbd) {
                 }*/
                $(".btn_sincronizars10").html('Sincronizar Con S10').removeClass('disabled');
                 // Recargar los datos del proveedor para reflejar cambios
-                sincronizacions10(idpersona_sincronizacion, e.data.nombre_razonsocial);
+                sincronizacions10(idpersona_sincronizacion, razonsocial_sincronizacion);
             } else {
                 Swal.fire("Error!", e.message, "error");
             }
@@ -306,16 +310,19 @@ function sincronizarproveedors10(id_registrotabla, idlogbd) {
 }
 
 
-function sincronizarcuentabancarias10(id_registrotabla, idlogbd) {
+function sincronizarcuentabancarias10() {
 
-    $(".btn_sincronizars10").html('Sincronizando...').addClass('disabled');
+    id_registrotabla = idpersona_sincronizacion;
+    idlogbd = '';
+
+    $(".btn_sincronizarcbs10").html('Sincronizando...').addClass('disabled');
     if (!id_registrotabla) {
         alert("Error: ID de proveedor no válido");
         return;
     }
 
     const BASE_URL = window.location.origin;
-    const url = `${BASE_URL}/proveedores/${id_registrotabla}/sincronizar-s10/${idlogbd || ""}`;
+    const url = `${BASE_URL}/proveedores/${id_registrotabla}/sincronizarcb-s10/${idlogbd || ""}`;
 
     $.ajax({
         url: url,
@@ -332,9 +339,9 @@ function sincronizarcuentabancarias10(id_registrotabla, idlogbd) {
                     console.log('Código S10 asignado:', e.data.codigo_s10);
                     // Aquí puedes actualizar la UI si lo deseas
                 }*/
-               $(".btn_sincronizars10").html('Sincronizar Con S10').removeClass('disabled');
+               $(".btn_sincronizarcbs10").html('Sincronizar Con S10').removeClass('disabled');
                 // Recargar los datos del proveedor para reflejar cambios
-                sincronizacions10(idpersona_sincronizacion, e.data.nombre_razonsocial);
+                sincronizacions10(idpersona_sincronizacion, razonsocial_sincronizacion);
             } else {
                 Swal.fire("Error!", e.message, "error");
             }

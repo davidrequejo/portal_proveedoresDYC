@@ -99,14 +99,14 @@ function renderFilas(rows){
             </button>
           </div>
         </td>
-        <td>${r.banco}</td>
-        <td>${tipoCuenta}</td>
+        <td>${r.banco ?? ''}</td>
+        <td>${tipoCuenta ?? ''}</td>
         <td>${r.numero_cuenta ?? ''}</td>
         <td>${r.predeterminado == 1 ? 'Sí' : 'No'}</td>
-        <td>${moneda}</td>
-        <td>${r.cuenta_interbancaria}</td>
-        <td>${r.numero_cuenta_abono}</td>
-        <td>${estado}</td>
+        <td>${moneda ?? ''}</td>
+        <td>${r.cuenta_interbancaria ?? ''}</td>
+        <td>${r.numero_cuenta_abono ?? ''}</td>
+        <td>${estado ?? ''}</td>
       </tr>
     `);
   });

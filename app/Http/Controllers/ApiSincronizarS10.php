@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\JsonResponse;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ApiSincronizarS10 extends Controller
 {
@@ -83,13 +85,11 @@ class ApiSincronizarS10 extends Controller
                 $tipo = 'success';
 
                 // Actualizar el campo estado_sincronizacions10 en la tabla logbd
-                if ($idlogbd) {
-                    $log = Logbd::find($idlogbd);
-                    if ($log) {
-                        $log->estado_sincronizacions10 = '1';
-                        $log->save();
-                    }
-                }
+                Logbd::where('nombre_tabla', 'persona')
+                    ->where('id_registrotabla', $proveedor->idpersona)
+                    ->update([
+                        'estado_sincronizacions10' => 1
+                    ]);
 
 
             } else {
@@ -256,18 +256,20 @@ class ApiSincronizarS10 extends Controller
     {
         try {
             // 1. Validar que el proveedor ya tenga código en S10
-            if (empty($proveedor->s10_codigo)) {
+            if (empty($proveedor->codigo_s10)) {
                 $mensaje = 'El proveedor no está sincronizado con S10. Primero sincronice el proveedor.';
                 return $this->handleResponse($request, $mensaje, 'error');
             }
 
             // 2. Obtener las cuentas bancarias activas del proveedor (no eliminadas)
-            $cuentasLocales = PersonaCuentaBancaria::obtenerCuentasActivasProveedor($proveedor->id);
+            $cuentasLocales = PersonaCuentaBancaria::obtenerCuentasActivasProveedor($proveedor->idpersona);
 
             if ($cuentasLocales->isEmpty()) {
                 $mensaje = 'El proveedor no tiene cuentas bancarias activas para sincronizar.';
                 return $this->handleResponse($request, $mensaje, 'warning');
             }
+
+            //var_dump($cuentasLocales->toArray()); die(); // Debug: Ver cuentas locales antes de sincronizar
 
             $creadas = 0;
             $existentes = 0;
@@ -280,27 +282,58 @@ class ApiSincronizarS10 extends Controller
                     // 3. Mapear los campos locales al formato que espera S10
                     $dataS10 = $this->mapCuentaToS10($cuenta, $proveedor);
 
+                    //var_dump($cuenta->idbanco); die(); // Debug: Ver datos mapeados para S10 antes de buscar/crear
+                    Log::info('Buscando cuenta con:', [
+                        'codigo_s10' => $proveedor->codigo_s10,
+                        'Banco_ID' => $dataS10['Banco_ID'],
+                        'NoCuenta' => $dataS10['NoCuenta']
+                    ]);
                     // 4. Buscar si ya existe en S10 (por CodIdentificador, Banco_ID, NoCuenta)
                     $existente = $s10Api->buscarCuentaBancaria(
-                        $proveedor->s10_codigo,
+                        $proveedor->codigo_s10,
                         $dataS10['Banco_ID'],
                         $dataS10['NoCuenta']
                     );
 
                     if ($existente) {
-                        // Ya existe → solo actualizamos el ID local si no lo tenía
-                        if (empty($cuenta->NroIdentificadorCuentaBancos10)) {
-                            $cuenta->NroIdentificadorCuentaBancos10 = $existente['NroIdentificadorCuentaBanco'] ?? null;
+                        // Ya existe → obtenemos el ID del campo correcto
+                        $idS10 = $existente['NoIdentificadorCuentaBanco'] 
+                            ?? $existente['NroIdentificadorCuentaBanco'] 
+                            ?? null;
+                        if (empty($cuenta->NroIdentificadorCuentaBancos10) && $idS10) {
+                            $cuenta->NroIdentificadorCuentaBancos10 = $idS10;
                             $cuenta->save();
+                            DB::table('logbd')
+                            ->where('idpersona', $proveedor->idpersona)
+                            ->where('id_registrotabla', $cuenta->idpersona_cuentabancaria)
+                            ->where('nombre_tabla', 'persona_cuentabancaria')
+                            ->update(['estado_sincronizacions10' => 1]);
                         }
+                            DB::table('logbd')
+                            ->where('idpersona', $proveedor->idpersona)
+                            ->where('id_registrotabla', $cuenta->idpersona_cuentabancaria)
+                            ->where('nombre_tabla', 'persona_cuentabancaria')
+                            ->update(['estado_sincronizacions10' => 1]);
                         $existentes++;
                     } else {
-                        // No existe → crear en S10
+                        Log::info('Creando cuenta en S10', $dataS10);
                         $s10Id = $s10Api->crearCuentaBancaria($dataS10);
-                        $cuenta->NroIdentificadorCuentaBancos10 = $s10Id;
-                        $cuenta->save();
-                        $creadas++;
+                        if ($s10Id) {
+                            $cuenta->NroIdentificadorCuentaBancos10 = $s10Id;
+                            $cuenta->save();
+
+                            DB::table('logbd')
+                            ->where('idpersona', $proveedor->idpersona)
+                            ->where('id_registrotabla', $cuenta->idpersona_cuentabancaria)
+                            ->where('nombre_tabla', 'persona_cuentabancaria')
+                            ->update(['estado_sincronizacions10' => 1]);
+                            
+                            $creadas++;
+                        } else {
+                            $errores[] = "Cuenta ID {$cuenta->idpersona_cuentabancaria}: No se obtuvo ID de S10";
+                        }
                     }
+
                 } catch (\Exception $e) {
                     $errores[] = "Cuenta ID {$cuenta->idpersona_cuentabancaria}: " . $e->getMessage();
                     Log::error('Error sincronizando cuenta bancaria', [
@@ -324,7 +357,7 @@ class ApiSincronizarS10 extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error general en sincronización de cuentas bancarias', [
-                'proveedor_id' => $proveedor->id,
+                'proveedor_id' => $proveedor->idpersona,
                 'error' => $e->getMessage()
             ]);
             return $this->handleResponse($request, 'Error interno: ' . $e->getMessage(), 'error');
@@ -341,16 +374,16 @@ class ApiSincronizarS10 extends Controller
        //$bancoIdS10 = $this->obtenerBancoIdS10($cuenta->idbanco);
 
         return [
-            'CodIdentificador'          => $proveedor->s10_codigo,
+            'CodIdentificador'          => $proveedor->codigo_s10,
             'Banco_ID'                  => Banco::getCodigos10Idbn($cuenta->idbanco), // o el método que tengas para obtener el código de banco para S10
             'NoCuenta'                  => $cuenta->numero_cuenta,
             'TipoCuentaBanco'           => $cuenta->tipocuenta, // ej. 'Corriente', 'Ahorros'
             'Descripcion'               => Banco::getabreviaturabn($cuenta->idbanco).' '.$cuenta->numero_cuenta.' '. ($cuenta->moneda=='01' ? 'S/' : 'U$'), // Ejemplo: "BCP 12345678";
             'CodMoneda'                 => $cuenta->moneda, // ej. 'PEN', 'USD'
-            'IBAN'                      => $cuenta->iban ?? '',
-            'BBAN'                      => $cuenta->bban ?? '',
-            'Activo'                    => 1, // Porque ya filtramos activas
-            'Predeterminado'            => $cuenta->predeterminado ,
+            'IBAN'                      => '',
+            'BBAN'                      => '',
+            'Activo'                    => true, // Porque ya filtramos activas
+            'Predeterminado'            => $cuenta->predeterminado == '1' ? true : false    , // Convertir a booleano
             'CIB'                       => $cuenta->cuenta_interbancaria ?? '',
             'NoCuentaCargo'             => $cuenta->numero_cuenta,
             'CodIdentificadorEmpresa'   => null,
@@ -365,12 +398,31 @@ class ApiSincronizarS10 extends Controller
     {
         if ($request->wantsJson()) {
             return response()->json([
-                'success' => $tipo === 'success',
+                'status' => $tipo === 'success',
                 'message' => $mensaje,
             ], $tipo === 'error' ? 500 : 200);
         }
 
         return redirect()->back()->with($tipo, $mensaje);
+    }
+
+    private function actualizarLogSincronizacion($idPersona,$idbanco,$noCuenta)
+    {
+        var_dump($idPersona,$idbanco,$noCuenta); die(); 
+        // Posibles claves donde puede estar el número de cuenta en el JSON
+        $claves = ['Moneda', 'CC1', 'CC2', 'CC3'];
+        
+        foreach ($claves as $clave) {
+            $actualizado = DB::table('logbd')
+                ->where('id_registrotabla', $idPersona)
+                ->where('nombre_tabla', 'persona_cuentabancaria')
+                ->whereRaw('JSON_EXTRACT(observacion, "$.Banco.id") = ?', [$idbanco])
+                ->update(['estado_sincronizacions10' => 1]);
+            
+            if ($actualizado) {
+                break; // Salir si ya se actualizó
+            }
+        }
     }
 
 

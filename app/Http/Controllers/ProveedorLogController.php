@@ -16,13 +16,13 @@ class ProveedorLogController extends Controller
 
             // 1. Buscar log por idpersona
             $verdatos = Logbd::where('nombre_tabla', 'persona')
-                 ->where('id_registrotabla', $idpersona)
+                 ->where('idpersona', $idpersona)
                   ->orderBy('idlogbd', 'DESC')
                  ->get();
 
             //cuentas bancarias
             $verdatos_cuentas = Logbd::where('nombre_tabla', 'persona_cuentabancaria')
-                ->where('id_registrotabla', $idpersona)
+                ->where('idpersona', $idpersona)
                 ->orderBy('idlogbd', 'DESC')
                 ->get();
 

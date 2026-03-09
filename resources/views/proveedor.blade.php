@@ -391,7 +391,9 @@
 
                         <div class="card">
                           <div class="card-header">
-                            <h3 class="card-title">DATOS DEL PROVEEDOR</h3>
+                            <h3 class="card-title">DATOS DEL PROVEEDOR
+                               <a class="btn btn-sm btn-principal btn_sincronizars10" onclick="sincronizarproveedors10()">Sincronizar Proveedor Con S10 </a>
+                            </h3>
                           </div>
                           <!-- /.card-header -->
                           <div class="card-body">
@@ -411,7 +413,10 @@
 
                         <div class="card">
                           <div class="card-header">
-                            <h3 class="card-title">DATOS CUENTAS BANCARIAS</h3>
+                            <h3 class="card-title">DATOS CUENTAS BANCARIAS 
+                              <a class="btn btn-sm btn-principal  btn_sincronizarcbs10" onclick="sincronizarcuentabancarias10()">Sincronizar Cuentas Bancarias Con S10</a>
+                            </h3>
+
                           </div>
                           <!-- /.card-header -->
                           <div class="card-body">
@@ -1010,9 +1015,9 @@
 
 
  
-  <script src="{{ asset('assets/js/proveedor.js') }}?version_erp=01.11"></script>
-  <script src="{{ asset('assets/js/proveedor_carga_masiva.js') }}?version_erp=01.11"></script>
-  <script src="{{ asset('assets/js/sincronizacions10.js') }}?version_erp=01.11"></script>
+  <script src="{{ asset('assets/js/proveedor.js') }}?version_erp=01.12"></script>
+  <script src="{{ asset('assets/js/proveedor_carga_masiva.js') }}?version_erp=01.12"></script>
+  <script src="{{ asset('assets/js/sincronizacions10.js') }}?version_erp=01.12"></script>
   
 
   <script>

@@ -30,246 +30,291 @@ class AllHomologacionesController extends Controller
     //-------------------------funciones que estoy utilizando----------------------
 
     public function listar_homologaciones_all(Request $r)
-    {
-        // Parámetros de entrada
-        $perPage = (int) $r->input('per_page', 20);
-        $page    = (int) $r->input('page', 1);
-        $sort    = $r->input('sort', 'idpersona_facha_homologacion');
-        $dir     = $r->input('dir', 'asc');
-        $q       = trim($r->input('q', ''));
+{
+    // Parámetros de entrada
+    $perPage = (int) $r->input('per_page', 20);
+    $page    = (int) $r->input('page', 1);
+    $sort    = $r->input('sort', 'idpersona_facha_homologacion');
+    $dir     = $r->input('dir', 'asc');
+    $q       = trim($r->input('q', ''));
 
-        // Filtros
-        $tipo_compra          = $r->input('tipo_compra');
-        $fecha_inicio_periodo = $r->input('fecha_inicio_periodo');
-        $fecha_fin_periodo    = $r->input('fecha_fin_periodo');
-        $estado_homologacion  = $r->input('estado_homologacion');
-        $estado_documento     = $r->input('estado_documento');
-        $id_proveedor         = $r->input('id_proveedor');
-        $id_persona_usuario   = $r->input('id_persona_usuario');
+    // Filtros
+    $tipo_compra          = $r->input('tipo_compra');
+    $fecha_inicio_periodo = $r->input('fecha_inicio_periodo');
+    $fecha_fin_periodo    = $r->input('fecha_fin_periodo');
+    $estado_homologacion  = $r->input('estado_homologacion');
+    $estado_documento     = $r->input('estado_documento');
+    $id_proveedor         = $r->input('id_proveedor');
+    $id_persona_usuario   = $r->input('id_persona_usuario');
 
-        // Columnas válidas para ordenar (incluye alias que usaremos)
-        $validSorts = [
-            'descripcion',
-            'fecha_inicio_proceso',
-            'fecha_inicio_periodo_h',
-            'fecha_fin_periodo_h',
-            'estado_homologacion',
-            'tipo_estandar',
-            'proveedor',
-            'comprador',
-            'todo_aprobado'
-        ];
+    // ====================== SUBCONSULTA para tipos ≠ 2 (usa 'Estandar' y 'Modelo') ======================
+    $subqueryEstandar = DB::table('persona_facha_homologacion as pfh')
+        ->join('docsproveedortipoestandar as docs', 'docs.idpersona_facha_homologacion', '=', 'pfh.idpersona_facha_homologacion')
+        ->join('detalletipoestandarproveedor as dtp', 'dtp.iddetalletipoestandarproveedor', '=', 'docs.iddetalletipoestandarproveedor')
+        ->join('documento_tipo_estandar as destts', 'destts.iddocumento_tipo_estandar', '=', 'dtp.iddocumento_tipo_estandar')
+        ->select(
+            'pfh.idpersona_facha_homologacion',
+            DB::raw("
+                CASE
+                    WHEN COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND (docs.archivo IS NULL OR docs.archivo = '') THEN 1 END) = COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') THEN 1 END)
+                        OR COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') THEN 1 END) = 0
+                    THEN 0
+                    WHEN COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND docs.archivo IS NOT NULL AND docs.archivo != '' THEN 1 END) = COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') THEN 1 END)
+                        AND COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND docs.estado_revision = 'Aprobado' THEN 1 END) = COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') THEN 1 END)
+                        AND COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') THEN 1 END) > 0
+                    THEN 1
+                    WHEN COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND (docs.archivo IS NULL OR docs.archivo = '') THEN 1 END) = 0
+                        AND COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND docs.estado_revision = 'Aprobado' THEN 1 END) = 0
+                        AND COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') THEN 1 END) > 0
+                    THEN 2
+                    WHEN COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND docs.archivo IS NOT NULL AND docs.archivo != '' AND docs.estado_revision IN ('Aprobado', 'Actualizado') THEN 1 END) > 0
+                        AND COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND (docs.archivo IS NULL OR docs.archivo = ''  OR docs.estado_revision IN ('Aprobado', 'Actualizado')) THEN 1 END) > 0
+                    THEN 3
+                    ELSE 5
+                END AS estado_documentos
+            ")
+        )
+        ->where('pfh.estado_trash', '1')
+        ->where('pfh.estado_delete', '1')
+        ->groupBy('pfh.idpersona_facha_homologacion');
 
-        if (!in_array($sort, $validSorts, true)) {
-            $sort = 'idpersona_facha_homologacion';
-        }
+    // ====================== SUBCONSULTA para tipo 2 (usa solo 'Interno') ======================
+    $subqueryInterno = DB::table('persona_facha_homologacion as pfh')
+        ->join('docsproveedortipoestandar as docs', 'docs.idpersona_facha_homologacion', '=', 'pfh.idpersona_facha_homologacion')
+        ->join('detalletipoestandarproveedor as dtp', 'dtp.iddetalletipoestandarproveedor', '=', 'docs.iddetalletipoestandarproveedor')
+        ->join('documento_tipo_estandar as destts', 'destts.iddocumento_tipo_estandar', '=', 'dtp.iddocumento_tipo_estandar')
+        ->select(
+            'pfh.idpersona_facha_homologacion',
+            DB::raw("
+                CASE
+                    WHEN COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND (docs.archivo IS NULL OR docs.archivo = '') THEN 1 END) = COUNT(CASE WHEN destts.tipo_documento = 'Interno' THEN 1 END)
+                        OR COUNT(CASE WHEN destts.tipo_documento = 'Interno' THEN 1 END) = 0
+                    THEN 0
+                    WHEN COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND docs.archivo IS NOT NULL AND docs.archivo != '' THEN 1 END) = COUNT(CASE WHEN destts.tipo_documento = 'Interno' THEN 1 END)
+                        AND COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND docs.estado_revision = 'Aprobado' THEN 1 END) = COUNT(CASE WHEN destts.tipo_documento = 'Interno' THEN 1 END)
+                        AND COUNT(CASE WHEN destts.tipo_documento = 'Interno' THEN 1 END) > 0
+                    THEN 1
+                    WHEN COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND (docs.archivo IS NULL OR docs.archivo = '') THEN 1 END) = 0
+                        AND COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND docs.estado_revision = 'Aprobado' THEN 1 END) = 0
+                        AND COUNT(CASE WHEN destts.tipo_documento = 'Interno' THEN 1 END) > 0
+                    THEN 2
+                    WHEN COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND docs.archivo IS NOT NULL AND docs.archivo != '' AND docs.estado_revision IN ('Aprobado', 'Actualizado') THEN 1 END) > 0
+                        AND COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND (docs.archivo IS NULL OR docs.archivo = '' OR docs.estado_revision IN ('Aprobado', 'Actualizado')) THEN 1 END) > 0
+                    THEN 3
+                    ELSE 5
+                END AS estado_documentos
+            ")
+        )
+        ->where('pfh.estado_trash', '1')
+        ->where('pfh.estado_delete', '1')
+        ->groupBy('pfh.idpersona_facha_homologacion');
 
-        $dir = strtolower($dir) === 'desc' ? 'desc' : 'asc';
+    // ====================== CONSULTA PARA OBTENER IDs PAGINADOS ======================
+    $queryIds = DB::table('persona_facha_homologacion as pfh')
+        ->join('docsproveedortipoestandar as docs', 'docs.idpersona_facha_homologacion', '=', 'pfh.idpersona_facha_homologacion')
+        ->join('detalletipoestandarproveedor as dtp', 'dtp.iddetalletipoestandarproveedor', '=', 'docs.iddetalletipoestandarproveedor')
+        ->join('tipoestandarproveedor as tep', 'tep.idtipoestandarproveedor', '=', 'dtp.idtipoestandarproveedor')
+        ->join('persona as comp', 'comp.idpersona', '=', 'pfh.idpersona')
+        ->join('users as u', 'u.id', '=', 'pfh.user_init_process')
+        ->join('persona as pu', 'u.idpersona', '=', 'pu.idpersona')
+        ->leftJoinSub($subqueryEstandar, 'aprob_est', function ($join) {
+            $join->on('pfh.idpersona_facha_homologacion', '=', 'aprob_est.idpersona_facha_homologacion');
+        })
+        ->leftJoinSub($subqueryInterno, 'aprob_int', function ($join) {
+            $join->on('pfh.idpersona_facha_homologacion', '=', 'aprob_int.idpersona_facha_homologacion');
+        })
+        // Seleccionamos las columnas necesarias para filtros, orden y group by
+        ->select(
+            'pfh.idpersona_facha_homologacion',
+            'pfh.idpersona',
+            'pfh.descripcion',
+            'pfh.fecha_inicio_proceso',
+            'pfh.fecha_inicio_periodo_h',
+            'pfh.fecha_fin_periodo_h',
+            'pfh.estado_homologacion',
+            'pfh.user_init_process',  // necesario para filtro
+            DB::raw("MAX(tep.descripcion) as tipo_estandar"),
+            DB::raw("MAX(tep.idtipoestandarproveedor) as idtipoestandarproveedor"),
+            'comp.nombre_razonsocial as proveedor',
+            'pu.nombre_razonsocial as comprador',
+            DB::raw("
+                CASE
+                    WHEN MAX(tep.idtipoestandarproveedor) IN (2, 5) 
+                    THEN MAX(COALESCE(aprob_int.estado_documentos, 0))
+                    ELSE MAX(COALESCE(aprob_est.estado_documentos, 0))
+                END as estado_documentos
+            ")
+        )
+        ->where('pfh.estado_trash', '1')
+        ->where('pfh.estado_delete', '1')
+        ->groupBy(
+            'pfh.idpersona_facha_homologacion',
+            'pfh.idpersona',
+            'pfh.descripcion',
+            'pfh.fecha_inicio_proceso',
+            'pfh.fecha_inicio_periodo_h',
+            'pfh.fecha_fin_periodo_h',
+            'pfh.estado_homologacion',
+            'pfh.user_init_process',
+            'comp.nombre_razonsocial',
+            'pu.nombre_razonsocial'
+        );
 
-        /* ====================== SUBCONSULTA ======================
-        Calcula todo_aprobado considerando SOLO documentos tipo 'Estandar' o 'Modelo'
-        Devuelve idpersona_facha_homologacion y todo_aprobado.
-        */
+    // ====================== FILTROS ======================
+    // Filtros usando HAVING (todas las columnas referenciadas están en GROUP BY)
+    if ($r->filled('estado_homologacion')) {
+        $queryIds->having('pfh.estado_homologacion', '=', $estado_homologacion);
+    }
 
-        // Subquery para tipos distintos de 2 (usa 'Estandar' y 'Modelo')
-        $subqueryEstandar = DB::table('persona_facha_homologacion as pfh')
-            ->join('docsproveedortipoestandar as docs', 'docs.idpersona_facha_homologacion', '=', 'pfh.idpersona_facha_homologacion')
-            ->join('detalletipoestandarproveedor as dtp', 'dtp.iddetalletipoestandarproveedor', '=', 'docs.iddetalletipoestandarproveedor')
-            ->join('documento_tipo_estandar as destts', 'destts.iddocumento_tipo_estandar', '=', 'dtp.iddocumento_tipo_estandar')
-            ->select(
-                'pfh.idpersona_facha_homologacion',
-                DB::raw("
-                    CASE
-                        -- 0: Pendiente Registro (no hay documentos requeridos o todos sin archivo)
-                        WHEN COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND (docs.archivo IS NULL OR docs.archivo = '') THEN 1 END) = COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') THEN 1 END)
-                            OR COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') THEN 1 END) = 0
-                        THEN 0
-                        -- 1: Completo (todos con archivo y todos aprobados)
-                        WHEN COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND docs.archivo IS NOT NULL AND docs.archivo != '' THEN 1 END) = COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') THEN 1 END)
-                            AND COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND docs.estado_revision = 'Aprobado' THEN 1 END) = COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') THEN 1 END)
-                            AND COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') THEN 1 END) > 0
-                        THEN 1
-                        -- 2: Pendiente de validar (todos con archivo, pero ninguno aprobado)
-                        WHEN COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND (docs.archivo IS NULL OR docs.archivo = '') THEN 1 END) = 0
-                            AND COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND docs.estado_revision = 'Aprobado' THEN 1 END) = 0
-                            AND COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') THEN 1 END) > 0
-                        THEN 2
-                        -- 3: Parcialmente completo (al menos un aprobado con archivo y al menos un documento sin archivo)
-                        WHEN COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND docs.archivo IS NOT NULL AND docs.archivo != '' AND docs.estado_revision IN ('Aprobado', 'Actualizado') THEN 1 END) > 0
-                            AND COUNT(CASE WHEN destts.tipo_documento IN ('Estandar', 'Modelo') AND (docs.archivo IS NULL OR docs.archivo = ''  OR docs.estado_revision IN ('Aprobado', 'Actualizado')) THEN 1 END) > 0
-                        THEN 3
-                        ELSE 5
-                    END AS estado_documentos
-                ")
-            )
-            ->where('pfh.estado_trash', '1')
-            ->where('pfh.estado_delete', '1')
-            ->groupBy('pfh.idpersona_facha_homologacion');
+    if ($r->filled('id_proveedor')) {
+        $queryIds->having('pfh.idpersona', '=', $id_proveedor);
+    }
 
-        // Subquery para tipo 2 (usa solo 'interno')
-        $subqueryInterno = DB::table('persona_facha_homologacion as pfh')
-            ->join('docsproveedortipoestandar as docs', 'docs.idpersona_facha_homologacion', '=', 'pfh.idpersona_facha_homologacion')
-            ->join('detalletipoestandarproveedor as dtp', 'dtp.iddetalletipoestandarproveedor', '=', 'docs.iddetalletipoestandarproveedor')
-            ->join('documento_tipo_estandar as destts', 'destts.iddocumento_tipo_estandar', '=', 'dtp.iddocumento_tipo_estandar')
-            ->select(
-                'pfh.idpersona_facha_homologacion',
-                DB::raw("
-                    CASE
-                        -- 0: Pendiente Registro (no hay documentos requeridos o todos sin archivo)
-                        WHEN COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND (docs.archivo IS NULL OR docs.archivo = '') THEN 1 END) = COUNT(CASE WHEN destts.tipo_documento = 'Interno' THEN 1 END)
-                            OR COUNT(CASE WHEN destts.tipo_documento = 'Interno' THEN 1 END) = 0
-                        THEN 0
-                        -- 1: Completo (todos con archivo y todos aprobados)
-                        WHEN COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND docs.archivo IS NOT NULL AND docs.archivo != '' THEN 1 END) = COUNT(CASE WHEN destts.tipo_documento = 'Interno' THEN 1 END)
-                            AND COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND docs.estado_revision = 'Aprobado' THEN 1 END) = COUNT(CASE WHEN destts.tipo_documento = 'Interno' THEN 1 END)
-                            AND COUNT(CASE WHEN destts.tipo_documento = 'Interno' THEN 1 END) > 0
-                        THEN 1
-                        -- 2: Pendiente de validar (todos con archivo, pero ninguno aprobado)
-                        WHEN COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND (docs.archivo IS NULL OR docs.archivo = '') THEN 1 END) = 0
-                            AND COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND docs.estado_revision = 'Aprobado' THEN 1 END) = 0
-                            AND COUNT(CASE WHEN destts.tipo_documento = 'Interno' THEN 1 END) > 0
-                        THEN 2
-                        -- 3: Parcialmente completo (al menos un aprobado con archivo y al menos un documento sin archivo)
-                        WHEN COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND docs.archivo IS NOT NULL AND docs.archivo != '' AND docs.estado_revision IN ('Aprobado', 'Actualizado') THEN 1 END) > 0
-                            AND COUNT(CASE WHEN destts.tipo_documento = 'Interno' AND (docs.archivo IS NULL OR docs.archivo = '' OR docs.estado_revision IN ('Aprobado', 'Actualizado')) THEN 1 END) > 0
-                        THEN 3
-                        ELSE 5
-                    END AS estado_documentos
-                ")
-            )
-            ->where('pfh.estado_trash', '1')
-            ->where('pfh.estado_delete', '1')
-            ->groupBy('pfh.idpersona_facha_homologacion');
+    if ($r->filled('id_persona_usuario')) {
+        $queryIds->having('pfh.user_init_process', '=', $id_persona_usuario);
+    }
 
-        /* ====================== CONSULTA PRINCIPAL ======================
-        Incluye TODOS los joins necesarios para obtener los campos descriptivos.
-        Se agrupa por periodo (pfh.idpersona_facha_homologacion) y las columnas que
-        no son agregadas (de pfh, comp, pu) para evitar duplicados.
-        Los campos de tablas con múltiples valores (tep.descripcion) se agregan con MAX.
-        El todo_aprobado viene de la subconsulta y se toma como MAX (es el mismo valor para el grupo).
-        */
-        $query = DB::table('persona_facha_homologacion as pfh')
-            ->join('docsproveedortipoestandar as docs', 'docs.idpersona_facha_homologacion', '=', 'pfh.idpersona_facha_homologacion')
-            ->join('detalletipoestandarproveedor as dtp', 'dtp.iddetalletipoestandarproveedor', '=', 'docs.iddetalletipoestandarproveedor')
-            ->join('tipoestandarproveedor as tep', 'tep.idtipoestandarproveedor', '=', 'dtp.idtipoestandarproveedor')
-            ->join('persona as comp', 'comp.idpersona', '=', 'pfh.idpersona')
-            ->join('users as u', 'u.id', '=', 'pfh.user_init_process')
-            ->join('persona as pu', 'u.idpersona', '=', 'pu.idpersona')
-            ->leftJoinSub($subqueryEstandar, 'aprob_est', function ($join) {
-                $join->on('pfh.idpersona_facha_homologacion', '=', 'aprob_est.idpersona_facha_homologacion');
-            })
-            ->leftJoinSub($subqueryInterno, 'aprob_int', function ($join) {
-                $join->on('pfh.idpersona_facha_homologacion', '=', 'aprob_int.idpersona_facha_homologacion');
-            })
-            ->select(
-                'pfh.idpersona_facha_homologacion',
-                'pfh.idpersona',
-                'pfh.descripcion',
-                'pfh.fecha_inicio_proceso',
-                'pfh.fecha_inicio_periodo_h',
-                'pfh.fecha_fin_periodo_h',
-                'pfh.estado_homologacion',
-                'pfh.estado_trash',
-                DB::raw("MAX(tep.descripcion) as tipo_estandar"),               // de todos los documentos del periodo
-                DB::raw("MAX(tep.idtipoestandarproveedor) as idtipoestandarproveedor"), // para filtro
-                'comp.nombre_razonsocial as proveedor',
-                'pu.nombre_razonsocial as comprador',
-                DB::raw("
-                    CASE
-                        WHEN MAX(tep.idtipoestandarproveedor) = 2 
-                        THEN MAX(COALESCE(aprob_int.estado_documentos, 0))
-                        ELSE MAX(COALESCE(aprob_est.estado_documentos, 0))
-                    END as estado_documentos
-                ")
-            )
-            ->where('pfh.estado_trash', '1')
-            ->where('pfh.estado_delete', '1')
-            ->groupBy(
-                'pfh.idpersona_facha_homologacion',
-                'pfh.idpersona',
-                'pfh.descripcion',
-                'pfh.fecha_inicio_proceso',
-                'pfh.fecha_inicio_periodo_h',
-                'pfh.fecha_fin_periodo_h',
-                'pfh.estado_homologacion',
-                'pfh.estado_trash',
-                'comp.nombre_razonsocial',
-                'pu.nombre_razonsocial'
-            );
+    // Fechas
+    if ($fecha_inicio_periodo && $fecha_fin_periodo) {
+        $queryIds->havingBetween('pfh.fecha_inicio_proceso', [$fecha_inicio_periodo, $fecha_fin_periodo]);
+    } elseif ($fecha_inicio_periodo) {
+        $queryIds->having('pfh.fecha_inicio_proceso', '>=', $fecha_inicio_periodo);
+    } elseif ($fecha_fin_periodo) {
+        $queryIds->having('pfh.fecha_inicio_proceso', '<=', $fecha_fin_periodo);
+    }
 
-        /* ====================== FILTROS ESPECÍFICOS ====================== */
-        // Los filtros sobre columnas que están en GROUP BY pueden ir en WHERE.
-        if ($r->filled('estado_homologacion')) {
-            $query->where('pfh.estado_homologacion', $estado_homologacion);
-        }
+    // Filtros sobre columnas agregadas (ya son alias en el SELECT)
+    if ($r->filled('tipo_compra')) {
+        $queryIds->having('idtipoestandarproveedor', '=', $tipo_compra);
+    }
 
-        if ($r->filled('id_proveedor')) {
-            $query->where('pfh.idpersona', $id_proveedor);
-        }
+    if ($r->filled('estado_documento')) {
+        $queryIds->having('estado_documentos', '=', (int) $estado_documento);
+    }
 
-        if ($r->filled('id_persona_usuario')) {
-            $query->where('pfh.user_init_process', $id_persona_usuario);
-        }
+    // ====================== BÚSQUEDA GLOBAL ======================
+    if (!empty($q) && is_string($q)) {
+        $q = strtolower($q);
+        // Construimos condiciones OR usando orHavingRaw
+        $queryIds->having(function ($having) use ($q) {
+            $having->orHavingRaw('LOWER(pfh.descripcion) LIKE ?', ["%{$q}%"])
+                ->orHavingRaw('LOWER(pfh.fecha_inicio_proceso) LIKE ?', ["%{$q}%"])
+                ->orHavingRaw('LOWER(pfh.fecha_inicio_periodo_h) LIKE ?', ["%{$q}%"])
+                ->orHavingRaw('LOWER(pfh.fecha_fin_periodo_h) LIKE ?', ["%{$q}%"])
+                ->orHavingRaw('LOWER(pfh.estado_homologacion) LIKE ?', ["%{$q}%"])
+                ->orHavingRaw('LOWER(tipo_estandar) LIKE ?', ["%{$q}%"])
+                ->orHavingRaw('LOWER(proveedor) LIKE ?', ["%{$q}%"])
+                ->orHavingRaw('LOWER(comprador) LIKE ?', ["%{$q}%"]);
+        });
+    }
 
-        // Fechas
-        if ($fecha_inicio_periodo && $fecha_fin_periodo) {
-            $query->whereBetween('pfh.fecha_inicio_proceso', [$fecha_inicio_periodo, $fecha_fin_periodo]);
-        } elseif ($fecha_inicio_periodo) {
-            $query->whereDate('pfh.fecha_inicio_proceso', '>=', $fecha_inicio_periodo);
-        } elseif ($fecha_fin_periodo) {
-            $query->whereDate('pfh.fecha_inicio_proceso', '<=', $fecha_fin_periodo);
-        }
+    // ====================== ORDENAMIENTO ======================
+    $validSorts = [
+        'descripcion',
+        'fecha_inicio_proceso',
+        'fecha_inicio_periodo_h',
+        'fecha_fin_periodo_h',
+        'estado_homologacion',
+        'tipo_estandar',
+        'proveedor',
+        'comprador',
+        'estado_documentos'
+    ];
 
-        /* ====================== FILTROS SOBRE COLUMNAS AGREGADAS ====================== */
-        // Estos deben ir en HAVING.
+    if (!in_array($sort, $validSorts, true)) {
+        $sort = 'idpersona_facha_homologacion';
+    }
 
-        // Filtro por tipo de compra (idtipoestandarproveedor)
-        if ($r->filled('tipo_compra')) {
-            $query->havingRaw('idtipoestandarproveedor = ?', [$tipo_compra]);
-        }
+    $dir = strtolower($dir) === 'desc' ? 'desc' : 'asc';
+    $queryIds->orderBy($sort, $dir);
 
-        // Filtro por estado de documentos (todo_aprobado)
-        if ($r->filled('estado_documento')) {
-            $query->havingRaw('estado_documentos = ?', [(int) $estado_documento]);
-        }
+    // ====================== PAGINACIÓN DE IDs ======================
+    $idsPaginator = $queryIds->paginate($perPage, ['*'], 'page', $page);
+    $ids = $idsPaginator->pluck('idpersona_facha_homologacion')->toArray();
 
-        /* ====================== BÚSQUEDA GLOBAL ====================== */
-        if (!empty($q) && is_string($q)) {
-            $q = strtolower($q);
-            $query->havingRaw("
-                (LOWER(pfh.descripcion) LIKE ? OR 
-                LOWER(pfh.fecha_inicio_proceso) LIKE ? OR 
-                LOWER(pfh.fecha_inicio_periodo_h) LIKE ? OR 
-                LOWER(pfh.fecha_fin_periodo_h) LIKE ? OR 
-                LOWER(pfh.estado_homologacion) LIKE ? OR 
-                LOWER(tipo_estandar) LIKE ? OR          /* ✅ Usamos el alias, NO tep.tipo_estandar */
-                LOWER(comp.nombre_razonsocial) LIKE ? OR 
-                LOWER(pu.nombre_razonsocial) LIKE ?)",
-                array_fill(0, 8, "%{$q}%")
-            );
-        }
-        /* ====================== ORDENAMIENTO ====================== */
-        // Para ordenar por campos agregados, usamos orderByRaw con el alias.
-        // Para campos no agregados, podemos usar orderBy normal, pero como todos los select
-        // son alias o agregados, usaremos orderByRaw para todos por consistencia.
-        $query->orderByRaw("{$sort} {$dir}");
-
-        /* ====================== PAGINACIÓN ====================== */
-        $homologaciones_all = $query->paginate($perPage, ['*'], 'page', $page);
-
+    // ====================== CONSULTA PARA DATOS COMPLETOS ======================
+    if (empty($ids)) {
         return response()->json([
-            'data'         => $homologaciones_all->items(),
-            'current_page' => $homologaciones_all->currentPage(),
-            'per_page'     => $homologaciones_all->perPage(),
-            'total'        => $homologaciones_all->total(),
-            'last_page'    => $homologaciones_all->lastPage(),
-            'from'         => $homologaciones_all->firstItem(),
-            'to'           => $homologaciones_all->lastItem(),
+            'data'         => [],
+            'current_page' => $idsPaginator->currentPage(),
+            'per_page'     => $idsPaginator->perPage(),
+            'total'        => $idsPaginator->total(),
+            'last_page'    => $idsPaginator->lastPage(),
+            'from'         => null,
+            'to'           => null,
             'sort'         => $sort,
             'dir'          => $dir,
             'q'            => $q,
         ]);
     }
+
+    // Consulta final con los IDs obtenidos
+    $dataQuery = DB::table('persona_facha_homologacion as pfh')
+        ->join('docsproveedortipoestandar as docs', 'docs.idpersona_facha_homologacion', '=', 'pfh.idpersona_facha_homologacion')
+        ->join('detalletipoestandarproveedor as dtp', 'dtp.iddetalletipoestandarproveedor', '=', 'docs.iddetalletipoestandarproveedor')
+        ->join('tipoestandarproveedor as tep', 'tep.idtipoestandarproveedor', '=', 'dtp.idtipoestandarproveedor')
+        ->join('persona as comp', 'comp.idpersona', '=', 'pfh.idpersona')
+        ->join('users as u', 'u.id', '=', 'pfh.user_init_process')
+        ->join('persona as pu', 'u.idpersona', '=', 'pu.idpersona')
+        ->leftJoinSub($subqueryEstandar, 'aprob_est', function ($join) {
+            $join->on('pfh.idpersona_facha_homologacion', '=', 'aprob_est.idpersona_facha_homologacion');
+        })
+        ->leftJoinSub($subqueryInterno, 'aprob_int', function ($join) {
+            $join->on('pfh.idpersona_facha_homologacion', '=', 'aprob_int.idpersona_facha_homologacion');
+        })
+        ->select(
+            'pfh.idpersona_facha_homologacion',
+            'pfh.idpersona',
+            'pfh.descripcion',
+            'pfh.fecha_inicio_proceso',
+            'pfh.fecha_inicio_periodo_h',
+            'pfh.fecha_fin_periodo_h',
+            'pfh.estado_homologacion',
+            'pfh.estado_trash',
+            DB::raw("MAX(tep.descripcion) as tipo_estandar"),
+            DB::raw("MAX(tep.idtipoestandarproveedor) as idtipoestandarproveedor"),
+            'comp.nombre_razonsocial as proveedor',
+            'pu.nombre_razonsocial as comprador',
+            DB::raw("
+                CASE
+                    WHEN MAX(tep.idtipoestandarproveedor) IN (2, 5) 
+                    THEN MAX(COALESCE(aprob_int.estado_documentos, 0))
+                    ELSE MAX(COALESCE(aprob_est.estado_documentos, 0))
+                END as estado_documentos
+            ")
+        )
+        ->whereIn('pfh.idpersona_facha_homologacion', $ids)
+        ->where('pfh.estado_trash', '1')
+        ->where('pfh.estado_delete', '1')
+        ->groupBy(
+            'pfh.idpersona_facha_homologacion',
+            'pfh.idpersona',
+            'pfh.descripcion',
+            'pfh.fecha_inicio_proceso',
+            'pfh.fecha_inicio_periodo_h',
+            'pfh.fecha_fin_periodo_h',
+            'pfh.estado_homologacion',
+            'pfh.estado_trash',
+            'comp.nombre_razonsocial',
+            'pu.nombre_razonsocial'
+        )
+        ->orderBy($sort, $dir); // mantener orden
+
+    $data = $dataQuery->get();
+
+    return response()->json([
+        'data'         => $data,
+        'current_page' => $idsPaginator->currentPage(),
+        'per_page'     => $idsPaginator->perPage(),
+        'total'        => $idsPaginator->total(),
+        'last_page'    => $idsPaginator->lastPage(),
+        'from'         => $idsPaginator->firstItem(),
+        'to'           => $idsPaginator->lastItem(),
+        'sort'         => $sort,
+        'dir'          => $dir,
+        'q'            => $q,
+    ]);
+}
 
     // Método para obtener todos roles personas
     public function selec2tipoEstandar()

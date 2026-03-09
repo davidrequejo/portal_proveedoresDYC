@@ -129,9 +129,10 @@ class S10ApiService
     }
 
     // Aquí puedes agregar más métodos para otras entidades (cuentas bancarias, contactos, etc.) siguiendo el mismo patrón
+// ==================== CUENTAS BANCARIAS ====================
+ // ==================== CUENTAS BANCARIAS ====================
 
-
-     /**
+    /**
      * Buscar una cuenta bancaria en S10 por proveedor, banco y número de cuenta.
      *
      * @param string $codIdentificador Código del proveedor en S10 (CodIdentificador)
@@ -139,86 +140,135 @@ class S10ApiService
      * @param string $noCuenta Número de cuenta (NoCuenta)
      * @return array|null
      */
-    public function buscarCuentaBancaria(string $codIdentificador, $bancoId, string $noCuenta): ?array
-    {
-        try {
-            $response = $this->client()->get('/cuenta-banco/buscar', [
-                'CodIdentificador' => $codIdentificador,
-                'Banco_ID'         => $bancoId,
-                'NoCuenta'         => $noCuenta,
-            ]);
+public function buscarCuentaBancaria(string $codIdentificador, $bancoId, string $noCuenta): ?array
+{
+    try {
+        $response = $this->client()->get('/cuenta-banco/buscar', [
+            'CodIdentificador' => $codIdentificador,
+            'Banco_ID'         => $bancoId,
+            'NoCuenta'         => $noCuenta,
+        ]);
 
-            if ($response->status() === 404) {
-                return null;
+        if ($response->status() === 404) {
+            return null;
+        }
+
+        $response->throw();
+
+        $json = $response->json();
+
+        // Si la respuesta tiene un campo 'data', lo procesamos
+        if (isset($json['data'])) {
+            $data = $json['data'];
+            // Si es un array indexado, tomamos el primer elemento
+            if (is_array($data) && array_keys($data) === range(0, count($data) - 1)) {
+                return !empty($data) ? $data[0] : null;
             }
+            // Si es un array asociativo, lo retornamos directamente
+            if (is_array($data)) {
+                return $data;
+            }
+        }
+        // Si no hay 'data', asumimos que la respuesta es el objeto mismo
+        return $json;
+    } catch (RequestException $e) {
+        if ($e->response && $e->response->status() === 404) {
+            return null;
+        }
+        $responseBody = $e->response ? $e->response->body() : null;
+        Log::error('Error al buscar cuenta bancaria en S10', [
+            'codIdentificador' => $codIdentificador,
+            'bancoId'          => $bancoId,
+            'noCuenta'         => $noCuenta,
+            'status'           => $e->response?->status(),
+            'body'             => $responseBody,
+        ]);
+        // Retornamos null para que el flujo intente crear la cuenta
+        return null;
+    }
+}
 
+public function crearCuentaBancaria(array $data): ?string
+{
+    $path = '/cuenta-banco/crear';
+
+    try {
+        $response = $this->client()->post($path, $data);
+        $this->logIfFailed($response, 'POST', $path, $data);
+        $response->throw();
+
+        $json = $response->json();
+        // Intentamos obtener el ID de diferentes formas posibles
+        return $json['id'] 
+            ?? $json['NoIdentificadorCuentaBanco'] 
+            ?? $json['NroIdentificadorCuentaBanco'] 
+            ?? null;
+    } catch (RequestException $e) {
+        $responseBody = $e->response ? $e->response->body() : null;
+        Log::error('Error al crear cuenta en S10', [
+            'data'   => $data,
+            'status' => $e->response?->status(),
+            'body'   => $responseBody,
+        ]);
+        throw $e; // Relanzamos para que el controlador lo capture
+    }
+}
+
+    /**
+     * Actualizar una cuenta bancaria existente en S10.
+     *
+     * @param string $idCuenta NroIdentificadorCuentaBanco en S10
+     * @param array $data Datos actualizados
+     * @return array Respuesta de S10
+     */
+    public function actualizarCuentaBancaria(string $idCuenta, array $data): array
+    {
+        $path = "/cuenta-banco/{$idCuenta}/actualizar";
+
+        try {
+            $response = $this->client()->put($path, $data);
+            $this->logIfFailed($response, 'PUT', $path, $data);
             $response->throw();
 
             return $response->json();
         } catch (RequestException $e) {
-            if ($e->response && $e->response->status() === 404) {
-                return null;
-            }
+            $responseBody = $e->response ? $e->response->body() : null;
+            Log::error('Error al actualizar cuenta bancaria en S10', [
+                'idCuenta' => $idCuenta,
+                'data'     => $data,
+                'status'   => $e->response?->status(),
+                'body'     => $responseBody,
+            ]);
             throw $e;
         }
     }
 
     /**
-     * Crear una nueva cuenta bancaria en S10.
-     *
-     * @param array $data Datos según la estructura de IdentificadorCuentaBanco
-     * @return int|string El ID de la cuenta creada (NroIdentificadorCuentaBanco)
-     */
-    public function crearCuentaBancaria(array $data)
-    {
-        $path = '/cuenta-banco/crear';
-
-        $response = $this->client()->post($path, $data);
-        $this->logIfFailed($response, 'POST', $path, $data);
-
-        $response->throw();
-
-        // Suponiendo que S10 devuelve el ID en el campo 'id' o 'NroIdentificadorCuentaBanco'
-        return $response->json('id') ?? $response->json('NroIdentificadorCuentaBanco');
-    }
-
-    /**
-     * Actualizar una cuenta bancaria existente en S10.
-     *
-     * @param int|string $idCuenta NroIdentificadorCuentaBanco en S10
-     * @param array $data Datos actualizados
-     * @return array Respuesta de S10
-     */
-    public function actualizarCuentaBancaria($idCuenta, array $data): array
-    {
-        $path = "/cuenta-banco/{$idCuenta}/actualizar";
-
-        $response = $this->client()->put($path, $data);
-        $this->logIfFailed($response, 'PUT', $path, $data);
-
-        $response->throw();
-
-        return $response->json();
-    }
-
-    /**
      * Eliminar una cuenta bancaria en S10.
      *
-     * @param int|string $idCuenta NroIdentificadorCuentaBanco en S10
+     * @param string $idCuenta NroIdentificadorCuentaBanco en S10
      * @return array Respuesta de S10
      */
-    public function eliminarCuentaBancaria($idCuenta): array
+    public function eliminarCuentaBancaria(string $idCuenta): array
     {
         $path = "/cuenta-banco/{$idCuenta}/eliminar";
 
-        $response = $this->client()->delete($path);
-        $this->logIfFailed($response, 'DELETE', $path);
+        try {
+            $response = $this->client()->delete($path);
+            $this->logIfFailed($response, 'DELETE', $path);
+            $response->throw();
 
-        $response->throw();
-
-        return $response->json();
+            return $response->json();
+        } catch (RequestException $e) {
+            $responseBody = $e->response ? $e->response->body() : null;
+            Log::error('Error al eliminar cuenta bancaria en S10', [
+                'idCuenta' => $idCuenta,
+                'status'   => $e->response?->status(),
+                'body'     => $responseBody,
+            ]);
+            throw $e;
+        }
     }
-
-
-   
 }
+    
+   
