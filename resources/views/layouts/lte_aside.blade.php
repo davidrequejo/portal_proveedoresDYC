@@ -114,6 +114,17 @@
               </a>
             </li>
           @endif
+
+          <li class="nav-header">PROCESO EVALUACIÓN</li>
+
+          @if (auth()->user()->perm_client_vista_client)
+            <li class="nav-item">
+              <a href="{{ route('selecc_evaluacion.index') }}" class="nav-link {{ request()->routeIs('selecc_evaluacion.*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-edit"></i>
+                <p> Selección Evaluación</p>
+              </a>
+            </li>
+          @endif
           
           <li class="nav-header">DATOS DE CONFIGURACIÓN</li>
           <li class="nav-item">

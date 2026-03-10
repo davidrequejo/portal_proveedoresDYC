@@ -1,7 +1,7 @@
 const BASE_URL = document.querySelector('meta[name="app-url"]').content;
 const CSRF = document.querySelector('meta[name="csrf-token"]').content;
  
-$(".editar_registro_cliente").on("click", function (e) { $("#submit-form-editarcliente").submit(); });   
+$("#editar_registro_proveedor").on("click", function (e) { $("#submit-form-editarproveedor").submit(); });   
 
 lista_select2(`${BASE_URL}/select2/bancos`, '#idbanco');
 lista_select2(`${BASE_URL}/select2/obtener`, '#distrito'); 
@@ -27,7 +27,7 @@ function limpiar_form_banco(){
   $(".error.invalid-feedback").remove();
 }
 
-function ver_editar_cliente(){
+function ver_editar_proveedor(){
 
   let id = $("#idpersonaUpdate").val();
 
@@ -38,7 +38,7 @@ function ver_editar_cliente(){
       $("#idpersona").val(e.data.cliente.idpersona);
 
       $("#idtipo_persona").val(e.data.cliente.idtipo_persona);
-      $("#idtipoestandarcliente").val(e.data.cliente.idtipoestandarcliente).trigger('change');
+      $("#idtipoestandarproveedor").val(e.data.cliente.idtipoestandarproveedor).trigger('change');
       $("#tipo_entidad_sunat").val(e.data.cliente.tipo_entidad_sunat).trigger('change');
       $("#tipo_documento_input1").val(e.data.cliente.tipo_documento).trigger('change');
       $("#numero_documento_input1").val(e.data.cliente.numero_documento);
@@ -69,10 +69,6 @@ function ver_editar_cliente(){
       let tipoDocumentoTexto = $('#tipo_documento_input1 option:selected').text();
       let tipoentidadTexto = $('#tipo_entidad_sunat option:selected').text();
 
-      if (e.data.cliente.ruc_persona_natural==null || e.data.cliente.ruc_persona_natural=='' ) {
-        $('#numero_documento_input2').val(e.data.cliente.numero_documento.substring(2, e.data.cliente.numero_documento.length - 1));
-      }
-
       controlarCampos(tipoDocumentoTexto, tipoentidadTexto);
 
       $(".vista_inicial").hide();
@@ -87,7 +83,7 @@ function ver_editar_cliente(){
   });
 }
 
-ver_editar_cliente();
+ver_editar_proveedor();
 
 
 function controlarCampos(tipoDocumentoTexto, tipoentidadTexto){
@@ -133,17 +129,16 @@ if ( tipoentidadTexto=='NATURAL') {
 function editar_datosproveedor(e){
 
   $(".spiner_enviando_correo").show();
-  $(".editar_registro_cliente").hide();
+  $("#editar_registro_proveedor").hide();
 
-
-  let formData = new FormData($("#form-editar-cliente")[0]);
+  let formData = new FormData($("#form-editar-proveedor")[0]);
   let id = $("#idpersonaUpdate").val();
   let url = '';
 
   if (id === '') {
     url =`${BASE_URL}/persona-cuenta-bancaria/crear`;
   } else {
-    url = `${BASE_URL}/actualizardatosproveedor/editarProveedor`;
+    url = `${BASE_URL}/actualizardatoscliente/editarcliente`;
     formData.append('_method', 'PUT');
   }
 
@@ -155,44 +150,17 @@ function editar_datosproveedor(e){
     processData: false,
     success: function (e) {
       if (e.status === true) {
-        ver_editar_cliente();
+        ver_editar_proveedor();
         Swal.fire("Correcto!", "Actualizado correctamente", "success");
-        $(".spiner_enviando_correo").hide();
-        $(".editar_registro_cliente").show();
-
-      } else {
         
+        $(".spiner_enviando_correo").hide();
+        $("#editar_registro_proveedor").show();
+      } else {
         ver_errores(e);
       }
     },
-
     error: function (xhr) {
-
-      if (xhr.status === 422) {
-
-        let errors = xhr.responseJSON.data;
-        let message = xhr.responseJSON.message;
-        let html = '<ul style="text-align:left">';
-
-        Object.values(errors).forEach(msgs => {
-          msgs.forEach(msg => {
-            html += `<li>${msg}</li>`;
-          });
-        });
-
-        html += '</ul>';
-
-        Swal.fire({
-          icon: 'warning',
-          title: message,
-          html: html
-        });
-        $(".spiner_enviando_correo").hide();
-        $(".editar_registro_cliente").show();
-      }else {
-        ver_errores(xhr);
-      }
-        
+      ver_errores(xhr);
     }
   });
 }
@@ -206,14 +174,14 @@ $(function () {
   $('#sexo').on('change', function() { $(this).trigger('blur'); });
   $('#nombre_razonsocial').on('change', function() { $(this).trigger('blur'); });
 
-  $("#form-editar-cliente").validate({
+  $("#form-editar-proveedor").validate({
     rules: {
       idbanco: { required: true },
       tipocuenta: { required: true },
       moneda:     { required: true },
       predeterminado:     { required: true },
       numero_cuenta: { required: true, number: true },
-      //cuenta_interbancaria: { required: true, number: true },
+      cuenta_interbancaria: { required: true, number: true },
     },
     messages: {
       idbanco: { required: "Campo requerido" },
@@ -221,7 +189,7 @@ $(function () {
       moneda:     { required: "Campo requerido" },
       predeterminado:     { required: "Campo requerido" },
       numero_cuenta: { required: "Campo requerido", number: "Ingrese un valor numérico" },
-      //cuenta_interbancaria: { required: "Campo requerido", number: "Ingrese un valor numérico" },
+      cuenta_interbancaria: { required: "Campo requerido", number: "Ingrese un valor numérico" },
 
     },
     errorElement: "span",
@@ -274,6 +242,4 @@ $(document).ready(function() {
     });
 
 });
-
-
 

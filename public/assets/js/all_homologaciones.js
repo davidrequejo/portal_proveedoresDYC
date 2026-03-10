@@ -177,10 +177,10 @@ function renderFilas(rows){
     let estado_completo = '';
 
     switch (r.estado_documentos) {
-      case 0: estado_completo = `<span class="badge bg-danger text-white">  Pendiente Registro</span>`; break;
-      case 1: estado_completo = `<span class="badge bg-success text-white"> Completo</span>`; break;
-      case 3: estado_completo = `<span class="badge badge-new  text-white"> Parcial Completo</span>`; break;
-      case 2: estado_completo = `<span class="badge bg-warning text-white"> Pendiente de validar</span>`; break;
+      case '0': estado_completo = `<span class="badge bg-danger text-white">  Pendiente Registro</span>`; break;
+      case '1': estado_completo = `<span class="badge bg-success text-white"> Completo</span>`; break;
+      case '3': estado_completo = `<span class="badge badge-new  text-white"> Parcial Completo</span>`; break;
+      case '2': estado_completo = `<span class="badge bg-warning text-white"> Pendiente de validar</span>`; break;
       default: estado_completo = `<span class="badge bg-danger text-white">Incompleto</span>`;    
     }
 

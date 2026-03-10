@@ -6,7 +6,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="app-url" content="{{ url('/') }}">
   
-  <title>Proveedores | Portal Proveedores D&C</title>
+  <title>Clientes | Portal Proveedores D&C</title>
 
   <link rel="icon" href="{{ asset('assets/images/brand-logos/dc-logo_cirsulo_white.png') }}" type="image/png">
 
@@ -22,9 +22,9 @@
 
 
   <style>
-    #tabla-proveedores_filter { width: calc(100% - 10px) !important; display: flex !important; justify-content: space-between !important; }
-    #tabla-proveedores_filter label { width: 100% !important;  }
-    #tabla-proveedores_filter label input { width: 100% !important;   }
+    #tabla-clientes_filter { width: calc(100% - 10px) !important; display: flex !important; justify-content: space-between !important; }
+    #tabla-clientes_filter label { width: 100% !important;  }
+    #tabla-clientes_filter label input { width: 100% !important;   }
 
     /* Indicadores de orden simple (opcional) */
     th.sortable { cursor:pointer; position:relative; }
@@ -126,12 +126,12 @@
           <div class="container-fluid">
             <div class="row mb-2">
               <div class="col-sm-6">
-                <h4 class="m-0 text-black-50 Nombre_inicial">Cliente</h4>
+                <h4 class="m-0 text-black-50 Nombre_inicial">Clientes</h4>
               </div><!-- /.col -->
               <div class="col-sm-6">
                 <div class="float-right">
 
-                  <div class="btn-group btn-agregar-cliente">
+                  <div class="btn-group btn-agregar-proyecto">
                     <button type="button" class="btn btn-primary" style="border-color: #fcfcfc !important;" data-toggle="modal" data-target="#modal-agregar-cliente" onclick="limpiar_form_cliente();" ><i class="ti ti-users-plus"></i> Crear nuevo</button>
                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="border-color: #fcfcfc !important;">
                       <span class="sr-only">Toggle Dropdown</span>
@@ -148,51 +148,6 @@
 
                 
               </div><!-- /.col -->
-
-                            <!-- ./col -->
-              <div class="col-12 filtros">
-                <div class="card" style="margin-top: 0.5rem !important;">
-                  
-                  <div class="card-body"  style="padding-bottom: 1px; !important;">
-
-                    <div class="p-1 " > 
-                      <div class="row">
-                        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                          <div class="activar-scroll-x-auto scroll-sm d-flex flex-nowrap gap-2">                                             
-                            <!-- ::::::::::::::::::::: FILTRO estado_documento :::::::::::::::::::::: -->
-                            <div style="width: 250px;  min-width: 200px;">
-                              <div class="form-group">
-                                <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('estado_actualizaciondatos_filtro')" ><i class="las la-sync-alt"></i></span> Estado Sincronización</label>                          
-                                <select name="estado_actualizaciondatos_filtro" id="estado_actualizaciondatos_filtro" class="form-control fs-h-input is-valid select2" placeholder="Estado" aria-invalid="false"  onchange="cargando_search(); delay(function(){filtros()}, 50 );">
-                                  <option value="2" >Provedor No Actualizo sus datos </option>
-                                  <option value="0" >Provedor Actualizo sus datos</option>
-                                  <option value="1" >Provedor Sincronizado Con S10</option>
-                                </select>
-                              </div>
-                            </div>
-
-                            <div style="width: 250px;  min-width: 200px;">
-                              <div class="form-group hidden">
-                                <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('tipo_persona_filtro')" ><i class="las la-sync-alt"></i></span> Tipo Persona</label>                          
-                                <select name="tipo_persona_filtro" id="tipo_persona_filtro" class="form-control fs-h-input is-valid select2" placeholder="Estado" aria-invalid="false"  onchange="cargando_search(); delay(function(){filtros()}, 50 );">
-                                  <option value="NATURAL">NATURAL</option>
-                                  <option value="JURIDICA">JURIDICA</option>
-                                </select>
-                              </div>
-                            </div>
-                         
-                          </div> 
-                        </div>
-                      </div>                                    
-                                                      
-                    </div>                   
-
-                  </div>
-
-                </div>
-              </div>
-
-
             </div><!-- /.row -->
           </div><!-- /.container-fluid -->
         </div>
@@ -206,7 +161,7 @@
 
               
               <!-- ./col -->
-              <div class="col" id="div-tabla-principal-cliente">
+              <div class="col" id="div-tabla-principal-proyecto">
                 <div class="card">
                   
                   <div class="card-body pb-1">
@@ -224,13 +179,13 @@
                         </select>
                       </div>
                       <div class="col-auto">
-                        <button type="button" class="btn btn-sm btn-outline-info recargar-tabla-proveedor" data-toggle="tooltip" data-original-title="Recargar tabla" ><i class="ti ti-refresh"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-info recargar-tabla-proyecto" data-toggle="tooltip" data-original-title="Recargar tabla" ><i class="ti ti-refresh"></i></button>
                       </div>
                     </div>
                     
                     <div class="table-responsive ">
                     
-                      <table class="table table-bordered table-hover styletabla" id="tabla-proveedores">
+                      <table class="table table-bordered table-hover styletabla" id="tabla-clientes">
                         <thead>
                           <tr>                        
                             <th style="padding: 8px 10px;">Acciones</th>
@@ -259,127 +214,115 @@
                 </div>
               </div>
 
-              <!--SINCRONIZACION CON EL S10--->
-              <div class="col-lg-12 div_sincronizacions10" style="display: none;" >
-                <div class="card">
-                  
-                  <div class="card-body pb-1">
-                    <div class="row mb-2">                    
+              <div class="col-lg-12" id="div-ver-detalle-documentos" style="display: none;">
 
-                      <div class="col-12  col-lg-6">
+                <!-- Tabla de homologaciones y periodos -->
+                <div class="row verdocumentosxhomologacion">
 
-                        <div class="card">
-                          <div class="card-header">
-                            <h3 class="card-title">DATOS DEL PROVEEDOR
-                               <a class="btn btn-sm btn-principal btn_sincronizars10" onclick="sincronizarproveedors10()">Sincronizar Proveedor Con S10 </a>
-                            </h3>
+                  <div class="col-xs-12 col-sm-6 col-lg-5 ">
+                    <div class="card">
+                      <div class="card-header border-0 ">
+                              
+                        <h3 class="card-title m-2 font-weight-bold text-principal"> Homologaciones del Proveedor
+                        </h3>
+                        <div class="float-right">
+
+                          <div class="btn-group">
+                          <button type="button" class="btn btn-primary" style="border-color: #ffffff !important;" data-toggle="modal" data-target="#modal_agregar_homologacion" onclick="limpiar_homologacion();"><i class="fas fa-plus-circle"></i> Crear</button>
                           </div>
-                          <!-- /.card-header -->
-                          <div class="card-body">
-                            <!-- we are adding the accordion ID so Bootstrap's collapse plugin detects it -->
-                            <div id="accordion" class="lista_cambios_proveedor">
-
-
-                            </div>
-                          </div>
-                          <!-- /.card-body -->
                         </div>
-
+                        <div class="card-tools m-2"></div>
 
                       </div>
-
-                      <div class="col-12  col-lg-6">
-
-                        <div class="card">
-                          <div class="card-header">
-                            <h3 class="card-title">DATOS CUENTAS BANCARIAS 
-                              <a class="btn btn-sm btn-principal  btn_sincronizarcbs10" onclick="sincronizarcuentabancarias10()">Sincronizar Cuentas Bancarias Con S10</a>
-                            </h3>
-
-                          </div>
-                          <!-- /.card-header -->
-                          <div class="card-body">
-                            <!-- we are adding the accordion ID so Bootstrap's collapse plugin detects it -->
-                            <div id="accordion" class="lista_cuentas_bancarias_proveedor">
-                              <div class="card">
-                                <div class="card-header">
-                                  <h4 class="card-title w-100">
-                                    <a class="d-block w-100 text-principal text-bold" data-toggle="collapse" href="#collapseOne">
-                                       <i class="fas fa-globe text-danger" ></i> Collapsible Group Item #1
-                                    </a>
-                                  </h4>
-                                </div>
-                                <div id="collapseOne" class="collapse show" data-parent="#accordion">
-                                  <div class="card-body">
-                                    <ul class="nav nav-pills flex-column">
-                                      <li class="nav-item active">
-                                        <p> <i class="far fa-circle text-secondary"></i> Razon Social : David Melvin Requejo Santa cruz </p>
-                                        <p><i class="far fa-circle text-secondary"></i> Tipo Documento: RUC </p>
-                                        <p> <i class="far fa-circle text-secondary"></i> Nro Documento : 10745456015 </p>
-                                        <p> <i class="far fa-circle text-secondary"></i> Razon Social : David Melvin Requejo Santa cruz </p>
-                                        <p><i class="far fa-circle text-secondary"></i> Tipo Documento: RUC </p>
-                                        <p> <i class="far fa-circle text-secondary"></i> Nro Documento : 10745456015 </p>
-                                        <p> <i class="far fa-circle text-secondary"></i> Razon Social : David Melvin Requejo Santa cruz </p>
-                                        <p><i class="far fa-circle text-secondary"></i> Tipo Documento: RUC </p>
-                                        <p> <i class="far fa-circle text-secondary"></i> Nro Documento : 10745456015 </p>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div class="card">
-                                <div class="card-header">
-                                  <h4 class="card-title w-100">
-                                    <a class="d-block w-100 text-principal text-bold" data-toggle="collapse" href="#collapseThree">
-                                      <i class="fas fa-globe text-success" ></i>  Collapsible Group Success
-                                    </a>
-                                  </h4>
-                                </div>
-                                <div id="collapseThree" class="collapse" data-parent="#accordion">
-                                  <div class="card-body">
-                                    <ul class="nav nav-pills flex-column">
-                                      <li class="nav-item active">
-                                        <p> <i class="far fa-circle text-secondary"></i> Razon Social : David Melvin Requejo Santa cruz </p>
-                                        <p><i class="far fa-circle text-secondary"></i> Tipo Documento: RUC </p>
-                                        <p> <i class="far fa-circle text-secondary"></i> Nro Documento : 10745456015 </p>
-                                        <p> <i class="far fa-circle text-secondary"></i> Razon Social : David Melvin Requejo Santa cruz </p>
-                                        <p><i class="far fa-circle text-secondary"></i> Tipo Documento: RUC </p>
-                                        <p> <i class="far fa-circle text-secondary"></i> Nro Documento : 10745456015 </p>
-                                        <p> <i class="far fa-circle text-secondary"></i> Razon Social : David Melvin Requejo Santa cruz </p>
-                                        <p><i class="far fa-circle text-secondary"></i> Tipo Documento: RUC </p>
-                                        <p> <i class="far fa-circle text-secondary"></i> Nro Documento : 10745456015 </p>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                </div>
-                              </div>
-
-                            </div>
-                          </div>
-                          <!-- /.card-body -->
-                        </div>
-
+                      <div class="card-body table-responsive ">
+                          <table class="table table-bordered table-hover styletabla" id="tabla-lista-homologaciones">
+                            <thead>
+                              <tr>                        
+                                <th style="padding: 8px 10px;">#</th>
+                                <th style="padding: 8px 10px;">Acc.</th>
+                                <th class="sortable" style="padding: 8px 10px;">Descripción</th>
+                                <th class="sortable" style="padding: 8px 10px;">F. Inicio </th>
+                                <th class="sortable" style="padding: 8px 10px;">F. Fin</th>
+                                <th class="sortable" style="padding: 8px 10px;">Categoria</th>
+                                <th class="sortable" style="padding: 8px 10px;">ver</th>
+                              </tr>
+                            </thead>
+                            <tbody class="tabla-list-homolog">                     
+                            </tbody>
+                          </table>
                       </div>
-
                     </div>
-
                   </div>
 
+                  <div class="col-xs-12 col-sm-6 col-lg-7 ">
+                    <div class="card">
+                      <div class="card-header border-0">
+                        <h3 class="card-title m-2 font-weight-bold text-principal">Validación de Documentos : <span class="text_nombre_periodo_homol" style="color: #ff0000 !important;"></span> </h3>
+                        <div class="card-tools m-2"></div>
+                      </div>
+                      <div class="card-body mostrar_documento_pdf">
+                        <div class="alert alert-dismissible bg-color-principal text-white">
+                          <button type="button" class="close" data-dismiss="alert" aria-hidden="true" disabled></button>
+                          <h5><i class="icon fas fa-info"></i> Sin vista previa!</h5>
+                          Para visualizar un documento, haga clic en el ícono <i class="fas fa-eye"></i> ubicado en la fila correspondiente de la tabla del lado izquierdo
+                        </div>
+                      </div>
+
+                      <div class="card-body table-responsive tbl_lista_documento_hmolog" style="display:none;">
+                        <table class="table table-striped styletabla table-valign-middle">
+                          <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>Descripcion Doc.</th>
+                            <th>Estado</th>
+                            <th>Ver</th>
+                            <th class="text-center">Act. Estado</th>
+                          </tr>
+                          </thead>
+                          <tbody class="tbl_lista_documentos">
+                          <tr>
+                             <td>001</td>
+                            <td>
+                              <img src="/assets/images/default/pdf_icon.png" alt="Product 1" class="img-circle img-size-32 mr-2">
+                              Fecha Ruc de la empresa
+                            </td>
+                            <td><span class="badge bg-success">Verificado</span></td>
+                            <td>
+                              <a href="#" class="text-muted">
+                                <i class="fas fa-search"></i>
+                              </a>
+                            </td>
+                            <td class="text-center">
+                              <a class="btn btn-info btn-sm" href="#"><i class="fas fa-pencil-alt"></i> Editar</a>                              
+                            </td>
+                          </tr>
+
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="modal-footer justify-content-end">
+                        <button type="button" class="btn btn-xs btn-outline-secondary" >  <i class="fas fa-mail-bulk fa-lg"></i> Enviar Revisión</button>
+                      </div>
+                    </div>
+                    <!-- /.card -->
+                  </div>
+                  <!-- /.col-md-6 -->
+
                 </div>
+
+                
               </div>
-
-
             </div>
             <!-- /.row -->
             
           </div><!-- /.container-fluid -->
 
-          <div class="modal fade backdrop-filter-3px" id="modal-agregar-cliente">
+
+          <div class="modal fade" id="modal-agregar-cliente">
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
               <div class="modal-content">
                 <div class="modal-header py-2 bg-color-principal" >
-                  <h5 class="modal-title text-white">Cliente</h5>
+                  <h5 class="modal-title text-white">Proveedor</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span class="text-white" aria-hidden="true">&times;</span>
                   </button>
@@ -396,8 +339,8 @@
                       <div class="col-12 col-sm-6 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label for="descripcion">Tipo Entidad Sunat</label>                          
-                          <!--<textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
-                          <select name="tipo_entidad_sunat" id="tipo_entidad_sunat" class="form-control fs-h-input is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
+                          <!--<textarea class="form-control form-control-sm" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
+                          <select name="tipo_entidad_sunat" id="tipo_entidad_sunat" class="form-control form-control-sm is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
                             <option value="NATURAL">NATURAL</option>
                             <option value="JURIDICA">JURIDICA</option>
                           </select>
@@ -408,8 +351,8 @@
                       <div class="col-12 col-sm-6 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label for="descripcion">Tipo de documento</label>                          
-                          <!--<textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
-                          <select name="tipo_documento" id="tipo_documento" class="form-control fs-h-input is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
+                          <!--<textarea class="form-control form-control-sm" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
+                          <select name="tipo_documento" id="tipo_documento" class="form-control form-control-sm is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
                             <option value="6">RUC</option>
                           </select>
                         </div>
@@ -434,7 +377,7 @@
                              </span> <span class="valido_novalido"> <span class="badge badge-secondary">Por Verificar</span> </span></label>                          
                            <div class="input-group">
                             
-                              <input type="number" name="numero_documento" class="form-control fs-h-input" id="numero_documento" placeholder="N° de documento" onkeypress="return soloNumeros(event)" maxlength="11" />
+                              <input type="number" name="numero_documento" class="form-control form-control-sm" id="numero_documento" placeholder="N° de documento" onkeypress="return soloNumeros(event)" maxlength="11" />
                               <div class="input-group-append" data-toggle="tooltip" data-original-title="Buscar Reniec/SUNAT" onclick="buscar_sunat_reniec();">
                                 <span class="input-group-text" style="cursor: pointer;">
                                   <i class="fas fa-search text-primary" id="search"></i>
@@ -449,24 +392,24 @@
                       <!-- Nombre y Apellidos -->
                       <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                         <div class="form-group">
-                          <label for="Nombre_Apellidos">Razon Social <sup class="text-danger">*</sup></label>
-                          <input type="text" name="nombre_razonsocial" class="form-control fs-h-input" id="nombre_razonsocial"  />
+                          <label for="Nombre_Apellidos">Nombre y Apellidos/Razon Social <sup class="text-danger">*</sup></label>
+                          <input type="text" name="nombre_razonsocial" class="form-control form-control-sm" id="nombre_razonsocial"  />
                         </div>
                       </div> 
                        <!-- Nombre apellidos maternos paternos  -->
                       <div class="col-12 col-sm-12 col-md-7 col-lg-7" style="display: none">
                         <div class="form-group">
                           <label for="Nombre_Apellidos">Nombre <sup class="text-danger">*</sup></label>
-                          <input type="text" name="nombre_persona_natural" class="form-control fs-h-input" id="nombre_persona_natural"  />
-                          <input type="text" name="apellido_paterno_per_natural" class="form-control fs-h-input" id="apellido_paterno_per_natural"  />
-                          <input type="text" name="apellido_materno_per_natural" class="form-control fs-h-input" id="apellido_materno_per_natural"  />
+                          <input type="text" name="nombre_persona_natural" class="form-control form-control-sm" id="nombre_persona_natural"  />
+                          <input type="text" name="apellido_paterno_per_natural" class="form-control form-control-sm" id="apellido_paterno_per_natural"  />
+                          <input type="text" name="apellido_materno_per_natural" class="form-control form-control-sm" id="apellido_materno_per_natural"  />
                         </div>
                       </div> 
                       <!-- Teléfono -->
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label>Teléfono</label>
-                          <input type="text" name="celular" id="celular" class="form-control fs-h-input" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text" onkeypress="return soloNumeros(event)">
+                          <input type="text" name="celular" id="celular" class="form-control form-control-sm" data-inputmask="'mask': ['999-999-999', '+51 999 999 999']" data-mask="" inputmode="text" onkeypress="return soloNumeros(event)">
                         </div>
                       </div>
 
@@ -474,14 +417,14 @@
                       <div class="col-12 col-sm-12 col-md-7 col-lg-7">
                         <div class="form-group">
                           <label for="email">Email</label>
-                           <input type="email" name="email" class="form-control fs-h-input" id="email" placeholder="Correo electrónico" onkeyup="convert_minuscula(this);">
+                           <input type="email" name="email" class="form-control form-control-sm" id="email" placeholder="Correo electrónico" onkeyup="convert_minuscula(this);">
                         </div>
                       </div>   
                       <!-- email -->
                       <div class="col-12 col-sm-12 col-md-5 col-lg-5">
                         <div class="form-group">
                           <label for="sitio_web">Sitio web</label>
-                           <input type="url" name="sitio_web" class="form-control fs-h-input" id="sitio_web" placeholder="www.tusitioweb.com">
+                           <input type="url" name="sitio_web" class="form-control form-control-sm" id="sitio_web" placeholder="www.tusitioweb.com">
                         </div>
                       </div>   
 
@@ -489,7 +432,7 @@
                       <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                         <div class="form-group">
                           <label for="direccion">Dirección </label> <br>
-                          <textarea name="direccion" id="direccion" class="form-control" rows="1"></textarea>
+                          <textarea name="direccion" id="direccion" class="form-control form-control-sm" rows="1"></textarea>
                         </div>
                       </div>
 
@@ -497,7 +440,7 @@
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label for="distrito">Distrito</label>
-                          <select name="distrito" id="distrito" class="form-control fs-h-input select2" style="width: 100%;"  > </select>   
+                          <select name="distrito" id="distrito" class="form-control fs-h-input is-valid select2" placeholder="Distrito" aria-invalid="false"> </select>   
                         </div>
                       </div> 
 
@@ -505,7 +448,7 @@
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label for="provincia">Provincia</label>
-                          <input type="text" name="provincia" class="form-control fs-h-input" id="provincia"  readonly/>
+                          <input type="text" name="provincia" class="form-control form-control-sm" id="provincia"  readonly/>
                         </div>
                       </div> 
 
@@ -513,7 +456,7 @@
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label for="departamento">Departamento</label>
-                          <input type="text" name="departamento" class="form-control fs-h-input" id="departamento"  readonly />
+                          <input type="text" name="departamento" class="form-control form-control-sm" id="departamento"  readonly />
                         </div>
                       </div> 
 
@@ -521,20 +464,20 @@
                         <div class="card-header font-weight-bold"  style="background-color: #e9ecef">Creación de Acceso al Portal <span class="text-center badge badge-info cursor-pointer" style=" font-size: 13px; pont" id="btn_generar_credenciales" >Generar credenciales</span></div>
                         
                         <div class="card-body text-secondary">
-                          <p class="card-text">Genera automáticamente el usuario y contraseña a partir de los datos del Cliente.</p>
+                          <p class="card-text">Genera automáticamente el usuario y contraseña a partir de los datos del proveedor.</p>
 
                           <div class="row">
                                <input type="hidden" name="id" id="id" />
                         
                               <div class="form-group col-md-6">
                                   <label>Usuario</label>
-                                  <input type="text" id="usuario_portal" name="usuario_portal" class="form-control fs-h-input"
+                                  <input type="text" id="usuario_portal" name="usuario_portal" class="form-control form-control-sm"
                                       placeholder="Usuario automático">
                               </div>
 
                               <div class="form-group col-md-6">
                                   <label>Contraseña</label>
-                                  <input type="text" id="clave_portal" name="clave_portal" class="form-control fs-h-input"
+                                  <input type="text" id="clave_portal" name="clave_portal" class="form-control form-control-sm"
                                       placeholder="Contraseña automática">
                               </div>
                           </div> 
@@ -561,12 +504,12 @@
                     </div>
                     
                     <!-- /.card-body -->
-                    <button type="submit" style="display: none;" id="submit-form-proveedor">Submit</button>
+                    <button type="submit" style="display: none;" id="submit-form-cliente">Submit</button>
                   </form>
                 </div>
                 <div class="modal-footer justify-content-between py-1">
                   <button type="button" class="btn btn-outline-secondary " data-dismiss="modal"><i class="ti ti-circle-dashed-x"></i>Cerrar</button>
-                  <button type="button" class="btn btn-primary guardar_registro_cliente" style="display:none;" ><i class="ti ti-device-floppy"></i> Guardar</button>
+                  <button type="button" class="btn btn-primary" id="guardar_registro_cliente" style="display:none;" ><i class="ti ti-device-floppy"></i> Guardar</button>
                 </div>
               </div>
               <!-- /.modal-content -->
@@ -575,73 +518,256 @@
           </div>
           <!-- /.modal -->
 
-          <!--Carga Masiva de clientes-->
-          <div class="modal fade backdrop-filter-3px" id="modal-agregar-cliente-masivo">
-            <div class="modal-dialog modal-lg modal-dialog-scrollable">
-              <div class="modal-content">
 
-                <!-- HEADER -->
-                <div class="modal-header py-2 bg-color-principal">
-                  <h4 class="modal-title text-white text-bold">Importación de Clientes</h4>
-                  <button type="button" class="close" data-dismiss="modal">
-                    <span class="text-white">&times;</span>
-                  </button>
+        <!-- Modal actualizar estado documento -->  
+        <div class="modal fade show" id="modal-actualizar-estado"  aria-modal="true" role="dialog">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h6 class="modal-title">Actualizar Estado : <strong class='text-info nombre_doc_edit'></strong> </h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <form id="form-actualizar-estado" name="form-actualizar-estado" method="POST">
+                  @csrf
+                  <input type="text" name="iddocsproveedortipoestandar" id="iddocsproveedortipoestandar" /> 
+                  <input type="text" name="idpersonadoc" id="idpersonadoc" /> 
+                  <input type="text" name="inputnombre_razonsocial_tipo" id="inputnombre_razonsocial_tipo" />
+                  <input type="text" name="inputemail_cliente_env_correo" id="inputemail_cliente_env_correo" />
+
+                  <div  class="row" id="cargando-3-formulario">
+
+                    <div class="col-12">
+                      <label for="estado_documentos">Estado de Documento</label>
+                      <select name="estado_documentos_update" id="estado_documentos_update" class="form-control form-control-sm is-valid select2" placeholder="Estado de Documentos" aria-invalid="false">
+                        <option value="Aprobado">Aprobado</option>
+                        <option value="Rechazado">Observado</option>
+                        <option value="Rechazado">Rechazado</option>
+                      </select>
+                    </div>
+
+                    <div class="col-12 mt-2">
+                      <div class="form-group">
+                        <label for="observacion_est_up">Obs </label> <br>
+                        <textarea name="observacion_est_up" id="observacion_est_up" class="form-control form-control-sm" rows="2"></textarea>
+                      </div>
+                    </div>
+
+                  </div>
+                  
+                  <!-- barprogress -->
+                  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px;">
+                    <div class="progress" id="barra_progress_act_est_div">
+                      <div id="barra_progress_act_est" class="progress-bar" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: 0%;">
+                        0%
+                      </div>
+                    </div>
+                  </div> 
+
+                  <div class="row" id="cargando-4-formulario" style="display: none;">
+                    <div class="col-lg-12 text-center">
+                      <i class="fas fa-spinner fa-pulse fa-3x"></i><br />
+                      <br />
+                      <h4>Cargando...</h4>
+                    </div>
+                  </div>
+
+                  <button type="submit" style="display: none;" id="submit-form-actualizar_estado">Submit</button>
+                </form>
+              </div>
+              <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-success" id="guardar_registro_actualizar_estado" ><i class="ti ti-device-floppy"></i> Guardar</button>
+              </div>
+            </div>
+            <!-- /.modal-content -->
+          </div>
+          <!-- /.modal-dialog -->
+        </div>
+
+
+        <!-- Modal agregar homologacion -->
+        <div class="modal fade show" id="modal_agregar_homologacion"  aria-modal="true" role="dialog">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h6 class="modal-title">Agregar Homologación</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <form id="form-add_homologacion" name="form-add_homologacion" method="POST">
+                  @csrf
+                  <input type="hidden" name="idpersona_facha_homologacion" id="idpersona_facha_homologacion" /> 
+                  <input type="hidden" name="idproveedor" id="idproveedor" /> 
+
+                  <div  class="row" id="cargando-5-formulario">
+
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                      <div class="form-group">
+                        <label for="descripcion">Categoria Proveedor </label>
+                        <select name="idtipoestandarproveedor" id="idtipoestandarproveedor" class="form-control form-control-sm is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                      <div class="form-group">
+                        <label for="descripcion">Descripción </label>                          
+                         <textarea name="descripcion_homologacion" id="descripcion_homologacion" class="form-control form-control-sm" rows="1" value="Periodo"></textarea>
+                      </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-6" >
+                      <div class="form-group">
+                        <label for="descripcion">F. Inicio  </label>                          
+                          <input type="date" name="fecha_inicio_periodo" class="form-control form-control-sm" id="fecha_inicio_periodo" />
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-6" >
+                      <div class="form-group">
+                        <label for="descripcion"> F. Fin </label>         
+                          <input type="date" name="fecha_fin_periodo" class="form-control form-control-sm" id="fecha_fin_periodo"  />
+                        </select>
+                      </div>
+                    </div>
+
+                  </div>
+                  
+                  <!-- barprogress -->
+                  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:20px;">
+                    <div class="progress" id="barra_progress_act_est_div">
+                      <div id="barra_progress_act_est" class="progress-bar" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: 0%;">
+                        0%
+                      </div>
+                    </div>
+                  </div> 
+
+                  <div class="row" id="cargando-6-formulario" style="display: none;">
+                    <div class="col-lg-12 text-center">
+                      <i class="fas fa-spinner fa-pulse fa-3x"></i><br />
+                      <br />
+                      <h4>Cargando...</h4>
+                    </div>
+                  </div>
+
+                  <button type="submit" style="display: none;" id="submit-form-add_homologacion">Submit</button>
+                </form>
+              </div>
+              <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="guardar_registro_add_homologacion" ><i class="ti ti-device-floppy"></i> Guardar</button>
+              </div>
+            </div>
+            <!-- /.modal-content -->
+          </div>
+          <!-- /.modal-dialog -->
+        </div>
+
+
+          <!-- Modal ver documento PDF -->     
+        <div class="modal fade show" id="modal_ver_documento"  aria-modal="true" role="dialog">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+
+                <div class="card-header border-0">
+                  <h3 class="card-title m-2 font-weight-bold text-black-50">Nombre Documento : <span class="nombre_documento_pdf" style="color: #ff0000 !important;"></span> </h3>
+                  <div class="card-tools m-2"></div>
                 </div>
 
-                <!-- BODY -->
-                <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div class="modal-body ver_documento_modal">
 
-                  <!-- INDICADOR PASOS -->
-                  <div class="step-indicator mb-3">
-                    <div class="step active" data-step="1">1. Plantilla</div>
-                    <div class="step" data-step="2">2. Importar Excel</div>
-                  </div>
+              </div>
+              <div class="modal-footer justify-content-end">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+              </div>
+            </div>
+            <!-- /.modal-content -->
+          </div>
+          <!-- /.modal-dialog -->
+        </div>
 
-                  <!-- PASO 1 -->
-                  <div class="step-content active" data-step="1">
-                    <div class="form-group">
-                      <label>Click para:</label>
-                      <a href="{{ asset('assets/plantilla-excel/Plantilla-importar-cliente.xlsx') }}" download="Plantilla-Cliente">Descargar plantilla excel</a>
-                    </div>
 
-                    <div class="alert alert-warning">
-                      <strong>Atención:</strong> Use la plantilla sin modificar columnas.
-                    </div>
+        <!--Carga Masiva de Proveedores-->
+        <div class="modal fade" id="modal-agregar-cliente-masivo">
+          <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
 
-                    <button class="btn btn-primary btn-next">Siguiente</button>
-                  </div>
+              <!-- HEADER -->
+              <div class="modal-header py-2 bg-color-principal">
+                <h4 class="modal-title text-white text-bold">Importación de Proveedores</h4>
+                <button type="button" class="close" data-dismiss="modal">
+                  <span class="text-white">&times;</span>
+                </button>
+              </div>
 
-                  <!-- PASO 2 -->
-                  <div class="step-content" data-step="2">
-                    <div class="form-group">
+              <!-- BODY -->
+              <div class="modal-body">
 
-                      <input type="file" class="filepond"  name="file_excel_clientes_masivo" id="input-plantilla-excel"   data-allow-reorder="true"  data-max-files="1"  >
-                            
-                    </div>
-
-                    <button class="btn btn-secondary btn-prev">Anterior</button>
-                  </div>
-
-                  <!-- PROGRESS -->
-                  <div class="progress mt-3 d-none" id="barra_progress_importar_clientes_div">
-                    <div id="barra_progress_importar_clientes"
-                        class="progress-bar"
-                        style="width:0%">0%</div>
-                  </div>
-
+                <!-- INDICADOR PASOS -->
+                <div class="step-indicator mb-3">
+                  <div class="step active" data-step="1">1. Plantilla</div>
+                  <div class="step" data-step="2">2. Importar Excel</div>
                 </div>
 
-                <!-- FOOTER -->
-                <div class="modal-footer d-none" id="div-btn-importar-clientes">
-                  <button class="btn btn-outline-danger btn-sm" data-dismiss="modal">Cerrar</button>
-                  <button class="btn btn-success btn-sm" id="guardar_registro_importar_clientes">
-                    Importar
-                  </button>
+                <!-- PASO 1 -->
+                <div class="step-content active" data-step="1">
+                  <div class="form-group">
+                    <label>Click para:</label>
+                    <a href="{{ asset('assets/plantilla-excel/Plantilla-importar-cliente.xlsx') }}" download="Plantilla-cliente">Descargar plantilla excel</a>
+                  </div>
+
+                  <div class="alert alert-warning">
+                    <strong>Atención:</strong> Use la plantilla sin modificar columnas.
+                  </div>
+
+                  <button class="btn btn-primary btn-next">Siguiente</button>
+                </div>
+
+                <!-- PASO 2 -->
+                <div class="step-content" data-step="2">
+                  <div class="form-group">
+
+                    <input type="file" class="filepond"  name="file_excel_cliente_masivo" id="input-plantilla-excel"   data-allow-reorder="true"  data-max-files="1"  >
+                          
+                  </div>
+
+                  <button class="btn btn-secondary btn-prev">Anterior</button>
+                </div>
+
+                <!-- PROGRESS -->
+                <div class="progress mt-3 d-none" id="barra_progress_importar_cliente_div">
+                  <div id="barra_progress_importar_cliente"
+                      class="progress-bar"
+                      style="width:0%">0%</div>
                 </div>
 
               </div>
+
+              <!-- FOOTER -->
+              <div class="modal-footer d-none" id="div-btn-importar-cliente">
+                <button class="btn btn-outline-danger btn-sm" data-dismiss="modal">Cerrar</button>
+                <button class="btn btn-success btn-sm" id="guardar_registro_importar_cliente">
+                  Importar
+                </button>
+              </div>
+
             </div>
           </div>
+        </div>
+
+
+
 
         </section>
         <!-- /.content -->
@@ -678,11 +804,11 @@
   <script src="{{ asset('adminlte3/plugins/bs-stepper/js/bs-stepper.min.js') }}"></script>
     <!-- bs-custom-file-input -->
   <script src="{{ asset('adminlte3/plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+
+
  
   <script src="{{ asset('assets/js/cliente.js') }}?version_erp=01.12"></script>
   <script src="{{ asset('assets/js/cliente_carga_masiva.js') }}?version_erp=01.12"></script>
-  <script src="{{ asset('assets/js/sincronizacions10.js') }}?version_erp=01.12"></script>
-  
 
   <script>
     $(function() {
@@ -694,11 +820,9 @@
     });
     // Input file
     bsCustomFileInput.init();
-     
+      
+      
     });
-
-      const idTipoPersonauser = {{ auth()->user()->persona->idtipo_persona }};
-
   </script>
 
 </body>

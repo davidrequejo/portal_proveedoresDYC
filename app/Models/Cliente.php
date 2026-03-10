@@ -14,7 +14,6 @@ class Cliente extends Model
     protected $fillable = [
 
 
-
         /* ================== CLAVES ================== */
         'idtipo_persona',
         'idtipoestandarproveedor',

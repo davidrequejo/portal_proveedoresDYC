@@ -95,8 +95,6 @@ const pondImportarProyecto = FilePond.create(inputImportarExcel, {
 });
 
 
-
-
 $('#guardar_registro_importar_cliente').on('click', function () {
 
   let file = pondImportarProyecto.getFile();

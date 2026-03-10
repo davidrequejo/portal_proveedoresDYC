@@ -22,6 +22,9 @@ use App\Http\Controllers\AreaPersonaController;
 use App\Http\Controllers\ProveedorLogController;
 use App\Http\Controllers\ApiSincronizarS10;
 
+//EVALUACION
+use App\Http\Controllers\SeleccEvaluacionController;
+
 
 
 Route::get('/', function () {  return redirect()->route('login'); });
@@ -203,6 +206,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
       // (opcional) resource si lo usas como en Banco
       Route::resource('area_persona', AreaPersonaController::class);
+
+
+      //:::::::::::::::::::::::::. SELECCIÓN EVALUACIÓN ::::::::::::::::::::::::::::::
+      Route::resource('selecc_evaluacion', SeleccEvaluacionController::class);
+      
 
       Route::get('/test-modelo', function() {
         try {
