@@ -32,6 +32,7 @@ class Homologacion  extends Model
         'fecha_fin_periodo_h',
         'user_init_process',
         'user_fin_process',
+        'idpersonacomprador',
         'estado_homologacion',
         'estado_trash',
         'estado_delete',

@@ -16,14 +16,16 @@ var  descrp_homol_edit = null;
  
 
 
-$("#guardar_registro_proveedor").on("click", function (e) { $("#submit-form-proveedor").submit(); });   
+$(".guardar_registro_proveedor").on("click", function (e) { $("#submit-form-proveedor").submit(); });   
 $(".guardar_registro_add_homologacion").on("click", function (e) { $("#submit-form-add_homologacion").submit(); });
-$("#guardar_registro_actualizar_estado").on("click", function (e) { $("#submit-form-actualizar_estado").submit(); });
+$(".guardar_registro_actualizar_estado").on("click", function (e) { $("#submit-form-actualizar_estado").submit(); });
 
 // lista_select2("../ajax/ajax_general.php?op=select2EmpresaACargo", '#empresa_acargo', null);
 
 lista_select2(`${BASE_URL}/select2/obtener`, '#distrito'); 
 lista_select2(`${BASE_URL}/select2/tipoestandar`, '#idtipoestandarproveedor');
+
+lista_select2(`${BASE_URL}/select2/pers_compr_adm`, '#idpersonacomprador',idPersonaUser);
 
 
 $("#distrito").select2({ theme: "bootstrap4", placeholder: "Seleccionar Distrito", allowClear: true, });
@@ -34,6 +36,10 @@ $('#tipo_documento').select2({ theme: "bootstrap4", placeholder: "Selecione", al
 $('#idsocio_negocio').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
 $('#tipo_entidad_sunat').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
 $('#estado_documentos_update').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
+
+$('#idpersonacomprador').select2({ theme: "bootstrap4", placeholder: "Selecione", allowClear: true });
+
+
 
 $("#estado_documentos_update").val("").trigger('change');
 
@@ -77,10 +83,37 @@ function show_hide_escenario(flag) {
 }
 
 //**activamso el bton si el estado de la sunat es favorable */
-$('#estado_sunat').on('change', function () {
+/*$('#estado_sunat').on('change', function () {
   const estado = $(this).val();
-  $('#guardar_registro_proveedor').toggle(estado === 'ACTIVO');
-});
+  $('.guardar_registro_proveedor').toggle(estado === 'ACTIVO');
+});*/
+
+function toggleBotonGuardar() {
+  
+  const tipoDoc = $('#tipo_documento').val();       // 'RUC' o 'EXTRANJERO'
+  const estadoSunat = $('#estado_sunat').val();     // 'ACTIVO', 'BAJA', etc.
+
+  if (tipoDoc === '7') {
+    $('.guardar_registro_proveedor').show();        // siempre visible
+  } else if (tipoDoc === '6') {
+    $('.guardar_registro_proveedor').toggle(estadoSunat === 'ACTIVO');
+  } else {
+    $('.guardar_registro_proveedor').hide();        // otros casos
+  }
+
+    // Control del maxlength según tipo de documento
+  if (tipoDoc === '7') {
+    $('#numero_documento').removeAttr('maxlength'); // quitar la restricción
+  } else if (tipoDoc === '6') {
+    $('#numero_documento').attr('maxlength', '11'); // poner maxlength 11
+  }
+}
+
+// Asignar eventos a ambos campos
+$('#tipo_documento, #estado_sunat').on('change', toggleBotonGuardar);
+
+// Ejecutar al cargar la página para establecer el estado inicial
+toggleBotonGuardar();
 
 $(document).ready(function() {
     // Cuando el valor del select cambia
@@ -91,8 +124,6 @@ $(document).ready(function() {
 
         $('#provincia').val(provincia);
         $('#departamento').val(departamento);
-
-        console.log(provincia);
         
 
     });
@@ -155,8 +186,6 @@ function tabla_principal_cargar(){
   $("#tabla-proveedores tbody").html('<tr><td colspan="15" class="text-center text-muted"><i class="fas fa-sync fa-spin"></i> Actualizando...</td></tr>');
   
   $.getJSON(`${BASE_URL}/proveedor/tabla_principal`, state, function(res){
-
-    console.log(res.data);
     
     renderFilas(res.data);
     renderPaginacion(res.current_page, res.last_page);
@@ -316,13 +345,7 @@ function limpiarFiltro(nombre) {
     case 'tipo_persona_filtro': $('#tipo_persona_filtro').val(''); state.tipo_persona_filtro = null; break; 
   }
 
-}
-
-
-
-
-
-      
+}      
 
 // ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 // ═══════                                       S E C C I O N   C R U D   P R O V E E D O R                                                        ═══════
@@ -333,6 +356,7 @@ function limpiar_form_proveedor(){
   //Mostramos los Materiales
   $("#idpersona").val("");
   $("#numero_documento").val("");
+  $('#tipo_documento').val("").trigger('change');
 
   $("#nombre_razonsocial").val("");
   $("#nombre_persona_natural").val("");
@@ -460,7 +484,7 @@ function guardar_y_editar_proveedor(e) {
           ver_errores(e);				 
         }
       } catch (err) { console.log('Error: ', err.message); toastr.error('<h5 class="font-size-16px">Error temporal!!</h5> puede intentalo mas tarde, o comuniquese con <i><a href="tel:+51921305769" >921-305-769</a></i> ─ <i><a href="tel:+51921487276" >921-487-276</a></i>'); } 
-      $("#guardar_registro_proveedor").html('Guardar Cambios').removeClass('disabled');
+      $(".guardar_registro_proveedor").html('Guardar Cambios').removeClass('disabled');
     },
     xhr: function () {
       var xhr = new window.XMLHttpRequest();
@@ -473,7 +497,7 @@ function guardar_y_editar_proveedor(e) {
       return xhr;
     },
     beforeSend: function () {
-      $("#guardar_registro_proveedor").html('<i class="fas fa-spinner fa-pulse fa-lg"></i>').addClass('disabled');
+      $(".guardar_registro_proveedor").html('<i class="fas fa-spinner fa-pulse fa-lg"></i>').addClass('disabled');
       $("#barra_progress_proyecto").css({ width: "0%",  });
       $("#barra_progress_proyecto").text("0%");
     },
@@ -501,7 +525,7 @@ function guardar_y_editar_proveedor(e) {
           title: message,
           html: html
         });
-        $("#guardar_registro_proveedor").html('Guardar Cambios').removeClass('disabled');
+        $(".guardar_registro_proveedor").html('Guardar Cambios').removeClass('disabled');
       }else {
         ver_errores(xhr);
       }
@@ -530,8 +554,6 @@ function eliminar_proveedor(id, nombres) {
           _token: $('meta[name="csrf-token"]').attr('content') // necesario para PUT
         },
         success: function (e) {
-          console.log(e);
-
           if (e.status === true) {
             Swal.fire("Eliminado!", "El registro ha sido eliminado.", "success");
             tabla_principal_cargar();
@@ -739,6 +761,7 @@ function ver_editar_periodo_h(id,tipo) {
       $("#descripcion_homologacion").val(e.data.data_homolog.descripcion);
       $("#fecha_inicio_proceso").val(e.data.data_homolog.fecha_inicio_proceso);
       $("#fecha_fin_periodo").val(e.data.data_homolog.fecha_fin);
+      $("#idpersonacomprador").val(e.data.data_homolog.idpersonacomprador).trigger('change');
 
       if (e.data.data_homolog.fecha_inicio_periodo_h!=null) {
          $("#fecha_inicio_periodo_h").val(e.data.data_homolog.fecha_inicio_periodo_h);
@@ -833,6 +856,7 @@ function ver_documentos_x_homologacion(id, descripcion) {
 
           let estadoHtml = '';
           const isPendiente = (r.estado_revision == 'Pendiente');
+          let accionesHtml = '';
 
           switch (r.estado_revision) {
               case 'Actualizado': estadoHtml = `<span class="badge bg-warning text-dark">Actualizado</span>`; break;
@@ -843,39 +867,51 @@ function ver_documentos_x_homologacion(id, descripcion) {
 
               default: estadoHtml = `<span class="badge bg-danger">Pendiente.</span>`; 
           }
-      
-        $(".tbl_lista_documentos_internos").append(`
 
-          <tr>
-            <td>${String(cont++).padStart(3, '0')}</td>
-            <td class="py-1 text-nowrap" ><i class="fas fa-file-pdf fa-lg color_icon_opt"></i> ${r.descripcion ?? ''}</td>
-            <td>${estadoHtml}</td>
-            <td class="py-1 text-center" style="cursor:pointer">
-                ${r.archivo
-                    ? `<a class="text-principal"
-                         onclick="ver_documento_proveedor('${r.archivo}','${r.descripcion}')">
-                        <i class="fas fa-search"></i>
-                       </a>`
-                    : `<a class="text-muted"
-                         onclick="toastr_info('No hay documento adjunto','Sin documento')">
-                        <i class="fas fa-search"></i>
-                       </a>`
-                }
-            </td>
-            <td class="py-1 text-center" >
-                    <a class="btn btn-sm"
-                      onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','cargar_documento')">
-                      
-                      <i class="fas fa-cloud-upload-alt color_icon_opt"></i>
-                    </a>
-                    <a class="btn btn-sm"
-                      onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','actualizar_estado')">
-                      <i class="fas fa-pencil-alt color_icon_opt"></i>
-                    </a>
-              
-            </td>
-          </tr>
-        `);
+          if (idTipoPersonauser == '2') {
+              accionesHtml = `
+                  <a class="btn btn-sm"
+                    onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','cargar_documento')">
+                    <i class="fas fa-cloud-upload-alt color_icon_opt"></i>
+                  </a>
+                  <a class="btn btn-sm"
+                    onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','actualizar_estado')">
+                    <i class="fas fa-pencil-alt color_icon_opt"></i>
+                  </a>
+              `;
+          } else {
+              accionesHtml =  `<a class="btn btn-sm"
+                    onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','cargar_documento')">
+                    <i class="fas fa-cloud-upload-alt color_icon_opt"></i>
+                  </a>
+                   <a class="text-muted" onclick="toastr_info('No Tienes Permisos','Para Actualizar el estado del documento')" >
+                      <i class="fas fa-pencil-alt "></i>
+                    </a>`;
+          }
+
+          $(".tbl_lista_documentos_internos").append(`
+
+            <tr>
+              <td>${String(cont++).padStart(3, '0')}</td>
+              <td class="py-1 text-nowrap" ><i class="fas fa-file-pdf fa-lg color_icon_opt"></i> ${r.descripcion ?? ''}</td>
+              <td>${estadoHtml}</td>
+              <td class="py-1 text-center" style="cursor:pointer">
+                  ${r.archivo
+                      ? `<a class="text-principal"
+                          onclick="ver_documento_proveedor('${r.archivo}','${r.descripcion}')">
+                          <i class="fas fa-search"></i>
+                        </a>`
+                      : `<a class="text-muted"
+                          onclick="toastr_info('No hay documento adjunto','Sin documento')">
+                          <i class="fas fa-search"></i>
+                        </a>`
+                  }
+              </td>
+              <td class="py-1 text-center" >
+                ${accionesHtml}                
+              </td>
+            </tr>
+          `);
          
       });
        
@@ -909,8 +945,6 @@ function eliminar_periodo_h(id, nombres) {
           _token: $('meta[name="csrf-token"]').attr('content') // necesario para PUT
         },
         success: function (e) {
-          console.log(e);
-
           if (e.status === true) {
             Swal.fire("Eliminado!", "El registro ha sido eliminado.", "success");
             lista_homologaciones(idpersona_tipo, nombre_razonsocial_tipo, email_proveedor_env_correo);
@@ -996,10 +1030,6 @@ function actualizar_estado_documento(id, idpersona, nombre_documento,archivo,est
     $('.div_archivo_up').show();
 
     $("#estado_documentos_update").val('Aprobado').trigger('change');
-
-    //validamoos DOC-1
-    console.log('archivo');
-    console.log(archivo);
     
     if (archivo!=='null' ) {
       $("#doc_old_1").val(archivo);
@@ -1055,7 +1085,7 @@ function guardar_y_editar_act_estado(e) {
           ver_errores(e);				 
         }
       } catch (err) { console.log('Error: ', err.message); toastr.error('<h5 class="font-size-16px">Error temporal!!</h5> puede intentalo mas tarde, o comuniquese con <i><a href="tel:+51921305769" >921-305-769</a></i> ─ <i><a href="tel:+51921487276" >921-487-276</a></i>'); } 
-      $("#guardar_registro_actualizar_estado").html('Guardar Cambios').removeClass('disabled');
+      $(".guardar_registro_actualizar_estado").html('Guardar Cambios').removeClass('disabled');
     },
     xhr: function () {
       var xhr = new window.XMLHttpRequest();
@@ -1068,7 +1098,7 @@ function guardar_y_editar_act_estado(e) {
       return xhr;
     },
     beforeSend: function () {
-      $("#guardar_registro_actualizar_estado").html('<i class="fas fa-spinner fa-pulse fa-lg"></i>').addClass('disabled');
+      $(".guardar_registro_actualizar_estado").html('<i class="fas fa-spinner fa-pulse fa-lg"></i>').addClass('disabled');
       $("#barra_progress_act_est").css({ width: "0%",  });
       $("#barra_progress_act_est").text("0%");
     },
@@ -1217,6 +1247,7 @@ $(function () {
   $('#tipo_entidad_sunat').on('change', function() { $(this).trigger('blur'); });
   $('#tipo_documento').on('change', function() { $(this).trigger('blur'); });
   $('#estado_documentos_update').on('change', function() { $(this).trigger('blur'); });
+  $('#idpersonacomprador').on('change', function() { $(this).trigger('blur'); });
 
   $("#form-agregar-proveedor").validate({
     //ignore: '.select2-input, .select2-focusser',
@@ -1264,12 +1295,14 @@ $(function () {
     //ignore: '.select2-input, .select2-focusser',
     rules: {
 
-      idtipoestandarproveedor:    { required: true, },     
+      idtipoestandarproveedor:    { required: true, }, 
+      idpersonacomprador :    { required: true, },    
       descripcion_homologacion:    { required: true, },   
       fecha_inicio_proceso:    { required: true, },  
     },
     messages: {
       idtipoestandarproveedor:    { required: "Campo requerido.", },
+      idpersonacomprador :    { required: "Campo requerido.", },
       descripcion_homologacion:    { required: "Campo requerido.", },
       fecha_inicio_proceso:    { required: "Campo requerido.", },
     },
@@ -1330,6 +1363,7 @@ $(function () {
   $('#tipo_entidad_sunat').rules('add', { required: true, messages: {  required: "Campo requerido" } });
   $('#tipo_documento').rules('add', { required: true, messages: {  required: "Campo requerido" } });
   $('#estado_documentos_update').rules('add', { required: true, messages: {  required: "Campo requerido" } });
+  $('#idpersonacomprador').rules('add', { required: true, messages: {  required: "Campo requerido" } });
 
 });
 

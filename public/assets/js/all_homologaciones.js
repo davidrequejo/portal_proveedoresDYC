@@ -177,11 +177,12 @@ function renderFilas(rows){
     let estado_completo = '';
 
     switch (r.estado_documentos) {
-      case '0': estado_completo = `<span class="badge bg-danger text-white">  Pendiente Registro</span>`; break;
-      case '1': estado_completo = `<span class="badge bg-success text-white"> Completo</span>`; break;
-      case '3': estado_completo = `<span class="badge badge-new  text-white"> Parcial Completo</span>`; break;
-      case '2': estado_completo = `<span class="badge bg-warning text-white"> Pendiente de validar</span>`; break;
-      default: estado_completo = `<span class="badge bg-danger text-white">Incompleto</span>`;    
+      case 0: estado_completo = `<span class="badge bg-danger text-white">  Pendiente Registro</span>`; break;
+      case 1: estado_completo = `<span class="badge bg-success text-white"> Completo</span>`; break;
+      case 2: estado_completo = `<span class="badge bg-warning text-white"> Pendiente de validar</span>`; break;
+      case 3: estado_completo = `<span class="badge badge-new  text-white"> Parcial Completo</span>`; break;
+      case 4: estado_completo = `<span class="badge bg-orange text-white"> Observado</span>`; break;
+      default: estado_completo = `<span class="badge bg-danger text-white"> Incompleto</span>`;    
     }
 
     switch (r.estado_homologacion) {
@@ -536,6 +537,7 @@ function ver_documentos_x_homologacion(id, descripcion,proveedor,idpersona) {
 
           let estadoHtml = '';
           const isPendiente = (r.estado_revision == 'Pendiente');
+          
 
           switch (r.estado_revision) {
               case 'Actualizado': estadoHtml = `<span class="badge bg-warning text-dark">Actualizado</span>`; break;
@@ -547,36 +549,36 @@ function ver_documentos_x_homologacion(id, descripcion,proveedor,idpersona) {
               default: estadoHtml = `<span class="badge bg-danger">Pendiente.</span>`; 
           }
       
-        $(".tbl_lista_documentos").append(`
-          <tr>
-            <td class="py-1"> ${String(cont++).padStart(3, '0')} </td>
-            <td class="py-1 text-nowrap" ><i class="fas fa-file-pdf fa-lg color_icon_opt"></i> ${r.descripcion ?? ''}</td>
-            <td class="py-1 text-nowrap" >${estadoHtml}</td>
-            <td class="py-1 text-center" style="cursor:pointer">
-                ${r.archivo
-                    ? `<a class="text-principal"
-                         onclick="ver_documento_proveedor('${r.archivo}','${r.descripcion}')">
-                        <i class="fas fa-search"></i>
-                       </a>`
-                    : `<a class="text-muted"
-                         onclick="toastr_info('No hay documento adjunto','Sin documento')">
-                        <i class="fas fa-search"></i>
-                       </a>`
+          $(".tbl_lista_documentos").append(`
+            <tr>
+              <td class="py-1"> ${String(cont++).padStart(3, '0')} </td>
+              <td class="py-1 text-nowrap" ><i class="fas fa-file-pdf fa-lg color_icon_opt"></i> ${r.descripcion ?? ''}</td>
+              <td class="py-1 text-nowrap" >${estadoHtml}</td>
+              <td class="py-1 text-center" style="cursor:pointer">
+                  ${r.archivo
+                      ? `<a class="text-principal"
+                          onclick="ver_documento_proveedor('${r.archivo}','${r.descripcion}')">
+                          <i class="fas fa-search"></i>
+                        </a>`
+                      : `<a class="text-muted"
+                          onclick="toastr_info('No hay documento adjunto','Sin documento')">
+                          <i class="fas fa-search"></i>
+                        </a>`
+                  }
+              </td>
+              <td class="py-1 text-center" >
+                ${isPendiente
+                    ? `<a class="text-muted" onclick="toastr_info('No hay documento adjunto','Sin documento')" >
+                        <i class="fas fa-pencil-alt "></i>
+                      </a>`
+                    : `<a class="btn btn-sm"
+                        onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','actualizar_estado')">
+                        <i class="fas fa-pencil-alt color_icon_opt"></i>
+                      </a>`
                 }
-            </td>
-            <td class="py-1 text-center" >
-              ${isPendiente
-                  ? `<a class="text-muted" onclick="toastr_info('No hay documento adjunto','Sin documento')" >
-                      <i class="fas fa-pencil-alt "></i>
-                    </a>`
-                  : `<a class="btn btn-sm"
-                      onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','actualizar_estado')">
-                      <i class="fas fa-pencil-alt color_icon_opt"></i>
-                    </a>`
-              }
-            </td>
-          </tr>
-        `);
+              </td>
+            </tr>
+          `);
          
       });
 
@@ -584,6 +586,7 @@ function ver_documentos_x_homologacion(id, descripcion,proveedor,idpersona) {
 
           let estadoHtml = '';
           const isPendiente = (r.estado_revision == 'Pendiente');
+          let accionesHtml = '';
 
           switch (r.estado_revision) {
               case 'Actualizado': estadoHtml = `<span class="badge bg-warning text-dark">Actualizado</span>`; break;
@@ -593,6 +596,27 @@ function ver_documentos_x_homologacion(id, descripcion,proveedor,idpersona) {
               case 'Aprobado': estadoHtml = `<span class="badge bg-success">Aprobado</span>`; break;
 
               default: estadoHtml = `<span class="badge bg-danger">Pendiente.</span>`; 
+          }
+
+          if (idTipoPersonauser == '2') {
+              accionesHtml = `
+                  <a class="btn btn-sm"
+                    onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','cargar_documento')">
+                    <i class="fas fa-cloud-upload-alt color_icon_opt"></i>
+                  </a>
+                  <a class="btn btn-sm"
+                    onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','actualizar_estado')">
+                    <i class="fas fa-pencil-alt color_icon_opt"></i>
+                  </a>
+              `;
+          } else {
+              accionesHtml =  `<a class="btn btn-sm"
+                    onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','cargar_documento')">
+                    <i class="fas fa-cloud-upload-alt color_icon_opt"></i>
+                  </a>
+                   <a class="text-muted" onclick="toastr_info('No Tienes Permisos','Para Actualizar el estado del documento')" >
+                      <i class="fas fa-pencil-alt "></i>
+                    </a>`;
           }
       
         $(".tbl_lista_documentos_internos").append(`
@@ -614,16 +638,7 @@ function ver_documentos_x_homologacion(id, descripcion,proveedor,idpersona) {
                 }
             </td>
             <td class="py-1 text-center" >
-                    <a class="btn btn-sm"
-                      onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','cargar_documento')">
-                      
-                      <i class="fas fa-cloud-upload-alt color_icon_opt"></i>
-                    </a>
-                    <a class="btn btn-sm"
-                      onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','actualizar_estado')">
-                      <i class="fas fa-pencil-alt color_icon_opt"></i>
-                    </a>
-              
+                ${accionesHtml}
             </td>
           </tr>
         `);

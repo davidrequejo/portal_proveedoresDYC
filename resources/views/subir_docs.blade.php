@@ -299,7 +299,7 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/subirdocs.js') }}?version_erp=01.12"></script>
+  <script src="{{ asset('assets/js/subirdocs.js') }}?version_erp=01.15"></script>
 
   <script>
     $(function() {

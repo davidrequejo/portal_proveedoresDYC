@@ -538,6 +538,7 @@
                           <!--<textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
                           <select name="tipo_documento" id="tipo_documento" class="form-control fs-h-input is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
                             <option value="6">RUC</option>
+                            <option value="7">EXTRANJERO</option>
                           </select>
                         </div>
                       </div>
@@ -693,7 +694,7 @@
                 </div>
                 <div class="modal-footer justify-content-between py-1">
                   <button type="button" class="btn btn-outline-secondary " data-dismiss="modal"><i class="ti ti-circle-dashed-x"></i>Cerrar</button>
-                  <button type="button" class="btn btn-primary" id="guardar_registro_proveedor" style="display:none;" ><i class="ti ti-device-floppy"></i> Guardar</button>
+                  <button type="button" class="btn btn-primary guardar_registro_proveedor" style="display:none;" ><i class="ti ti-device-floppy"></i> Guardar</button>
                 </div>
               </div>
               <!-- /.modal-content -->
@@ -785,7 +786,7 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                  <button type="button" class="btn btn-primary" id="guardar_registro_actualizar_estado" ><i class="ti ti-device-floppy"></i> Guardar</button>
+                  <button type="button" class="btn btn-primary guardar_registro_actualizar_estado" ><i class="ti ti-device-floppy"></i> Guardar</button>
                 </div>
               </div>
               <!-- /.modal-content -->
@@ -813,6 +814,15 @@
                     <input type="hidden" name="inputemail_proveedor_env_correo" id="inputemail_proveedor_env_correo" />
 
                     <div  class="row" id="cargando-5-formulario">
+
+
+                      <div class="col-12 col-sm-12 col-md-12 col-lg-12 div_tipocompra ">
+                        <div class="form-group">
+                          <label for="descripcion">Comprador solicitante </label>
+                          <select name="idpersonacomprador" id="idpersonacomprador" class="form-control fs-h-input is-valid select2" placeholder="Comprador solicitante" aria-invalid="false">
+                          </select>
+                        </div>
+                      </div>
 
                       <div class="col-12 col-sm-12 col-md-12 col-lg-12 div_tipocompra ">
                         <div class="form-group">
@@ -1013,11 +1023,11 @@
     <!-- bs-custom-file-input -->
   <script src="{{ asset('adminlte3/plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
 
-
+  <script>    const idPersonaUser = {{ auth()->user()->persona->idpersona }};  </script>
  
-  <script src="{{ asset('assets/js/proveedor.js') }}?version_erp=01.12"></script>
-  <script src="{{ asset('assets/js/proveedor_carga_masiva.js') }}?version_erp=01.12"></script>
-  <script src="{{ asset('assets/js/sincronizacions10.js') }}?version_erp=01.12"></script>
+  <script src="{{ asset('assets/js/proveedor.js') }}?version_erp=01.15"></script>
+  <script src="{{ asset('assets/js/proveedor_carga_masiva.js') }}?version_erp=01.15"></script>
+  <script src="{{ asset('assets/js/sincronizacions10.js') }}?version_erp=01.15"></script>
   
 
   <script>
@@ -1034,7 +1044,8 @@
     });
 
     const idTipoPersonauser = {{ auth()->user()->persona->idtipo_persona }};
-
+    
+    
   </script>
 
 </body>

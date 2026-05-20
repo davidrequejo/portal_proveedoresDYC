@@ -503,11 +503,6 @@ class ProveedorController extends Controller
             ->where('p.estado_delete', 1)
             ->where('p.idtipo_persona', 3); // Solo proveedores
 
-
-
-
-
-
         /* ====================== FILTROS DIRECTOS (WHERE) ====================== */
         if ($r->filled('tipo_entidad_sunat')) { $query->where('p.tipo_entidad_sunat', $tipo_entidad_sunat); }
 
@@ -615,19 +610,39 @@ class ProveedorController extends Controller
     // Método para obtener todos roles personas
     public function selec2tipoEstandar()
     {
-    try {
-        $data  = Tipo_estandar::select2tipoestandar();
+        try {
+            $data  = Tipo_estandar::select2tipoestandar();
 
-        $options = ''; // string para concatenar HTML
-        foreach ($data as $t) {
-            $options .= '<option value="'.$t->idtipoestandarproveedor.'" >' . e($t->descripcion). '</option>';
+            $options = ''; // string para concatenar HTML
+            foreach ($data as $t) {
+                $options .= '<option value="'.$t->idtipoestandarproveedor.'" >' . e($t->descripcion). '</option>';
+            }
+
+            return ApiResponse::success($options, 'Tipo Estandar obtenida');
+
+        } catch (\Throwable $e) {
+            return ApiResponse::error($e);
         }
 
-        return ApiResponse::success($options, 'Tipo Estandar obtenida');
-
-    } catch (\Throwable $e) {
-        return ApiResponse::error($e);
     }
+
+
+        // Método para obtener todos roles personas
+    public function select2pers_compr_adm()
+    {
+        try {
+            $data  = Tipo_estandar::select2pers_compr_adm();
+
+            $options = ''; // string para concatenar HTML
+            foreach ($data as $t) {
+                $options .= '<option value="'.$t->idpersona.'" >' . e($t->nombre_razonsocial). '</option>';
+            }
+
+            return ApiResponse::success($options, 'obtener datos de personas con rol');
+
+        } catch (\Throwable $e) {
+            return ApiResponse::error($e);
+        }
 
     }
 

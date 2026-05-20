@@ -198,6 +198,8 @@
                                   <option value="1" >Completo</option>
                                   <option value="2" >Pendiente de validar</option>
                                   <option value="3" >Parcialmente completo</option>
+                                  <option value="4" >Observado</option>
+
 
                                 </select>
                               </div>
@@ -948,7 +950,7 @@
 
 
  
-  <script src="{{ asset('assets/js/all_homologaciones.js') }}?version_erp=01.12"></script>
+  <script src="{{ asset('assets/js/all_homologaciones.js') }}?version_erp=01.15"></script>
 
   <script>
     $(function() {

@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Cookie;
 use ZipStream\ZipStream;
 use ZipStream\OperationMode;
 use Illuminate\Support\Facades\Log;
+use  PDO;
 
 class AllHomologacionesController extends Controller
 {
@@ -29,7 +30,7 @@ class AllHomologacionesController extends Controller
 
     //-------------------------funciones que estoy utilizando----------------------
 
-    public function listar_homologaciones_all(Request $r)
+   /* public function listar_homologaciones_all(Request $r)
 {
     // Parámetros de entrada
     $perPage = (int) $r->input('per_page', 20);
@@ -314,6 +315,56 @@ class AllHomologacionesController extends Controller
         'dir'          => $dir,
         'q'            => $q,
     ]);
+}*/
+
+public function listar_homologaciones_all(Request $r)
+{
+    $perPage = (int) $r->input('per_page', 20);
+    $page    = (int) $r->input('page', 1);
+    $sort    = $r->input('sort', 'idpersona_facha_homologacion');
+    $dir     = $r->input('dir', 'asc');
+    $q       = trim($r->input('q', ''));
+
+    $pdo  = DB::getPdo();
+    $stmt = $pdo->prepare('CALL sp_listar_homologaciones(?,?,?,?,?,?,?,?,?,?,?,?)');
+
+    $stmt->execute([
+        $page,
+        $perPage,
+        $sort,
+        $dir,
+        $q,
+        $r->input('tipo_compra'),
+        $r->input('fecha_inicio_periodo'),
+        $r->input('fecha_fin_periodo'),
+        $r->input('estado_homologacion'),
+        $r->input('estado_documento'),
+        $r->input('id_proveedor'),
+        $r->input('id_persona_usuario'),
+    ]);
+
+    // Primer result set → total
+    $primerSet = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $total     = $primerSet[0]['total'] ?? 0;
+
+    // Segundo result set → datos
+    $stmt->nextRowset();
+    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $lastPage = $total > 0 ? (int) ceil($total / $perPage) : 1;
+
+    return response()->json([
+        'data'         => $data,
+        'current_page' => $page,
+        'per_page'     => $perPage,
+        'total'        => $total,
+        'last_page'    => $lastPage,
+        'from'         => $total > 0 ? ($page - 1) * $perPage + 1 : null,
+        'to'           => $total > 0 ? min($page * $perPage, $total) : null,
+        'sort'         => $sort,
+        'dir'          => $dir,
+        'q'            => $q,
+    ]);
 }
 
     // Método para obtener todos roles personas
@@ -374,11 +425,11 @@ class AllHomologacionesController extends Controller
     public function select2compradoreshomologacion()
     {
       try {
-        $data  = PersonaFechaHomologacion::select2usuarioproceso();
+        $data  = PersonaFechaHomologacion::select2compradores();
 
         $options = '<option value="" >Seleccionar</option>';
         foreach ($data as $t) {
-            $options .= '<option value="'.$t->iduser.'" >' . e($t->nombre_razonsocial).'</option>';
+            $options .= '<option value="'.$t->idpersona.'" >' . e($t->nombre_razonsocial).'</option>';
         }
 
         return ApiResponse::success($options, 'Tipo Estandar obtenida');

@@ -570,7 +570,8 @@ function replica_nrocuenta() {   $('#numero_cuenta_abono').val($('#numero_cuenta
 function verificar_tipocuenta() {   
   if ($('#tipo_entidad_sunat').val() === 'NATURAL') { 
     
-    $('#tipocuenta option[value="D"]').remove();  $('#tipocuenta option[value="C"]').remove(); 
+    //$('#tipocuenta option[value="D"]').remove(); 
+    $('#tipocuenta option[value="C"]').remove(); 
 
   }else{ 
     

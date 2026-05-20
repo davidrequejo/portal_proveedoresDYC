@@ -84,7 +84,7 @@ class PersonaFechaHomologacion extends Model
               ->get();
     }
 
-
+    //no se esta usando, se cambio por select2compradores
     public static function select2usuarioproceso()
     {
         return DB::table('persona_facha_homologacion as pfh')
@@ -100,6 +100,18 @@ class PersonaFechaHomologacion extends Model
     }
 
 
+    public static function select2compradores()
+    {
+        return DB::table('persona_facha_homologacion as pfh')
+            ->join('persona as p', 'pfh.idpersonacomprador', '=', 'p.idpersona')
+            ->join('sunat_c06_doc_identidad as sd', 'p.tipo_documento', '=', 'sd.code_sunat')
+            ->select( 'p.idpersona as idpersona', 'p.nombre_razonsocial', 'p.numero_documento', 'sd.abreviatura as tipodocumento' )
+            ->where('pfh.estado_trash', '1')
+            ->where('pfh.estado_delete', '1')
+            ->groupBy('p.idpersona', 'p.nombre_razonsocial', 'p.numero_documento', 'sd.abreviatura' )
+            ->orderBy('p.nombre_razonsocial')
+            ->get();
+    }
 
     /**
      * Relación con Persona
@@ -107,6 +119,20 @@ class PersonaFechaHomologacion extends Model
     public function persona()
     {
         return $this->belongsTo(Persona::class, 'idpersona');
+    }
+    
+    // Método para obtener homologaciones vigentes con datos de persona
+    public static function seleccion_evaluacion()
+    {
+        return DB::table('persona_facha_homologacion as pfh')
+            ->join('persona as p', 'p.idpersona', '=', 'pfh.idpersona')
+            ->select( 'pfh.idpersona_facha_homologacion', 'pfh.idpersona', 'pfh.fecha_inicio_periodo_h', 'pfh.fecha_fin_periodo_h', 'pfh.estado_homologacion', 'p.nombre_razonsocial', 'p.numero_documento' )
+            ->where('pfh.estado_homologacion', 'Vigente')
+            ->where('pfh.estado_trash', '1')
+            ->where('pfh.estado_delete', '1')
+            ->orderBy('p.nombre_razonsocial')
+            ->get();
+
     }
 
 

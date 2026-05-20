@@ -164,6 +164,7 @@
                                 <select name="tipo_documento_input1" id="tipo_documento_input1" class="form-control form-control-sm is-valid select2" placeholder="Tipo de documento" aria-invalid="false" readonly>
                                   <option value="1">DNI</option>
                                   <option value="6">RUC</option>
+                                  <option value="7">EXTRANJERO</option>
                                 </select>
                               </div>
                             </div>
@@ -622,8 +623,8 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/actualizardatosproveedor.js') }}?version_erp=01.12"></script>
-  <script src="{{ asset('assets/js/persona_cuentabancaria.js') }}?version_erp=01.12"></script>
+  <script src="{{ asset('assets/js/actualizardatosproveedor.js') }}?version_erp=01.15"></script>
+  <script src="{{ asset('assets/js/persona_cuentabancaria.js') }}?version_erp=01.15"></script>
 
   <script>
     $(function() {

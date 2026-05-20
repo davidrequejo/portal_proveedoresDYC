@@ -115,10 +115,18 @@
             </li>
           @endif
 
-          <li class="nav-header">PROCESO EVALUACIÓN</li>
+          <li class="nav-header hidden">PROCESO EVALUACIÓN</li>
 
-          @if (auth()->user()->perm_client_vista_client)
-            <li class="nav-item">
+          @if (auth()->user()->perm_proveedor_vista_adm)
+            <li class="nav-item hidden">
+              <a href="{{ route('plantilla_evaluacion.index') }}" class="nav-link {{ request()->routeIs('plantillas_evaluacion.*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-edit"></i>
+                <p>Plantillas</p>
+              </a>
+            </li>
+          @endif
+          @if (auth()->user()->perm_proveedor_vista_adm)
+            <li class="nav-item hidden">
               <a href="{{ route('selecc_evaluacion.index') }}" class="nav-link {{ request()->routeIs('selecc_evaluacion.*') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-edit"></i>
                 <p> Selección Evaluación</p>
@@ -196,6 +204,12 @@
 
 
          <!-- <li class="nav-header">EXTRAS</li> -->
+          <li class="nav-item">
+              <a href="{{ route('manual_usuario') }}" class="nav-link {{ request()->routeIs('manual_usuario.*') ? 'active' : '' }}">
+                <i class=" nav-icon fas fa-th-list"></i>
+                <p>Manual de Usuario</p>
+              </a>
+            </li>
 
 
           

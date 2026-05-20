@@ -196,7 +196,7 @@
 
                       <div class="col-12 col-sm-6 col-md-8 col-lg-8">
                         <div class="form-group">
-                          <label for="descripcion">Persona</label>                          
+                          <label for="descripcion">Seleccionar Proveedor</label>                          
                           <!--<textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
                           <select name="idpersona" id="idpersona" class="form-control is-valid select2 fs-h-input" placeholder="Persona" aria-invalid="false">
                           </select>
@@ -296,7 +296,7 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/usuario.js') }}?version_erp=01.05"></script>
+  <script src="{{ asset('assets/js/seleccion_evaluacion.js') }}?version_erp=01.05"></script>
 
   <script>
     $(function() {

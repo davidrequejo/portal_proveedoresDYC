@@ -23,6 +23,7 @@ use App\Http\Controllers\ProveedorLogController;
 use App\Http\Controllers\ApiSincronizarS10;
 
 //EVALUACION
+use App\Http\Controllers\PlantillaEvaluacionController;
 use App\Http\Controllers\SeleccEvaluacionController;
 
 
@@ -35,6 +36,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
     // :::::::::::::::::::::::::::::: I N I C I O ::::::::::::::::::::::::::::::
      Route::resource('inicio', InicioController::class);
+    //:.:::::::::::::::::: MNUAL DE USUARIO ::::::::::::::::::::::::::::::
+     Route::get('/manual_usuario', function () {  return view('manual_usuario');   })->name('manual_usuario');
 
     // ::::::::::::::::: PERSONAS SOCIO NEGOCIO ::::::::::::::::::::::::::::::
     Route::post('/persona/crear_persona', [PersonaController::class, 'crear_persona'])->name('persona.crear_persona');                     // crear
@@ -76,6 +79,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
     Route::get('/select2/tipoestandar', [ProveedorController::class, 'selec2tipoEstandar']); //  ← select2  
     Route::get('/select2/periodohomologacion', [ProveedorController::class, 'selec2periodohomologacion']); //  ← select2  
+    Route::get('/select2/pers_compr_adm', [ProveedorController::class, 'select2pers_compr_adm']); //  ← select2  
     Route::resource('proveedor', ProveedorController::class);
 
     //:::::::::::::::::::::::::. FECHA HOMOLOGACIÓN :::::::::::::::::::::::::::::: 
@@ -207,8 +211,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
       // (opcional) resource si lo usas como en Banco
       Route::resource('area_persona', AreaPersonaController::class);
 
+      //:::::::::::::::::::::::::. PLANTILLAS EVALUACIÓN ::::::::::::::::::::::::::::::
+      Route::resource('plantilla_evaluacion', PlantillaEvaluacionController::class);
 
       //:::::::::::::::::::::::::. SELECCIÓN EVALUACIÓN ::::::::::::::::::::::::::::::
+      Route::get('/select2/personas_selec_evaluacion', [SeleccEvaluacionController::class, 'select2PersonaselecEvaluacion']); //  ← select2 
       Route::resource('selecc_evaluacion', SeleccEvaluacionController::class);
       
 

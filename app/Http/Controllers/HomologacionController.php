@@ -26,6 +26,7 @@ class HomologacionController extends Controller
             // Validación
             $data = $r->validate([
                 'idproveedor' => 'required',
+                'idpersonacomprador' => 'required',
                 'idtipoestandarproveedor' => 'required',
                 'descripcion_homologacion'  => 'string|max:45',
                 'fecha_inicio_proceso' => 'required|date',
@@ -33,6 +34,7 @@ class HomologacionController extends Controller
 
             $p_homologacion = Homologacion::create([
                 'idpersona'   => $r->idproveedor,
+                'idpersonacomprador' => $r->idpersonacomprador,
                 'descripcion'  => $r->descripcion_homologacion,
                 'fecha_inicio_proceso'  => $r->fecha_inicio_proceso,
                 'estado_trash'  => '1',
@@ -98,6 +100,7 @@ class HomologacionController extends Controller
             // 1) Validación
             $data = $r->validate([
                 'idtipoestandarproveedor'   => 'required',
+                'idpersonacomprador'        => 'required',
                 'descripcion_homologacion'  => 'string|max:45',
                 'fecha_inicio_proceso'      => 'required|date',
                //'fecha_fin_periodo'         => 'required|date|after_or_equal:fecha_inicio_periodo',
@@ -111,6 +114,8 @@ class HomologacionController extends Controller
 
             // 3) Actualizar cabecera
             $p_homologacion->update([
+                'idpersonacomprador' => $r->idpersonacomprador,
+                'idtipoestandarproveedor' => $r->idtipoestandarproveedor,
                 'descripcion'   => $r->descripcion_homologacion,
                 'fecha_inicio_proceso'  => $r->fecha_inicio_proceso,
                 'fecha_fin'     => $r->fecha_fin_periodo,
@@ -295,6 +300,7 @@ class HomologacionController extends Controller
             $fecha = Homologacion::select([
                     'idpersona_facha_homologacion',
                     'idpersona',        // <- en tu create guardas idpersona
+                    'idpersonacomprador', 
                     'descripcion',
                     'fecha_inicio_proceso',
                     'fecha_fin',

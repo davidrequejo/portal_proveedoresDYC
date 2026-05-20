@@ -679,9 +679,9 @@
     <!-- bs-custom-file-input -->
   <script src="{{ asset('adminlte3/plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
  
-  <script src="{{ asset('assets/js/cliente.js') }}?version_erp=01.12"></script>
-  <script src="{{ asset('assets/js/cliente_carga_masiva.js') }}?version_erp=01.12"></script>
-  <script src="{{ asset('assets/js/sincronizacions10.js') }}?version_erp=01.12"></script>
+  <script src="{{ asset('assets/js/cliente.js') }}?version_erp=01.15"></script>
+  <script src="{{ asset('assets/js/cliente_carga_masiva.js') }}?version_erp=01.15"></script>
+  <script src="{{ asset('assets/js/sincronizacions10.js') }}?version_erp=01.15"></script>
   
 
   <script>
