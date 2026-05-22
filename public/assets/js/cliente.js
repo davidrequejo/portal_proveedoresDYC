@@ -186,7 +186,7 @@ function renderFilas(rows){
           <div class="btn-group btn-group-sm">
             <button class="btn btn-xs text-nowrap bnt-editar-proyecto" onclick="ver_editar_cliente(${r.idpersona})" > <i class="fas fa-pencil-alt color_icon_opt"></i></button>
             <button class="btn btn-xs text-nowrap bn-ver-proyecto hidden show_view_eliminar" onclick="eliminar_cliente(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')"><i class="fas fa-trash color_icon_opt"></i></button>
-            <button class="btn btn-xs text-nowrap" onclick="sincronizacions10(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')" ><i class="fas fa-globe color_icon_opt">
+            <button class="btn btn-xs text-nowrap" onclick="sincronizacions10(${r.idpersona}, '${r.nombre_razonsocial ?? ''}','cliente')" ><i class="fas fa-globe color_icon_opt">
             <sup>${est_sub_sync}</sup></i> 
             
              </button>

@@ -26,6 +26,11 @@ class ApiSincronizarS10 extends Controller
         $this->s10Api = $s10Api;
     }
 
+    /**====================================================================== 
+     =======----------S I N C R O N I Z A C I Ó N--------------=============== 
+    ============---------P R O V E E D O R E S------------==================== 
+    ====================================================================== */
+
         /**
      * Sincroniza un proveedor con S10.
      * Si al actualizar se obtiene 404, se resetea el código y se crea uno nuevo.
@@ -39,7 +44,7 @@ class ApiSincronizarS10 extends Controller
             if (!empty($proveedor->codigo_s10)) {
                 try {
                     $datos = $this->mapearParaActualizacion($proveedor);
-                    $respuesta = $this->s10Api->actualizarProveedor($proveedor->codigo_s10, $datos);
+                    $respuesta = $this->s10Api->actualizarProveedorcliente($proveedor->codigo_s10, $datos);
                     // Si llegamos aquí, la actualización fue exitosa y tenemos respuesta
                 } catch (RequestException $e) {
                     if ($e->response && $e->response->status() === 404) {
@@ -62,7 +67,7 @@ class ApiSincronizarS10 extends Controller
                     $proveedor->codigo_s10 = $existente['CodIdentificador'];
                     $proveedor->save();
                     $datos = $this->mapearParaActualizacion($proveedor);
-                    $respuesta = $this->s10Api->actualizarProveedor($proveedor->codigo_s10, $datos);
+                    $respuesta = $this->s10Api->actualizarProveedorcliente($proveedor->codigo_s10, $datos);
                 } else {
                     // No existe → obtener nuevo código y crear
                     $nuevoCodigo = $this->s10Api->obtenerProximoCodigo();
@@ -72,7 +77,7 @@ class ApiSincronizarS10 extends Controller
                     $proveedor->codigo_s10 = $nuevoCodigo;
                     $proveedor->save();
                     $datos = $this->mapearParaCreacion($proveedor);
-                    $respuesta = $this->s10Api->crearProveedor($datos);
+                    $respuesta = $this->s10Api->crearProveedorcliente($datos);
                 }
             }
 
@@ -153,7 +158,7 @@ class ApiSincronizarS10 extends Controller
             'TelefonoMovil' => $proveedor->celular,
             'Email' => $proveedor->email,
             'Internet' => null,
-            'Aniversario' => $proveedor->fecha_nacimiento ? Carbon::parse($proveedor->fecha_nacimiento)->format('Ymd') : null,
+            'Aniversario' => !empty($proveedor->fecha_nacimiento) ? \Carbon\Carbon::parse($proveedor->fecha_nacimiento)->format('Y-m-d') : null,
             'RucAntiguo' => null,
             'NaturalJuridica' => ($proveedor->tipo_entidad_sunat == 'JURIDICA') ? true : false,
             'CodTratamiento' => $proveedor->tratamiento_pers_natural,
@@ -209,6 +214,7 @@ class ApiSincronizarS10 extends Controller
             'Auxiliar1' => null,
             'Auxiliar2' => null,
             'Activo' => $proveedor->estado == '1',
+            'CodTipoIdentificador' => '02',   // 02 = Proveedor
         ];
     }
 
@@ -229,7 +235,7 @@ class ApiSincronizarS10 extends Controller
             $data['TelefonoMovil'] = $proveedor->celular;
         }
         if (!is_null($proveedor->email)) $data['Email'] = $proveedor->email;
-        if (!is_null($proveedor->fecha_nacimiento)) $data['Aniversario'] = $proveedor->fecha_nacimiento ? Carbon::parse($proveedor->fecha_nacimiento)->format('Ymd') : null;
+        if (!is_null($proveedor->fecha_nacimiento)) $data['Aniversario'] =  $proveedor->fecha_nacimiento ? \Carbon\Carbon::parse($proveedor->fecha_nacimiento)->format('Y-m-d') : null;
         if (!is_null($proveedor->tratamiento_pers_natural)) $data['CodTratamiento'] = $proveedor->tratamiento_pers_natural;
         if (!is_null($proveedor->apellido_paterno_per_natural)) $data['ApellidoPaterno'] = $proveedor->apellido_paterno_per_natural;
         if (!is_null($proveedor->apellido_materno_per_natural)) $data['ApellidoMaterno'] = $proveedor->apellido_materno_per_natural;
@@ -242,6 +248,234 @@ class ApiSincronizarS10 extends Controller
 
         // Activo se envía siempre
         $data['Activo'] = $proveedor->estado == '1';
+
+            // 👇 Agrega esta línea
+        $data['CodTipoIdentificador'] = '02';
+
+        return $data;
+    }
+
+    /**====================================================================== 
+     =======----------S I N C R O N I Z A C I Ó N--------------=============== 
+    ============---------C L I E N T E S ------------==================== 
+    ====================================================================== */
+    public function sincronizar_cliente(Request $request, Proveedor $proveedor, $idlogbd = null): JsonResponse|RedirectResponse
+    {
+        try {
+            $documento = $proveedor->numero_documento;
+           // var_dump($documento); die(); // Debug: Ver número de documento antes de sincronizar
+
+            // --- INTENTO DE ACTUALIZACIÓN SI TIENE CÓDIGO ---
+            if (!empty($proveedor->codigo_s10)) {
+                try {
+                    $datos = $this->mapearParaActualizacioncliente($proveedor);
+                    $respuesta = $this->s10Api->actualizarProveedorcliente($proveedor->codigo_s10, $datos);
+                    // Si llegamos aquí, la actualización fue exitosa y tenemos respuesta
+                } catch (RequestException $e) {
+                    if ($e->response && $e->response->status() === 404) {
+                        // El código guardado no existe en S10 → lo reseteamos y pasamos a crear
+                        $proveedor->codigo_s10 = null;
+                        $proveedor->save(); // Guardamos el reseteo en la BD local
+                        // No definimos $respuesta aquí, dejamos que el flujo continúe a la creación
+                    } else {
+                        // Otro error (500, timeout, etc.) lo relanzamos
+                        throw $e;
+                    }
+                }
+            }
+
+            // --- SI NO TIENE CÓDIGO (O SE RESETEÓ), BUSCAMOS O CREAMOS ---
+            if (empty($proveedor->codigo_s10)) {
+                $existente = $this->s10Api->buscarPorDocumento($documento);
+                if ($existente && isset($existente['CodIdentificador'])) {
+                    // Ya existe en S10 → actualizar con ese código
+                    $proveedor->codigo_s10 = $existente['CodIdentificador'];
+                    $proveedor->save();
+                    $datos = $this->mapearParaActualizacioncliente($proveedor);
+                    $respuesta = $this->s10Api->actualizarProveedorcliente($proveedor->codigo_s10, $datos);
+                } else {
+                    // No existe → obtener nuevo código y crear
+                    $nuevoCodigo = $this->s10Api->obtenerProximoCodigo();
+                    if (!$nuevoCodigo) {
+                        throw new \Exception('No se pudo obtener un código disponible de S10.');
+                    }
+                    $proveedor->codigo_s10 = $nuevoCodigo;
+                    $proveedor->save();
+                    $datos = $this->mapearParaCreacioncliente($proveedor);
+                    //var_dump($datos); die(); // Debug: Ver datos mapeados para creación antes de llamar a la API
+                    $respuesta = $this->s10Api->crearProveedorcliente($datos);
+                }
+            }
+
+            // --- PROCESAR RESPUESTA DE LA API .NET ---
+            if ($respuesta['ok']) {
+                $proveedor->estado_sincronizacions10 = '1';
+                $proveedor->save();
+                $mensaje = 'Proveedor sincronizado correctamente con S10.';
+                $data = ['codigo_s10' => $proveedor->codigo_s10];
+                $tipo = 'success';
+
+                // Actualizar el campo estado_sincronizacions10 en la tabla logbd
+                Logbd::where('nombre_tabla', 'persona')
+                    ->where('id_registrotabla', $proveedor->idpersona)
+                    ->update([
+                        'estado_sincronizacions10' => 1
+                    ]);
+
+
+            } else {
+                $mensaje = 'Error al sincronizar el proveedor.';
+                $data = [];
+                $tipo = 'error';
+            }
+
+            if ($request->wantsJson()) {
+                if ($tipo === 'success') {
+                    return ApiResponse::success($data, $mensaje);
+                } else {
+                    return ApiResponse::error(new \Exception($mensaje), 400);
+                }
+            }
+
+            return back()->with($tipo, $mensaje);
+
+        } catch (RequestException $e) {
+            report($e);
+            $errorMsg = 'Error de comunicación con S10.';
+            if ($e->response) {
+                $errorMsg .= ' Código: ' . $e->response->status();
+            }
+            if ($request->wantsJson()) {
+                return ApiResponse::error($e, 500);
+            }
+            return back()->with('error', $errorMsg);
+        } catch (\Exception $e) {
+            report($e);
+            $errorMsg = 'Error interno: ' . $e->getMessage();
+            if ($request->wantsJson()) {
+                return ApiResponse::error($e, 500);
+            }
+            return back()->with('error', $errorMsg);
+        }
+    }
+
+        /**
+     * Mapeo para creación: se envían todos los campos (incluyendo null)
+     */
+    private function mapearParaCreacioncliente(Proveedor $proveedor): array
+    {
+        return [
+            'CodIdentificador' => $proveedor->codigo_s10,
+            'Descripcion' => $proveedor->nombre_razonsocial,
+            'Abreviatura' => null,
+            'RUC' => $proveedor->numero_documento,
+            'Rubro' => null,
+            'Direccion' => $proveedor->direccion,
+            'CodLugar' => UbigeoDistrito::getCodigoReniecById($proveedor->distrito),
+            'CodPostal' => null,
+            'DireccionPostal' => null,
+            'CodLugarPostal' => null,
+            'CodPostalPostal' => null,
+            'Telefono1' => $proveedor->celular,
+            'Telefono2' => null,
+            'Telefono3' => null,
+            'Fax' => null,
+            'TelefonoMovil' => $proveedor->celular,
+            'Email' => $proveedor->email,
+            'Internet' => null,
+            'Aniversario' => !empty($proveedor->fecha_nacimiento)? \Carbon\Carbon::parse($proveedor->fecha_nacimiento)->format('Y-m-d') : null,
+            'RucAntiguo' => null,
+            'NaturalJuridica' => ($proveedor->tipo_entidad_sunat == 'JURIDICA') ? true : false,
+            'CodTratamiento' => $proveedor->tratamiento_pers_natural,
+            'ApellidoPaterno' => $proveedor->apellido_paterno_per_natural,
+            'ApellidoMaterno' => $proveedor->apellido_materno_per_natural,
+            'Nombres' => $proveedor->nombre_persona_natural,
+            'Sexo' => $proveedor->sexo,
+            'DNI' => $proveedor->ruc_persona_natural,
+            'CodigoAlterno' => null,
+            'CodLogo' => null,
+            'CodFormaDePago' => null,
+            'Customizacion' => null,
+            'NroRubroIdentificador' => null,
+            'ESSALUD' => null,
+            'AFP' => null,
+            'Nextel' => null,
+            'RPM' => null,
+            'RPC' => null,
+            'Anexo' => null,
+            'CodMonedaProveedor' => null,
+            'Retencion' => false,
+            'RetencionP' => 0,
+            'Detraccion' => false,
+            'DetraccionP' => 0,
+            'Percepcion' => false,
+            'PercepcionP' => 0,
+            'DescripcionAlterna' => null,
+            'MedioDePago' => 0,
+            'DireccionCobranza' => 0,
+            'CodPaisOrigen' => 'PE',
+            'NroIdentificadorCategoria' => null,
+            'Skype' => null,
+            'MSN' => null,
+            'NumeroAutorizacionProveedor' => null,
+            'FechaCaducidadAutorizacion' => null,
+            'NumeroCuspp' => null,
+            'NroTipoDoc' => null,
+            'NroNacionalidad' => null,
+            'NroRegimenLaboral' => null,
+            'NroTipoTrabajador' => null,
+            'NroNivelEducativo' => null,
+            'NroEstadoDomicilio' => null,
+            'Clave' => null,
+            'BuenContribuyente' => false,
+            'NroAgrupaIdentificador' => null,
+            'Emaildesc' => null,
+            'NroEstadoCivil' => null,
+            'GrupoSanguineo' => null,
+            'GranComprador' => false,
+            'Latitud' => null,
+            'Longitud' => null,
+            'CodEstablecimiento' => null,
+            'Auxiliar1' => null,
+            'Auxiliar2' => null,
+            'Activo' => $proveedor->estado == '1',
+            'CodTipoIdentificador' => '01',
+        ];
+    }
+
+    /**
+     * Mapeo para actualización: solo se incluyen campos con valor (no null)
+     */
+    private function mapearParaActualizacioncliente(Proveedor $proveedor): array
+    {
+        $data = [];
+
+        // Solo agregamos si el valor no es null (excepto booleanos false que sí se incluyen)
+        if (!is_null($proveedor->nombre_razonsocial)) $data['Descripcion'] = $proveedor->nombre_razonsocial;
+        if (!is_null($proveedor->numero_documento)) $data['RUC'] = $proveedor->numero_documento;
+        if (!is_null($proveedor->direccion)) $data['Direccion'] = $proveedor->direccion;
+        if (!is_null(UbigeoDistrito::getCodigoReniecById($proveedor->distrito))) $data['CodLugar'] = UbigeoDistrito::getCodigoReniecById($proveedor->distrito);
+        if (!is_null($proveedor->celular)) {
+            $data['Telefono1'] = $proveedor->celular;
+            $data['TelefonoMovil'] = $proveedor->celular;
+        }
+        if (!is_null($proveedor->email)) $data['Email'] = $proveedor->email;
+        if (!is_null($proveedor->fecha_nacimiento)) $data['Aniversario'] =  $proveedor->fecha_nacimiento ? \Carbon\Carbon::parse($proveedor->fecha_nacimiento)->format('Y-m-d') : null;
+        if (!is_null($proveedor->tratamiento_pers_natural)) $data['CodTratamiento'] = $proveedor->tratamiento_pers_natural;
+        if (!is_null($proveedor->apellido_paterno_per_natural)) $data['ApellidoPaterno'] = $proveedor->apellido_paterno_per_natural;
+        if (!is_null($proveedor->apellido_materno_per_natural)) $data['ApellidoMaterno'] = $proveedor->apellido_materno_per_natural;
+        if (!is_null($proveedor->nombre_persona_natural)) $data['Nombres'] = $proveedor->nombre_persona_natural;
+        if (!is_null($proveedor->sexo)) $data['Sexo'] = $proveedor->sexo;
+        if (!is_null($proveedor->ruc_persona_natural)) $data['DNI'] = $proveedor->ruc_persona_natural;
+
+        // NaturalJuridica siempre se envía porque es booleano (puede ser false)
+        $data['NaturalJuridica'] = ($proveedor->tipo_entidad_sunat == 'JURIDICA') ? true : false;
+
+        // Activo se envía siempre
+        $data['Activo'] = $proveedor->estado == '1';
+
+            // 👇 Agrega esta línea
+        $data['CodTipoIdentificador'] = '01';
 
         return $data;
     }

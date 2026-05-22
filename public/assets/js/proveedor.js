@@ -134,32 +134,46 @@ document.getElementById("btn_generar_credenciales").addEventListener("click", fu
     let razon = document.getElementById("nombre_razonsocial")?.value || "";
     let ruc = document.getElementById("numero_documento")?.value || "";
 
-    if (razon.trim() === "") { toastr_warning('Primero completa el campo de Nombre / Razón Social', 'Campo requerido');     
+    if (razon.trim() === "") { 
+        toastr_warning('Primero completa el campo de Nombre / Razón Social', 'Campo requerido');     
         return;
     }
 
-    // --- GENERAR USUARIO DESDE NOMBRE ---
+    if (ruc.trim() === "") { 
+        toastr_warning('Primero completa el campo de RUC', 'Campo requerido');     
+        return;
+    }
+
+    // --- GENERAR USUARIO DESDE INICIALES DEL NOMBRE + DÍGITOS DEL RUC ---
+    // Ej: CONSTRUCTORA VILOR E.I.R.L. + RUC 20123456789 → cvei2012789
+    // Garantiza uniqueness con: iniciales + primeros 4 dígitos + últimos 3 dígitos del RUC
+    let rucLimpio = ruc.replace(/\D/g, ''); // quitar caracteres no numéricos del RUC
     let usuario = razon
         .toLowerCase()
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // quitar tildes
-        .replace(/[^a-z0-9]/g, "")                       // quitar caracteres raros
-        .substring(0, 12);                               // limitar a 12 chars
+        .trim()
+        .split(/\s+/) // dividir por espacios
+        .map(palabra => palabra.replace(/[^a-z0-9]/g, '').charAt(0)) // primera letra de cada palabra
+        .join('') // unir iniciales
+        .concat(rucLimpio.slice(0, 4)) // agregar primeros 4 dígitos del RUC
+        .concat(rucLimpio.slice(-3)) // agregar últimos 3 dígitos del RUC
+        .substring(0, 12); // limitar a 12 chars
 
     // si está vacío, usar RUC
-    if (usuario.trim() === "") {
+    if (usuario === "") {
         usuario = "user" + ruc.slice(-4);
     }
 
     // --- GENERAR CONTRASEÑA DESDE RUC + RANDOM ---
-    let random = Math.floor(100 + Math.random() * 900); // 3 dígitos
+    let random = String(Math.floor(100 + Math.random() * 900)); // 3 dígitos
     let password = ruc.slice(-4) + random;
 
-    if (usuario!=null && password!=null) {
+    if (usuario && password) {
       // Colocar valores en inputs
       document.getElementById("usuario_portal").value = usuario;
       document.getElementById("clave_portal").value = password;
 
-      toastr_success('Usuario y contraseña generado conrrectamente');
+      toastr_success('Usuario y contraseña generado correctamente');
 
     }
 
@@ -228,7 +242,7 @@ function renderFilas(rows){
             <button class="btn btn-xs text-nowrap bnt-editar-proyecto" onclick="ver_editar_proveedor(${r.idpersona})" > <i class="fas fa-pencil-alt color_icon_opt"></i></button>
             <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="lista_homologaciones(${r.idpersona}, '${r.nombre_razonsocial ?? ''}','${r.email ?? ''}')" ><i class="fas fa-folder fa-0 color_icon_opt"> <sup>${totalHomologaciones}</sup> </i></button>
             <button class="btn btn-xs text-nowrap bn-ver-proyecto hidden show_view_eliminar" onclick="eliminar_proveedor(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')"><i class="fas fa-trash color_icon_opt"></i></button>
-            <button class="btn btn-xs text-nowrap" onclick="sincronizacions10(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')" ><i class="fas fa-globe color_icon_opt">
+            <button class="btn btn-xs text-nowrap" onclick="sincronizacions10(${r.idpersona}, '${r.nombre_razonsocial ?? ''}','proveedor')" ><i class="fas fa-globe color_icon_opt">
             <sup>${est_sub_sync}</sup></i> 
             
              </button>
@@ -842,7 +856,7 @@ function ver_documentos_x_homologacion(id, descripcion) {
                       <i class="fas fa-pencil-alt "></i>
                     </a>`
                   : `<a class="btn btn-sm"
-                      onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','actualizar_estado')">
+                      onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','${r.observacion ?? ''}','actualizar_estado')">
                       <i class="fas fa-pencil-alt color_icon_opt"></i>
                     </a>`
               }
@@ -871,17 +885,17 @@ function ver_documentos_x_homologacion(id, descripcion) {
           if (idTipoPersonauser == '2') {
               accionesHtml = `
                   <a class="btn btn-sm"
-                    onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','cargar_documento')">
+                    onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','${r.observacion ?? ''}','cargar_documento')">
                     <i class="fas fa-cloud-upload-alt color_icon_opt"></i>
                   </a>
                   <a class="btn btn-sm"
-                    onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','actualizar_estado')">
+                    onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','${r.observacion ?? ''}','actualizar_estado')">
                     <i class="fas fa-pencil-alt color_icon_opt"></i>
                   </a>
               `;
           } else {
               accionesHtml =  `<a class="btn btn-sm"
-                    onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','cargar_documento')">
+                    onclick="actualizar_estado_documento(${r.iddocsproveedortipoestandar}, ${r.idpersona},'${r.descripcion ?? ''}','${r.archivo}','${r.estado_revision}','${r.observacion ?? ''}','cargar_documento')">
                     <i class="fas fa-cloud-upload-alt color_icon_opt"></i>
                   </a>
                    <a class="text-muted" onclick="toastr_info('No Tienes Permisos','Para Actualizar el estado del documento')" >
@@ -999,6 +1013,22 @@ function ver_documento_proveedor(ruta_documento, nombre_documento) {
 
 }
 
+function limpiar_form_actualizar_estado() {
+  $("#iddocsproveedortipoestandar").val("");
+  $("#idpersonadoc").val("");
+  $("#estado_documentos_update").val("").trigger('change');
+  $("#observacion_est_up").val("");
+
+  $("#doc_old_1").val("");
+  $("#doc1").val("");
+  $("#doc1_ver").html(`<img src="/assets/svg/pdf.svg" alt="" width="50%" >`);
+  $("#doc1_nombre").html("");
+
+  $(".div_act_est_doc_h_select").hide();
+  $(".div_obs_est_up").hide();
+  $(".div_archivo_up").hide();
+}
+
 
 // ══ I M A G E N   A P L I C A C I O N E S══
 
@@ -1013,7 +1043,8 @@ function doc1_eliminar() { $("#doc1").val("");	$("#doc1_ver").html('<img src="/a
 
 let link_direccion_update_doc = null;
 
-function actualizar_estado_documento(id, idpersona, nombre_documento,archivo,estado_revision,direccion_update) { 
+function actualizar_estado_documento(id, idpersona, nombre_documento,archivo,estado_revision,observacion,direccion_update) { 
+  limpiar_form_actualizar_estado();
    
   link_direccion_update_doc = direccion_update;
 
@@ -1023,6 +1054,7 @@ function actualizar_estado_documento(id, idpersona, nombre_documento,archivo,est
     $('.div_archivo_up').hide();
 
     $("#estado_documentos_update").val(estado_revision).trigger('change');
+    $("#observacion_est_up").val(observacion);
 
   } else {
     $('.div_act_est_doc_h_select').hide();
@@ -1030,7 +1062,7 @@ function actualizar_estado_documento(id, idpersona, nombre_documento,archivo,est
     $('.div_archivo_up').show();
 
     $("#estado_documentos_update").val('Aprobado').trigger('change');
-    
+    $("#observacion_est_up").val(observacion);
     if (archivo!=='null' ) {
       $("#doc_old_1").val(archivo);
       $("#doc1_nombre").html(``);
@@ -1080,7 +1112,8 @@ function guardar_y_editar_act_estado(e) {
         if (e.status == true) {          
           ver_documentos_x_homologacion(idfechaperso_homol_edit, descrp_homol_edit) ;
           Swal.fire("Correcto!", "Actualizado correctamente", "success");          
-          $("#modal-actualizar-estado").modal("hide");           
+          $("#modal-actualizar-estado").modal("hide");   
+          limpiar_form_actualizar_estado();        
         }else{
           ver_errores(e);				 
         }

@@ -80,7 +80,7 @@ class S10ApiService
         return $response->json('proximoCodigo');
     }
 
-    public function buscarPorDocumento(string $documento): ?array
+    /*public function buscarPorDocumento(string $documento): ?array
     {
         try {
             $response = $this->client()->get('/proveedor/buscar', ['documento' => $documento]);
@@ -102,9 +102,45 @@ class S10ApiService
             // Si no, relanzamos
             throw $e;
         }
+    }*/
+    public function buscarPorDocumento($documento)
+    {
+        try {
+            $response = Http::withToken($this->apiKey)
+                ->get($this->baseUrl . '/proveedor/buscar', [
+                    'documento' => $documento
+                ]);
+
+            if ($response->status() === 404) {
+                return null;
+            }
+
+            if ($response->status() === 409) {
+                $body = $response->json();
+
+                throw new \Exception(
+                    $body['message'] ?? 'Se encontraron registros duplicados en S10. Debe revisar antes de sincronizar.'
+                );
+            }
+
+            $response->throw();
+
+            $json = $response->json();
+
+            return $json['data'] ?? null;
+
+        } catch (\Exception $e) {
+            throw $e;
+        }
     }
 
-    public function crearProveedor(array $data): array
+    /**
+     * Crear un nuevo proveedor/cliente en S10.
+     *
+     * @param array $data Datos del proveedor/cliente
+     * @return array
+     */
+    public function crearProveedorcliente(array $data): array
     {
         $path = '/proveedor/crear';
 
@@ -115,8 +151,23 @@ class S10ApiService
 
         return $response->json();
     }
+    /*public function crearProveedorcliente(array $data)
+    {
+        $response = Http::withToken($this->apiKey)
+            ->post($this->baseUrl . '/proveedor/crear', $data);
 
-    public function actualizarProveedor(string $codigo, array $data): array
+        \Log::info('Respuesta crear proveedor S10', [
+            'status' => $response->status(),
+            'body' => $response->body(),
+            'data_enviada' => $data,
+        ]);
+
+        $response->throw();
+
+        return $response->json();
+    }*/
+
+    public function actualizarProveedorcliente(string $codigo, array $data): array
     {
         $path = "/proveedor/{$codigo}/actualizar";
 
@@ -129,8 +180,8 @@ class S10ApiService
     }
 
     // Aquí puedes agregar más métodos para otras entidades (cuentas bancarias, contactos, etc.) siguiendo el mismo patrón
-// ==================== CUENTAS BANCARIAS ====================
- // ==================== CUENTAS BANCARIAS ====================
+    // ==================== CUENTAS BANCARIAS ====================
+    // ==================== CUENTAS BANCARIAS ====================
 
     /**
      * Buscar una cuenta bancaria en S10 por proveedor, banco y número de cuenta.

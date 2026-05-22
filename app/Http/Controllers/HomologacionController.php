@@ -356,6 +356,7 @@ class HomologacionController extends Controller
                     'docs.nombreDocumento',
                     'docs.archivo',
                     'docs.estado_revision',
+                    'docs.observacion',
                     'docs.estado_trash',
                     'docs.estado_delete'
                 )
@@ -379,6 +380,7 @@ class HomologacionController extends Controller
                     'docs.nombreDocumento',
                     'docs.archivo',
                     'docs.estado_revision',
+                    'docs.observacion',
                     'docs.estado_trash',
                     'docs.estado_delete'
                 )

@@ -171,7 +171,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     // marcar todas
     Route::get('/notificaciones/marcar-todas', [NotificacionController::class, 'marcarTodas'] )->name('notificaciones.marcarTodas');
 
-    //::::::::::::::::::::::::::::::::.ALL NOTIFICACIONES ::::::::::::::::::::::::::::::: 
+     //::::::::::::::::::::::::::::::::.ALL NOTIFICACIONES ::::::::::::::::::::::::::::::: 
      Route::get('/homologaciones/listar_homologaciones_all', [AllHomologacionesController::class, 'listar_homologaciones_all'])->name('all_homologaciones.listar_homologaciones_all'); // AJAX
      Route::get('/select2/compradores_all', [AllHomologacionesController::class, 'select2compradoreshomologacion']); //  ← select2 
      Route::get('/select2/proveedores_all', [AllHomologacionesController::class, 'select2proveedoreshomologacion']); //  ← select2 
@@ -188,7 +188,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
      Route::resource('all_homologaciones', AllHomologacionesController::class);
 
-    //:::::::::::::::::::::::::. AREA PERSONA ::::::::::::::::::::::::::::::
+      //:::::::::::::::::::::::::. AREA PERSONA ::::::::::::::::::::::::::::::
       Route::post('/area_persona/crear_area_persona', [AreaPersonaController::class, 'crear_area_persona'])->name('area_persona.crear_area_persona'); // crear
       Route::get('/area_persona/tabla_principal', [AreaPersonaController::class, 'listar_area_persona'])->name('area_persona.listar_area_persona'); // AJAX
       Route::get('/area_persona/{idarea_persona}/ver-editar', [AreaPersonaController::class, 'mostrar_area_persona'])->whereNumber('idarea_persona')->name('area_persona.mostrar_area_persona'); // mostrar para editar
@@ -199,10 +199,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
       //::::::::::::::::::::::. Log proveedor / Cuenta Bancaria ::::::::::::::::::::::: vercuentasbancariaslogproveedor
       Route::get('/logController/verdatosproveedor/{id?}', [ProveedorLogController::class, 'verdatoslogproveedor'])->name('ProveedorLogController.verdatoslogproveedor');
-        Route::get('/logController/vercuentasbancariasproveedor/{id?}', [ProveedorLogController::class, 'vercuentasbancariaslogproveedor'])->name('ProveedorLogController.vercuentasbancariaslogproveedor');
+      Route::get('/logController/vercuentasbancariasproveedor/{id?}', [ProveedorLogController::class, 'vercuentasbancariaslogproveedor'])->name('ProveedorLogController.vercuentasbancariaslogproveedor');
 
       //:::::::::::::::::::::::API PARA CONECTAR S10 :::::::::::::::::::::::::::::::::::::::::.
       Route::post('/proveedores/{proveedor}/sincronizar-s10/{idlogbd?}', [ApiSincronizarS10::class, 'sincronizar'])->name('proveedores.sincronizar');
+      Route::post('/clientes/{proveedor}/sincronizar-s10-cliente/{idlogbd?}', [ApiSincronizarS10::class, 'sincronizar_cliente'])->name('proveedores.sincronizar_cliente');
       Route::post('/proveedores/{proveedor}/sincronizarcb-s10/{idlogbd?}', [ApiSincronizarS10::class, 'sincronizarCuentasBancarias'])->name('proveedores.sincronizarCuentasBancarias');
       
       

@@ -3,10 +3,14 @@ const CSRFF = document.querySelector('meta[name="csrf-token"]').content;
 
 let idpersona_sincronizacion = '';
 let razonsocial_sincronizacion = '';
+let tipo_sincronizacion = '';
 
-function sincronizacions10(idpersona, nombre_razonsocial) {
+function sincronizacions10(idpersona, nombre_razonsocial, tipo) {
+
+    console.log("Iniciando sincronización para:", { idpersona, nombre_razonsocial, tipo });
     idpersona_sincronizacion = idpersona;
     razonsocial_sincronizacion = nombre_razonsocial;
+    tipo_sincronizacion = tipo;
     show_hide_escenario(3);
     $(".lista_cambios_proveedor").empty();
     $(".lista_cuentas_bancarias_proveedor").empty();
@@ -251,15 +255,19 @@ function sincronizarproveedors10() {
 
     $(".btn_sincronizars10").html('Sincronizando...').addClass('disabled');
     if (!id_registrotabla) {
-        alert("Error: ID de proveedor no válido");
+        alert("Error: ID de registro no válido");
         return;
     }
 
     const BASE_URL = window.location.origin;
-    const url = `${BASE_URL}/proveedores/${id_registrotabla}/sincronizar-s10/${idlogbd || ""}`;
+    const urlxtipo = tipo_sincronizacion === 'proveedor' ? `${BASE_URL}/proveedores/${id_registrotabla}/sincronizar-s10/${idlogbd || ""}` : `${BASE_URL}/clientes/${id_registrotabla}/sincronizar-s10-cliente/${idlogbd || ""}`;
+    ///clientes/{cliente}/sincronizar-s10-cliente/{idlogbd?}
+
+    console.log("URL de sincronización:", urlxtipo);
+    //const url = `${BASE_URL}/proveedores/${id_registrotabla}/sincronizar-s10/${idlogbd || ""}`;
 
     $.ajax({
-        url: url,
+        url: urlxtipo,
         method: "POST",
         dataType: "json",
         data: {},
@@ -275,7 +283,7 @@ function sincronizarproveedors10() {
                 }*/
                $(".btn_sincronizars10").html('Sincronizar Con S10').removeClass('disabled');
                 // Recargar los datos del proveedor para reflejar cambios
-                sincronizacions10(idpersona_sincronizacion, razonsocial_sincronizacion);
+                sincronizacions10(idpersona_sincronizacion, razonsocial_sincronizacion, tipo_sincronizacion);
             } else {
                 Swal.fire("Error!", e.message, "error");
             }
@@ -317,7 +325,7 @@ function sincronizarcuentabancarias10() {
 
     $(".btn_sincronizarcbs10").html('Sincronizando...').addClass('disabled');
     if (!id_registrotabla) {
-        alert("Error: ID de proveedor no válido");
+        alert("Error: ID de registro no válido");
         return;
     }
 
@@ -341,7 +349,7 @@ function sincronizarcuentabancarias10() {
                 }*/
                $(".btn_sincronizarcbs10").html('Sincronizar Con S10').removeClass('disabled');
                 // Recargar los datos del proveedor para reflejar cambios
-                sincronizacions10(idpersona_sincronizacion, razonsocial_sincronizacion);
+                sincronizacions10(idpersona_sincronizacion, razonsocial_sincronizacion, tipo_sincronizacion);
             } else {
                 Swal.fire("Error!", e.message, "error");
             }

@@ -1025,9 +1025,9 @@
 
   <script>    const idPersonaUser = {{ auth()->user()->persona->idpersona }};  </script>
  
-  <script src="{{ asset('assets/js/proveedor.js') }}?version_erp=01.15"></script>
-  <script src="{{ asset('assets/js/proveedor_carga_masiva.js') }}?version_erp=01.15"></script>
-  <script src="{{ asset('assets/js/sincronizacions10.js') }}?version_erp=01.15"></script>
+  <script src="{{ asset('assets/js/proveedor.js') }}?v={{ filemtime(public_path('assets/js/proveedor.js')) }}"></script>
+  <script src="{{ asset('assets/js/proveedor_carga_masiva.js') }}?v={{ filemtime(public_path('assets/js/proveedor_carga_masiva.js')) }}"></script>
+  <script src="{{ asset('assets/js/sincronizacions10.js') }}?v={{ filemtime(public_path('assets/js/sincronizacions10.js')) }}"></script>
   
 
   <script>
