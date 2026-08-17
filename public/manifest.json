@@ -1,0 +1,26 @@
+{
+    "name": "Portal Proveedores DYC",
+    "short_name": "DYC Portal",
+    "description": "Portal de proveedores de DYC para gestion documental y procesos de homologacion.",
+    "start_url": "/inicio",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#0b2f4f",
+    "theme_color": "#0b2f4f",
+    "orientation": "portrait",
+    "categories": ["business", "productivity"],
+    "icons": [
+        {
+            "src": "/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

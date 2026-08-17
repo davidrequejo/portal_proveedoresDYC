@@ -89,3 +89,5 @@
 
     }
 </script>
+
+@include('layouts.pwa_install')

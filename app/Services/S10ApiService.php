@@ -103,33 +103,38 @@ class S10ApiService
             throw $e;
         }
     }*/
-    public function buscarPorDocumento($documento)
+    public function buscarPorDocumento($documento): ?array
     {
-        try {
-            $response = Http::withToken($this->apiKey)
-                ->get($this->baseUrl . '/proveedor/buscar', [
-                    'documento' => $documento
-                ]);
+        $path = '/proveedor/buscar';
 
+        try {
+            $response = $this->client()->get($path, [
+                'documento' => $documento
+            ]);
+
+            // Si la API responde 404, significa que no existe (no es un error)
             if ($response->status() === 404) {
                 return null;
             }
 
+            // Si hay duplicados
             if ($response->status() === 409) {
                 $body = $response->json();
-
                 throw new \Exception(
                     $body['message'] ?? 'Se encontraron registros duplicados en S10. Debe revisar antes de sincronizar.'
                 );
             }
 
+            $this->logIfFailed($response, 'GET', $path, ['documento' => $documento]);
             $response->throw();
 
             $json = $response->json();
-
             return $json['data'] ?? null;
 
-        } catch (\Exception $e) {
+        } catch (RequestException $e) {
+            if ($e->response && $e->response->status() === 404) {
+                return null;
+            }
             throw $e;
         }
     }

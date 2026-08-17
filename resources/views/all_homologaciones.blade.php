@@ -219,7 +219,17 @@
                                 <select name="id_persona_usuario" id="id_persona_usuario" class="form-control fs-h-input is-valid select2" placeholder="Comprador" aria-invalid="false"  onchange="cargando_search(); delay(function(){filtros()}, 50 );">
                                 </select>
                               </div>
-                            </div>                          
+                            </div>   
+                            
+                            <!-- ::::::::::::::::::::: exportar excel :::::::::::::::::::::: -->
+                            <div style="width: 50px;  min-width: 50px;">
+                              <div class="form-group">                        
+                                <div class="input-group">
+                                <label for="descripcion"> Descarga</label>                          
+                                  <button type="button" id="btn-exportar-excel-homologaciones" class="btn btn-success btn-block" onclick="exportar_excel_homologaciones();" title="Exportar la página actual a Excel"><i class="fas fa-file-excel"></i></button>
+                                </div>
+                              </div>
+                            </div> 
                           </div> 
                         </div>
                         <div class="col-12 col-sm-12 col-md-12 col-lg-1 col-xl-1 d-flex align-items-center justify-content-center">
@@ -288,9 +298,11 @@
 
                   </div>
                   <!-- /.card-body -->
-                  <div class="card-footer clearfix bg-color-white"  >
+                  <div class="card-footer clearfix bg-color-white">
+                    <div class="float-left small pt-1">
+                      <div id="resumen-registros">Mostrando 0 de 0 registros</div>
+                    </div>
                     <ul class="pagination pagination-sm m-0 float-right" id="paginacion">
-                      
                     </ul>
                   </div>
                 </div>
@@ -950,7 +962,8 @@
 
 
  
-  <script src="{{ asset('assets/js/all_homologaciones.js') }}?version_erp=01.15"></script>
+  <script src="{{ asset('adminlte3/plugins/xlsx/xlsx.full.min.js') }}"></script>
+  <script src="{{ asset('assets/js/all_homologaciones.js') }}?version_erp=01.17"></script>
 
   <script>
     $(function() {

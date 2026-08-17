@@ -158,15 +158,16 @@ function tabla_principal_cargar(){
 
     console.log(res.data);
     
-    renderFilas(res.data);
+    renderFilas(res.data, res.total);
     renderPaginacion(res.current_page, res.last_page);
     marcarOrden(state.sort, state.dir);
   }).fail(function (xhr) { ver_errores(xhr); });
 }
 
 // Render filas de la tabla
-function renderFilas(rows){
+function renderFilas(rows, total = 0){
 
+  actualizarResumenRegistros(rows, total);
   const $tb = $("#tabla-homologaciones tbody").empty();
   if (!rows || rows.length === 0){
     $tb.append('<tr><td colspan="15" class="text-center text-muted">Sin resultados</td></tr>');
@@ -234,6 +235,11 @@ function renderPaginacion(actual, total){
   for (let i = ini; i <= fin; i++){  $p.append(mkItem(String(i), i, false, i===actual)); }
   if (fin < total) { if (fin < total-1) $p.append(`<li class="page-item disabled"><span class="page-link">…</span></li>`); $p.append(mkItem(String(total), total));  }    
   $p.append(mkItem('Sig.', actual+1, actual>=total));// Next
+}
+
+function actualizarResumenRegistros(rows, total) {
+  const visibles = Array.isArray(rows) ? rows.length : 0;
+  $('#resumen-registros').text(`Mostrando ${visibles} de ${total || 0} registros`);
 }
 
 // Marcar orden visualmente
@@ -318,6 +324,52 @@ function filtros() {
 
 tabla_principal_cargar();
 
+// Exporta únicamente las homologaciones visibles en la página actual.
+function exportar_excel_homologaciones() {
+  if (typeof XLSX === 'undefined') {
+    toastr_error('No se pudo cargar la librería para exportar Excel.');
+    return;
+  }
+
+  const filas = document.querySelectorAll('#tabla-homologaciones tbody tr.fila-proyecto');
+  if (!filas.length) {
+    toastr_warning('No hay homologaciones visibles para exportar.');
+    return;
+  }
+
+  const encabezados = [
+    'Proveedor',
+    'Tipo de compra',
+    'Fecha inicio proceso',
+    'Fecha inicio período',
+    'Fecha fin período',
+    'Descripción',
+    'Comprador',
+    'Estado proceso',
+    'Estado documentos'
+  ];
+
+  const datos = Array.from(filas, fila => {
+    const celdas = fila.querySelectorAll('td');
+    return Array.from(celdas)
+      .slice(1, 10)
+      .map((celda, indice) => {
+        const valor = celda.innerText.trim().replace(/\s+/g, ' ');
+        return indice === 2 ? valor.replace(/^(\d{2})-(\d{2})-(\d{4})$/, '$1/$2/$3') : valor;
+      });
+  });
+
+  const hoja = XLSX.utils.aoa_to_sheet([encabezados, ...datos]);
+  hoja['!cols'] = encabezados.map((encabezado, indice) => ({
+    wch: Math.max(encabezado.length + 2, ...datos.map(fila => (fila[indice] || '').length + 2), 14)
+  }));
+
+  const libro = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(libro, hoja, 'Homologaciones');
+
+  const fecha = new Date().toISOString().slice(0, 10);
+  XLSX.writeFile(libro, `homologaciones_${fecha}.xlsx`);
+}
 function limpiarFiltro(nombre) { 
   switch (nombre) { 
     case 'tipo_compra': $('#tipo_compra').val(null).trigger('change'); state.tipo_compra = null; break; 

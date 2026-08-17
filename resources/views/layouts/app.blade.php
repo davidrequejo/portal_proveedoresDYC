@@ -8,6 +8,7 @@
         <title>{{ config('app.name', 'ERP Optimiza') }}</title>
 
         <link rel="icon" href="{{ asset('assets/images/brand-logos/dc-logo_cirsulo_white.png') }}" type="image/png">
+        @include('layouts.pwa_meta')
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -45,6 +46,7 @@
 
         @stack('modals')
 
+        @include('layouts.pwa_install')
         @livewireScripts
     </body>
 </html>

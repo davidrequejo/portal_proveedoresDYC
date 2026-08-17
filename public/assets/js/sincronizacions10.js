@@ -260,17 +260,17 @@ function sincronizarproveedors10() {
     }
 
     const BASE_URL = window.location.origin;
-    const urlxtipo = tipo_sincronizacion === 'proveedor' ? `${BASE_URL}/proveedores/${id_registrotabla}/sincronizar-s10/${idlogbd || ""}` : `${BASE_URL}/clientes/${id_registrotabla}/sincronizar-s10-cliente/${idlogbd || ""}`;
-    ///clientes/{cliente}/sincronizar-s10-cliente/{idlogbd?}
+    const urlxtipo = tipo_sincronizacion === 'proveedor' 
+        ? `${BASE_URL}/proveedores/${id_registrotabla}/sincronizar-s10${idlogbd ? "/" + idlogbd : ""}` 
+        : `${BASE_URL}/clientes/${id_registrotabla}/sincronizar-s10-cliente${idlogbd ? "/" + idlogbd : ""}`;
 
     console.log("URL de sincronización:", urlxtipo);
     //const url = `${BASE_URL}/proveedores/${id_registrotabla}/sincronizar-s10/${idlogbd || ""}`;
 
     $.ajax({
         url: urlxtipo,
-        method: "POST",
+        method: "GET",
         dataType: "json",
-        data: {},
         success: function (e) {
             // Usamos 'success' en lugar de 'status'
             console.log(e);
@@ -330,13 +330,12 @@ function sincronizarcuentabancarias10() {
     }
 
     const BASE_URL = window.location.origin;
-    const url = `${BASE_URL}/proveedores/${id_registrotabla}/sincronizarcb-s10/${idlogbd || ""}`;
+    const url = `${BASE_URL}/proveedores/${id_registrotabla}/sincronizarcb-s10${idlogbd ? "/" + idlogbd : ""}`;
 
     $.ajax({
         url: url,
-        method: "POST",
+        method: "GET",
         dataType: "json",
-        data: {},
         success: function (e) {
             // Usamos 'success' en lugar de 'status'
             console.log(e);

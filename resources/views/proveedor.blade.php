@@ -571,6 +571,10 @@
                               </div>
                               <input type="hidden" class="input_hidden_ss"  id="estado_sunat"  />
                             </div>
+                            <div class="custom-control custom-checkbox mt-2">
+                              <input type="checkbox" class="custom-control-input" id="validacion_manual_sunat">
+                              <label class="custom-control-label font-weight-normal" for="validacion_manual_sunat">Validacion manual</label>
+                            </div>
                         </div>
                       </div>
 

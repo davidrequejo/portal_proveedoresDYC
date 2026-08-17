@@ -92,11 +92,12 @@ function toggleBotonGuardar() {
   
   const tipoDoc = $('#tipo_documento').val();       // 'RUC' o 'EXTRANJERO'
   const estadoSunat = $('#estado_sunat').val();     // 'ACTIVO', 'BAJA', etc.
+  const validacionManualSunat = $('#validacion_manual_sunat').is(':checked');
 
   if (tipoDoc === '7') {
     $('.guardar_registro_proveedor').show();        // siempre visible
   } else if (tipoDoc === '6') {
-    $('.guardar_registro_proveedor').toggle(estadoSunat === 'ACTIVO');
+    $('.guardar_registro_proveedor').toggle(estadoSunat === 'ACTIVO' || validacionManualSunat);
   } else {
     $('.guardar_registro_proveedor').hide();        // otros casos
   }
@@ -110,7 +111,18 @@ function toggleBotonGuardar() {
 }
 
 // Asignar eventos a ambos campos
-$('#tipo_documento, #estado_sunat').on('change', toggleBotonGuardar);
+$('#tipo_documento').on('change', function () {
+  $('#validacion_manual_sunat').prop('checked', false);
+  toggleBotonGuardar();
+});
+
+$('#estado_sunat, #validacion_manual_sunat').on('change', toggleBotonGuardar);
+
+$('#numero_documento').on('input', function () {
+  $('#validacion_manual_sunat').prop('checked', false);
+  $('#estado_sunat').val('').trigger('change');
+  $(".valido_novalido").html(`<span class="badge badge-secondary">Por Verificar</span>`);
+});
 
 // Ejecutar al cargar la página para establecer el estado inicial
 toggleBotonGuardar();
@@ -389,6 +401,7 @@ function limpiar_form_proveedor(){
 
   $("#tipo_entidad_sunat").val("").trigger('change');
   $("#distrito").val("").trigger('change');
+  $("#validacion_manual_sunat").prop('checked', false);
   $("#estado_sunat").val("").trigger('change');
   $(".valido_novalido").html(`<span class="badge badge-secondary">Por Verificar</span>`);
 
@@ -1399,6 +1412,4 @@ $(function () {
   $('#idpersonacomprador').rules('add', { required: true, messages: {  required: "Campo requerido" } });
 
 });
-
-
 
