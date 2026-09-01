@@ -206,9 +206,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
       Route::get('/logController/vercuentasbancariasproveedor/{id?}', [ProveedorLogController::class, 'vercuentasbancariaslogproveedor'])->name('ProveedorLogController.vercuentasbancariaslogproveedor');
 
       //:::::::::::::::::::::::API PARA CONECTAR S10 :::::::::::::::::::::::::::::::::::::::::.
-      Route::get('/proveedores/{proveedor}/sincronizar-s10/{idlogbd?}', [ApiSincronizarS10::class, 'sincronizar'])->name('proveedores.sincronizar');
-      Route::get('/clientes/{proveedor}/sincronizar-s10-cliente/{idlogbd?}', [ApiSincronizarS10::class, 'sincronizar_cliente'])->name('proveedores.sincronizar_cliente');
-      Route::get('/proveedores/{proveedor}/sincronizarcb-s10/{idlogbd?}', [ApiSincronizarS10::class, 'sincronizarCuentasBancarias'])->name('proveedores.sincronizarCuentasBancarias');
+      Route::post('/proveedores/{proveedor}/sincronizar-s10/{idlogbd?}', [ApiSincronizarS10::class, 'sincronizar'])->name('proveedores.sincronizar');
+      Route::post('/clientes/{proveedor}/sincronizar-s10-cliente/{idlogbd?}', [ApiSincronizarS10::class, 'sincronizar_cliente'])->name('proveedores.sincronizar_cliente');
+      Route::post('/proveedores/{proveedor}/sincronizarcb-s10/{idlogbd?}', [ApiSincronizarS10::class, 'sincronizarCuentasBancarias'])->name('proveedores.sincronizarCuentasBancarias');
       
       
        Route::get('/pruebas10api', function () {  return view('pruebas10api');   })->name('pruebas10api');

@@ -47,4 +47,4 @@
 
 
   <!-- summernote -->
-  <link rel="stylesheet" href="{{ asset('assets/css/style_new.css') }}">
+  <link rel="stylesheet" href="{{ asset('assets/css/style_new.css') }}?v={{ filemtime(public_path('assets/css/style_new.css')) }}">

@@ -65,7 +65,6 @@ class ApiSincronizarS10 extends Controller
                 if ($existente && isset($existente['CodIdentificador'])) {
                     // Ya existe en S10 → actualizar con ese código
                     $proveedor->codigo_s10 = $existente['CodIdentificador'];
-                    $proveedor->save();
                     $datos = $this->mapearParaActualizacion($proveedor);
                     $respuesta = $this->s10Api->actualizarProveedorcliente($proveedor->codigo_s10, $datos);
                 } else {
@@ -75,14 +74,13 @@ class ApiSincronizarS10 extends Controller
                         throw new \Exception('No se pudo obtener un código disponible de S10.');
                     }
                     $proveedor->codigo_s10 = $nuevoCodigo;
-                    $proveedor->save();
                     $datos = $this->mapearParaCreacion($proveedor);
                     $respuesta = $this->s10Api->crearProveedorcliente($datos);
                 }
             }
 
             // --- PROCESAR RESPUESTA DE LA API .NET ---
-            if ($respuesta['ok']) {
+            if ($this->respuestaS10Ok($respuesta ?? null)) {
                 $proveedor->estado_sincronizacions10 = '1';
                 $proveedor->save();
                 $mensaje = 'Proveedor sincronizado correctamente con S10.';
@@ -107,7 +105,7 @@ class ApiSincronizarS10 extends Controller
                 if ($tipo === 'success') {
                     return ApiResponse::success($data, $mensaje);
                 } else {
-                    return ApiResponse::error(new \Exception($mensaje), 400);
+                    return $this->errorS10Json($mensaje, 400);
                 }
             }
 
@@ -120,19 +118,52 @@ class ApiSincronizarS10 extends Controller
                 $errorMsg .= ' Código: ' . $e->response->status();
             }
             if ($request->wantsJson()) {
-                return ApiResponse::error($e, 500);
+                return $this->errorS10Json($errorMsg, 502);
             }
             return back()->with('error', $errorMsg);
         } catch (\Exception $e) {
             report($e);
             $errorMsg = 'Error interno: ' . $e->getMessage();
             if ($request->wantsJson()) {
-                return ApiResponse::error($e, 500);
+                return $this->errorS10Json($errorMsg, 500);
             }
             return back()->with('error', $errorMsg);
         }
     }
 
+
+    private function respuestaS10Ok($respuesta): bool
+    {
+        return is_array($respuesta) && array_key_exists('ok', $respuesta) && $respuesta['ok'] === true;
+    }
+
+    private function errorS10Json(string $message, int $statusCode)
+    {
+        return response()->json([
+            'status' => false,
+            'message' => $message,
+        ], $statusCode);
+    }
+
+
+    private function validarCuentaParaS10(array $dataS10, PersonaCuentaBancaria $cuenta): void
+    {
+        if (empty($dataS10['CodIdentificador'])) {
+            throw new \InvalidArgumentException('El proveedor no tiene codigo S10 configurado.');
+        }
+
+        if (empty($cuenta->idbanco)) {
+            throw new \InvalidArgumentException("La cuenta ID {$cuenta->idpersona_cuentabancaria} no tiene banco seleccionado.");
+        }
+
+        if (empty($dataS10['Banco_ID'])) {
+            throw new \InvalidArgumentException('El banco seleccionado no tiene codigo S10 configurado.');
+        }
+
+        if (empty($dataS10['NoCuenta'])) {
+            throw new \InvalidArgumentException("La cuenta ID {$cuenta->idpersona_cuentabancaria} no tiene numero de cuenta.");
+        }
+    }
 
     /**
      * Mapeo para creación: se envían todos los campos (incluyendo null)
@@ -263,7 +294,6 @@ class ApiSincronizarS10 extends Controller
     {
         try {
             $documento = $proveedor->numero_documento;
-           // var_dump($documento); die(); // Debug: Ver número de documento antes de sincronizar
 
             // --- INTENTO DE ACTUALIZACIÓN SI TIENE CÓDIGO ---
             if (!empty($proveedor->codigo_s10)) {
@@ -290,7 +320,6 @@ class ApiSincronizarS10 extends Controller
                 if ($existente && isset($existente['CodIdentificador'])) {
                     // Ya existe en S10 → actualizar con ese código
                     $proveedor->codigo_s10 = $existente['CodIdentificador'];
-                    $proveedor->save();
                     $datos = $this->mapearParaActualizacioncliente($proveedor);
                     $respuesta = $this->s10Api->actualizarProveedorcliente($proveedor->codigo_s10, $datos);
                 } else {
@@ -300,18 +329,16 @@ class ApiSincronizarS10 extends Controller
                         throw new \Exception('No se pudo obtener un código disponible de S10.');
                     }
                     $proveedor->codigo_s10 = $nuevoCodigo;
-                    $proveedor->save();
                     $datos = $this->mapearParaCreacioncliente($proveedor);
-                    //var_dump($datos); die(); // Debug: Ver datos mapeados para creación antes de llamar a la API
                     $respuesta = $this->s10Api->crearProveedorcliente($datos);
                 }
             }
 
             // --- PROCESAR RESPUESTA DE LA API .NET ---
-            if ($respuesta['ok']) {
+            if ($this->respuestaS10Ok($respuesta ?? null)) {
                 $proveedor->estado_sincronizacions10 = '1';
                 $proveedor->save();
-                $mensaje = 'Proveedor sincronizado correctamente con S10.';
+                $mensaje = 'Cliente sincronizado correctamente con S10.';
                 $data = ['codigo_s10' => $proveedor->codigo_s10];
                 $tipo = 'success';
 
@@ -324,7 +351,7 @@ class ApiSincronizarS10 extends Controller
 
 
             } else {
-                $mensaje = 'Error al sincronizar el proveedor.';
+                $mensaje = 'Error al sincronizar el cliente.';
                 $data = [];
                 $tipo = 'error';
             }
@@ -333,7 +360,7 @@ class ApiSincronizarS10 extends Controller
                 if ($tipo === 'success') {
                     return ApiResponse::success($data, $mensaje);
                 } else {
-                    return ApiResponse::error(new \Exception($mensaje), 400);
+                    return $this->errorS10Json($mensaje, 400);
                 }
             }
 
@@ -346,14 +373,14 @@ class ApiSincronizarS10 extends Controller
                 $errorMsg .= ' Código: ' . $e->response->status();
             }
             if ($request->wantsJson()) {
-                return ApiResponse::error($e, 500);
+                return $this->errorS10Json($errorMsg, 502);
             }
             return back()->with('error', $errorMsg);
         } catch (\Exception $e) {
             report($e);
             $errorMsg = 'Error interno: ' . $e->getMessage();
             if ($request->wantsJson()) {
-                return ApiResponse::error($e, 500);
+                return $this->errorS10Json($errorMsg, 500);
             }
             return back()->with('error', $errorMsg);
         }
@@ -503,20 +530,17 @@ class ApiSincronizarS10 extends Controller
                 return $this->handleResponse($request, $mensaje, 'warning');
             }
 
-            //var_dump($cuentasLocales->toArray()); die(); // Debug: Ver cuentas locales antes de sincronizar
 
             $creadas = 0;
             $existentes = 0;
             $errores = [];
 
-            DB::beginTransaction();
-
             foreach ($cuentasLocales as $cuenta) {
                 try {
                     // 3. Mapear los campos locales al formato que espera S10
                     $dataS10 = $this->mapCuentaToS10($cuenta, $proveedor);
+                    $this->validarCuentaParaS10($dataS10, $cuenta);
 
-                    //var_dump($cuenta->idbanco); die(); // Debug: Ver datos mapeados para S10 antes de buscar/crear
                     Log::info('Buscando cuenta con:', [
                         'codigo_s10' => $proveedor->codigo_s10,
                         'Banco_ID' => $dataS10['Banco_ID'],
@@ -577,8 +601,6 @@ class ApiSincronizarS10 extends Controller
                 }
             }
 
-            DB::commit();
-
             $mensaje = "Sincronización completada. Creadas: $creadas, ya existentes: $existentes.";
             if (!empty($errores)) {
                 $mensaje .= " Errores: " . implode('; ', $errores);
@@ -589,7 +611,6 @@ class ApiSincronizarS10 extends Controller
 
             return $this->handleResponse($request, $mensaje, $tipo);
         } catch (\Exception $e) {
-            DB::rollBack();
             Log::error('Error general en sincronización de cuentas bancarias', [
                 'proveedor_id' => $proveedor->idpersona,
                 'error' => $e->getMessage()
@@ -632,7 +653,8 @@ class ApiSincronizarS10 extends Controller
     {
         if ($request->wantsJson()) {
             return response()->json([
-                'status' => $tipo === 'success',
+                'status' => $tipo !== 'error',
+                'type' => $tipo,
                 'message' => $mensaje,
             ], $tipo === 'error' ? 500 : 200);
         }
@@ -642,7 +664,6 @@ class ApiSincronizarS10 extends Controller
 
     private function actualizarLogSincronizacion($idPersona,$idbanco,$noCuenta)
     {
-        var_dump($idPersona,$idbanco,$noCuenta); die(); 
         // Posibles claves donde puede estar el número de cuenta en el JSON
         $claves = ['Moneda', 'CC1', 'CC2', 'CC3'];
         

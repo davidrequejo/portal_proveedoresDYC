@@ -347,22 +347,44 @@ class ClienteController extends Controller
                 'p.estado',
                 DB::raw('(
                     SELECT CASE
+                        WHEN p.codigo_s10 IS NULL OR p.codigo_s10 = \'\' THEN 0
                         -- 🟥 Existe y tiene pendientes
                         WHEN EXISTS (
                             SELECT 1
                             FROM logbd lbd
-                            WHERE lbd.id_registrotabla = p.idpersona
+                            WHERE lbd.nombre_tabla = \'persona\'
+                            AND lbd.id_registrotabla = p.idpersona
                             AND lbd.estado_sincronizacions10 = 0
-                        ) THEN 0
-
-                        -- 🟦 Existe pero todo está sincronizado
-                        WHEN EXISTS (
-                            SELECT 1
-                            FROM logbd lbd
-                            WHERE lbd.id_registrotabla = p.idpersona
                         ) THEN 1
 
+                        -- 🟦 Existe pero todo está sincronizado
                         -- ⚪ No existe ningún registro
+                        WHEN NOT EXISTS (
+                            SELECT 1
+                            FROM persona_cuentabancaria pcb
+                            WHERE pcb.idpersona = p.idpersona
+                            AND pcb.estado_trash = 1
+                            AND pcb.estado_delete = 1
+                        ) THEN 1
+                        WHEN EXISTS (
+                            SELECT 1
+                            FROM persona_cuentabancaria pcb
+                            WHERE pcb.idpersona = p.idpersona
+                            AND pcb.estado_trash = 1
+                            AND pcb.estado_delete = 1
+                            AND (
+                                pcb.NroIdentificadorCuentaBancos10 IS NULL
+                                OR pcb.NroIdentificadorCuentaBancos10 = \'\'
+                                OR EXISTS (
+                                    SELECT 1
+                                    FROM logbd lbd
+                                    WHERE lbd.nombre_tabla = \'persona_cuentabancaria\'
+                                    AND lbd.id_registrotabla = pcb.idpersona_cuentabancaria
+                                    AND lbd.idpersona = p.idpersona
+                                    AND lbd.estado_sincronizacions10 = 0
+                                )
+                            )
+                        ) THEN 1
                         ELSE 2
                     END
                 ) AS estado_sincronizacion')

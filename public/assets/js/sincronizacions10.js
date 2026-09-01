@@ -1,9 +1,33 @@
-/*const BASE_URL = document.querySelector('meta[name="app-url"]').content;*/
 const CSRFF = document.querySelector('meta[name="csrf-token"]').content;
 
 let idpersona_sincronizacion = '';
 let razonsocial_sincronizacion = '';
 let tipo_sincronizacion = '';
+let sincronizandoProveedorS10 = false;
+let sincronizandoCuentasS10 = false;
+
+function s10BaseUrl() {
+    const meta = document.querySelector('meta[name="app-url"]');
+    return meta && meta.content ? meta.content.replace(/\/$/, "") : window.location.origin;
+}
+
+function mensajeErrorS10(xhr, mensajeDefault) {
+    if (xhr.responseJSON && xhr.responseJSON.message) {
+        return xhr.responseJSON.message;
+    }
+
+    if (xhr.responseText) {
+        return xhr.responseText;
+    }
+
+    return xhr.statusText || mensajeDefault;
+}
+
+function refrescarTablaPrincipalS10() {
+    if (typeof tabla_principal_cargar === "function" && $("#tabla-proveedores").length) {
+        tabla_principal_cargar();
+    }
+}
 
 function sincronizacions10(idpersona, nombre_razonsocial, tipo) {
 
@@ -250,42 +274,48 @@ $.ajaxSetup({
 });
 
 function sincronizarproveedors10() {
-    id_registrotabla = idpersona_sincronizacion;
-    idlogbd = '';
+    const id_registrotabla = idpersona_sincronizacion;
+    const idlogbd = '';
+    const $boton = $(".btn_sincronizars10");
 
-    $(".btn_sincronizars10").html('Sincronizando...').addClass('disabled');
     if (!id_registrotabla) {
         alert("Error: ID de registro no válido");
         return;
     }
 
-    const BASE_URL = window.location.origin;
+    if (sincronizandoProveedorS10) {
+        return;
+    }
+
+    sincronizandoProveedorS10 = true;
+    $boton.html('Sincronizando...').addClass('disabled').prop('disabled', true);
+
+    const BASE_URL_S10 = s10BaseUrl();
     const urlxtipo = tipo_sincronizacion === 'proveedor' 
-        ? `${BASE_URL}/proveedores/${id_registrotabla}/sincronizar-s10${idlogbd ? "/" + idlogbd : ""}` 
-        : `${BASE_URL}/clientes/${id_registrotabla}/sincronizar-s10-cliente${idlogbd ? "/" + idlogbd : ""}`;
+        ? `${BASE_URL_S10}/proveedores/${id_registrotabla}/sincronizar-s10${idlogbd ? "/" + idlogbd : ""}`
+        : `${BASE_URL_S10}/clientes/${id_registrotabla}/sincronizar-s10-cliente${idlogbd ? "/" + idlogbd : ""}`;
 
     console.log("URL de sincronización:", urlxtipo);
-    //const url = `${BASE_URL}/proveedores/${id_registrotabla}/sincronizar-s10/${idlogbd || ""}`;
-
     $.ajax({
         url: urlxtipo,
-        method: "GET",
+        method: "POST",
         dataType: "json",
+        data: { _token: CSRFF },
         success: function (e) {
             // Usamos 'success' en lugar de 'status'
             console.log(e);
 
             if (e.status == true) {
-                Swal.fire("Exito!", e.message, "success");
+                Swal.fire(e.type === "warning" ? "Atencion!" : "Exito!", e.message, e.type === "warning" ? "warning" : "success");
                 /* if (e.data && e.data.codigo_s10) {
                     console.log('Código S10 asignado:', e.data.codigo_s10);
                     // Aquí puedes actualizar la UI si lo deseas
                 }*/
-               $(".btn_sincronizars10").html('Sincronizar Con S10').removeClass('disabled');
                 // Recargar los datos del proveedor para reflejar cambios
                 sincronizacions10(idpersona_sincronizacion, razonsocial_sincronizacion, tipo_sincronizacion);
+                refrescarTablaPrincipalS10();
             } else {
-                Swal.fire("Error!", e.message, "error");
+                Swal.fire("Error!", e.message || "No se pudo sincronizar con S10.", "error");
             }
         },
         error: function (xhr) {
@@ -313,6 +343,10 @@ function sincronizarproveedors10() {
             });
 
             console.error(xhr);
+        },
+        complete: function () {
+            sincronizandoProveedorS10 = false;
+            $boton.html('Sincronizar Con S10').removeClass('disabled').prop('disabled', false);
         },
     });
 }
@@ -320,37 +354,45 @@ function sincronizarproveedors10() {
 
 function sincronizarcuentabancarias10() {
 
-    id_registrotabla = idpersona_sincronizacion;
-    idlogbd = '';
+    const id_registrotabla = idpersona_sincronizacion;
+    const idlogbd = '';
+    const $boton = $(".btn_sincronizarcbs10");
 
-    $(".btn_sincronizarcbs10").html('Sincronizando...').addClass('disabled');
     if (!id_registrotabla) {
         alert("Error: ID de registro no válido");
         return;
     }
 
-    const BASE_URL = window.location.origin;
-    const url = `${BASE_URL}/proveedores/${id_registrotabla}/sincronizarcb-s10${idlogbd ? "/" + idlogbd : ""}`;
+    if (sincronizandoCuentasS10) {
+        return;
+    }
+
+    sincronizandoCuentasS10 = true;
+    $boton.html('Sincronizando...').addClass('disabled').prop('disabled', true);
+
+    const BASE_URL_S10 = s10BaseUrl();
+    const url = `${BASE_URL_S10}/proveedores/${id_registrotabla}/sincronizarcb-s10${idlogbd ? "/" + idlogbd : ""}`;
 
     $.ajax({
         url: url,
-        method: "GET",
+        method: "POST",
         dataType: "json",
+        data: { _token: CSRFF },
         success: function (e) {
             // Usamos 'success' en lugar de 'status'
             console.log(e);
 
             if (e.status == true) {
-                Swal.fire("Exito!", e.message, "success");
+                Swal.fire(e.type === "warning" ? "Atencion!" : "Exito!", e.message, e.type === "warning" ? "warning" : "success");
                 /* if (e.data && e.data.codigo_s10) {
                     console.log('Código S10 asignado:', e.data.codigo_s10);
                     // Aquí puedes actualizar la UI si lo deseas
                 }*/
-               $(".btn_sincronizarcbs10").html('Sincronizar Con S10').removeClass('disabled');
                 // Recargar los datos del proveedor para reflejar cambios
                 sincronizacions10(idpersona_sincronizacion, razonsocial_sincronizacion, tipo_sincronizacion);
+                refrescarTablaPrincipalS10();
             } else {
-                Swal.fire("Error!", e.message, "error");
+                Swal.fire("Error!", e.message || "No se pudieron sincronizar las cuentas bancarias con S10.", "error");
             }
         },
         error: function (xhr) {
@@ -378,6 +420,10 @@ function sincronizarcuentabancarias10() {
             });
 
             console.error(xhr);
+        },
+        complete: function () {
+            sincronizandoCuentasS10 = false;
+            $boton.html('Sincronizar Con S10').removeClass('disabled').prop('disabled', false);
         },
     });
 }

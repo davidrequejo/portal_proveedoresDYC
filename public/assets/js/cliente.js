@@ -161,19 +161,24 @@ function renderFilas(rows){
   }
   rows.forEach(r => {
     var totalHomologaciones = r.total_homologaciones != 0 ? `<span class="badge badge-info"> ${r.total_homologaciones}</span>` : '<span class="badge badge-warning"> 0</span> ';
+    const estadoSync = Number(r.estado_sincronizacion);
     let est_sub_sync = '';
+    let estadoSyncTitulo = 'Estado S10 no disponible';
 
-    switch (r.estado_sincronizacion) {
+    switch (estadoSync) {
       case 0:
-        est_sub_sync = '<span class="dot-sync pendiente"></span>'; // 🔴
+        est_sub_sync = '<span class="dot-sync no-sync"></span>';
+        estadoSyncTitulo = 'Sin sincronizar S10';
         break;
 
       case 1:
-        est_sub_sync = '<span class="dot-sync ok"></span>';        // 🟢
+        est_sub_sync = '<span class="dot-sync parcial"></span>';
+        estadoSyncTitulo = 'Sincronizacion parcial S10';
         break;
 
       case 2:
-        est_sub_sync = '<span class="dot-sync none"></span>';      // ⚪
+        est_sub_sync = '<span class="dot-sync ok"></span>';
+        estadoSyncTitulo = 'Sincronizacion completa S10';
         break;
 
       default:
@@ -186,7 +191,7 @@ function renderFilas(rows){
           <div class="btn-group btn-group-sm">
             <button class="btn btn-xs text-nowrap bnt-editar-proyecto" onclick="ver_editar_cliente(${r.idpersona})" > <i class="fas fa-pencil-alt color_icon_opt"></i></button>
             <button class="btn btn-xs text-nowrap bn-ver-proyecto hidden show_view_eliminar" onclick="eliminar_cliente(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')"><i class="fas fa-trash color_icon_opt"></i></button>
-            <button class="btn btn-xs text-nowrap" onclick="sincronizacions10(${r.idpersona}, '${r.nombre_razonsocial ?? ''}','cliente')" ><i class="fas fa-globe color_icon_opt">
+            <button class="btn btn-xs text-nowrap" title="${estadoSyncTitulo}" onclick="sincronizacions10(${r.idpersona}, '${r.nombre_razonsocial ?? ''}','cliente')" ><i class="fas fa-globe color_icon_opt">
             <sup>${est_sub_sync}</sup></i> 
             
              </button>
@@ -684,6 +689,4 @@ $(function () {
   $('#tipo_documento').rules('add', { required: true, messages: {  required: "Campo requerido" } });
 
 });
-
-
 

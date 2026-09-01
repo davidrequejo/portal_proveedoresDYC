@@ -164,9 +164,9 @@
                               <div class="form-group">
                                 <label for="descripcion"><span class="badge bg-info m-r-4px badge-new cursor-pointer" onclick="limpiarFiltro('estado_actualizaciondatos_filtro')" ><i class="las la-sync-alt"></i></span> Estado Sincronización</label>                          
                                 <select name="estado_actualizaciondatos_filtro" id="estado_actualizaciondatos_filtro" class="form-control fs-h-input is-valid select2" placeholder="Estado" aria-invalid="false"  onchange="cargando_search(); delay(function(){filtros()}, 50 );">
-                                  <option value="2" >Provedor No Actualizo sus datos </option>
-                                  <option value="0" >Provedor Actualizo sus datos</option>
-                                  <option value="1" >Provedor Sincronizado Con S10</option>
+                                  <option value="0" >Sin sincronizar S10</option>
+                                  <option value="1" >Sincronizacion parcial S10</option>
+                                  <option value="2" >Sincronizacion completa S10</option>
                                 </select>
                               </div>
                             </div>
@@ -271,7 +271,7 @@
                         <div class="card">
                           <div class="card-header">
                             <h3 class="card-title">DATOS DEL PROVEEDOR
-                               <a class="btn btn-sm btn-principal btn_sincronizars10" onclick="sincronizarproveedors10()">Sincronizar Proveedor Con S10 </a>
+                               <button type="button" class="btn btn-sm btn-principal btn_sincronizars10" onclick="sincronizarproveedors10()">Sincronizar Proveedor Con S10 </button>
                             </h3>
                           </div>
                           <!-- /.card-header -->
@@ -293,7 +293,7 @@
                         <div class="card">
                           <div class="card-header">
                             <h3 class="card-title">DATOS CUENTAS BANCARIAS 
-                              <a class="btn btn-sm btn-principal  btn_sincronizarcbs10" onclick="sincronizarcuentabancarias10()">Sincronizar Cuentas Bancarias Con S10</a>
+                              <button type="button" class="btn btn-sm btn-principal  btn_sincronizarcbs10" onclick="sincronizarcuentabancarias10()">Sincronizar Cuentas Bancarias Con S10</button>
                             </h3>
 
                           </div>

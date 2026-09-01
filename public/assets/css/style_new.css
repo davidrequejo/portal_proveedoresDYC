@@ -153,15 +153,30 @@
 
 .dot-sync{
     display: inline-block;
-    width: 8px;
-    height: 8px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
+    border: 1px solid #fff;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.18);
+    vertical-align: top;
 }
 
-.dot-sync{ width:8px;height:8px;border-radius:50%;display:inline-block; }
-.pendiente{ background: #adb5bd; }
+.fa-globe.color_icon_opt{
+    position: relative;
+}
+
+.fa-globe.color_icon_opt sup{
+    position: absolute;
+    top: -7px;
+    right: -8px;
+    line-height: 0;
+}
+
+.no-sync{ background:#dc3545; }
+.parcial{ background:#f59e0b; }
 .ok{ background:#28a745; }
-.none{ background:#dc3545; }
+.pendiente{ background:#dc3545; }
+.none{ background:#adb5bd; }
 
 
 
@@ -1108,4 +1123,3 @@ select[readonly].select2-hidden-accessible + .select2-container .select2-selecti
 @media (max-width: 1200px) {
   
 }
-

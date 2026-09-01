@@ -22,7 +22,7 @@
         @livewireStyles        
        
         <!-- Theme style -->
-        <link rel="stylesheet" href="{{ asset('assets/css/style_new.css') }}">
+        <link rel="stylesheet" href="{{ asset('assets/css/style_new.css') }}?v={{ filemtime(public_path('assets/css/style_new.css')) }}">
     </head>
     <body>
         <div class="font-sans text-gray-900 antialiased">
