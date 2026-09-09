@@ -68,6 +68,48 @@ class S10ApiService
         ]);
     }
 
+    private function mensajeErrorS10(array $body, string $fallback): string
+    {
+        $message = trim((string) ($body['message'] ?? ''));
+        $errors = $this->aplanarErroresS10($body['errors'] ?? null);
+
+        if ($message === '') {
+            $message = $fallback;
+        }
+
+        if (!empty($errors)) {
+            $message .= "\n" . implode("\n", array_map(fn ($error) => '- ' . $error, $errors));
+        }
+
+        return $message;
+    }
+
+    private function aplanarErroresS10($errors): array
+    {
+        if (empty($errors)) {
+            return [];
+        }
+
+        if (is_string($errors)) {
+            return [trim($errors)];
+        }
+
+        if (!is_array($errors)) {
+            return [trim((string) $errors)];
+        }
+
+        $resultado = [];
+        foreach ($errors as $error) {
+            foreach ($this->aplanarErroresS10($error) as $detalle) {
+                if ($detalle !== '') {
+                    $resultado[] = $detalle;
+                }
+            }
+        }
+
+        return $resultado;
+    }
+
     public function obtenerProximoCodigo(): ?string
     {
         $path = '/proveedor/proximo-codigo';
@@ -120,8 +162,9 @@ class S10ApiService
             // Si hay duplicados
             if ($response->status() === 409) {
                 $body = $response->json();
+                $body = is_array($body) ? $body : [];
                 throw new \Exception(
-                    $body['message'] ?? 'Se encontraron registros duplicados en S10. Debe revisar antes de sincronizar.'
+                    $this->mensajeErrorS10($body, 'Se encontraron registros duplicados en S10. Debe revisar antes de sincronizar.')
                 );
             }
 
@@ -254,10 +297,16 @@ public function crearCuentaBancaria(array $data): ?string
         $response->throw();
 
         $json = $response->json();
+        $json = is_array($json) ? $json : [];
+        if (($json['ok'] ?? true) === false) {
+            throw new \Exception($this->mensajeErrorS10($json, 'Error al crear cuenta bancaria en S10.'));
+        }
+
         // Intentamos obtener el ID de diferentes formas posibles
         return $json['id'] 
             ?? $json['NoIdentificadorCuentaBanco'] 
             ?? $json['NroIdentificadorCuentaBanco'] 
+            ?? $json['NroIdentificadorCuentaBancos10']
             ?? null;
     } catch (RequestException $e) {
         $responseBody = $e->response ? $e->response->body() : null;

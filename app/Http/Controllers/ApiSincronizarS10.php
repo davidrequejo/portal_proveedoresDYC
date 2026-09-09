@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\JsonResponse;
+use Throwable;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -96,7 +97,7 @@ class ApiSincronizarS10 extends Controller
 
 
             } else {
-                $mensaje = 'Error al sincronizar el proveedor.';
+                $mensaje = $this->mensajeRespuestaS10($respuesta ?? null, 'Error al sincronizar el proveedor.');
                 $data = [];
                 $tipo = 'error';
             }
@@ -113,10 +114,7 @@ class ApiSincronizarS10 extends Controller
 
         } catch (RequestException $e) {
             report($e);
-            $errorMsg = 'Error de comunicación con S10.';
-            if ($e->response) {
-                $errorMsg .= ' Código: ' . $e->response->status();
-            }
+            $errorMsg = $this->mensajeExceptionS10($e, 'Error de comunicacion con S10.');
             if ($request->wantsJson()) {
                 return $this->errorS10Json($errorMsg, 502);
             }
@@ -135,6 +133,86 @@ class ApiSincronizarS10 extends Controller
     private function respuestaS10Ok($respuesta): bool
     {
         return is_array($respuesta) && array_key_exists('ok', $respuesta) && $respuesta['ok'] === true;
+    }
+
+    private function mensajeRespuestaS10($respuesta, string $fallback): string
+    {
+        if (!is_array($respuesta)) {
+            return $fallback;
+        }
+
+        return $this->formatearMensajeS10($respuesta, $fallback);
+    }
+
+    private function mensajeExceptionS10(Throwable $e, string $fallback): string
+    {
+        if ($e instanceof RequestException && $e->response) {
+            $json = null;
+
+            try {
+                $json = $e->response->json();
+            } catch (Throwable $ignored) {
+                $json = null;
+            }
+
+            if (is_array($json)) {
+                return $this->formatearMensajeS10(
+                    $json,
+                    $fallback . ' Codigo: ' . $e->response->status()
+                );
+            }
+
+            $body = trim((string) $e->response->body());
+            if ($body !== '') {
+                return $body;
+            }
+
+            return $fallback . ' Codigo: ' . $e->response->status();
+        }
+
+        return $e->getMessage() !== '' ? $e->getMessage() : $fallback;
+    }
+
+    private function formatearMensajeS10(array $body, string $fallback): string
+    {
+        $message = trim((string) ($body['message'] ?? ''));
+        $errores = $this->aplanarErroresS10($body['errors'] ?? null);
+
+        if ($message === '') {
+            $message = $fallback;
+        }
+
+        if (!empty($errores)) {
+            $message .= "\n" . implode("\n", array_map(fn ($error) => '- ' . $error, $errores));
+        }
+
+        return $message;
+    }
+
+    private function aplanarErroresS10($errors): array
+    {
+        if (empty($errors)) {
+            return [];
+        }
+
+        if (is_string($errors)) {
+            return [trim($errors)];
+        }
+
+        if (!is_array($errors)) {
+            return [trim((string) $errors)];
+        }
+
+        $resultado = [];
+        foreach ($errors as $error) {
+            foreach ($this->aplanarErroresS10($error) as $detalle) {
+                if ($detalle !== '') {
+                    $resultado[] = $detalle;
+                }
+            }
+        }
+
+        return $resultado;
     }
 
     private function errorS10Json(string $message, int $statusCode)
@@ -163,6 +241,19 @@ class ApiSincronizarS10 extends Controller
         if (empty($dataS10['NoCuenta'])) {
             throw new \InvalidArgumentException("La cuenta ID {$cuenta->idpersona_cuentabancaria} no tiene numero de cuenta.");
         }
+    }
+
+    private function usuarioHomologacionS10(): string
+    {
+        $usuario = trim((string) (auth()->user()?->email ?? 'sistema'));
+
+        if ($usuario === '') {
+            $usuario = 'sistema';
+        }
+
+        return str_ends_with($usuario, '-homologacion')
+            ? $usuario
+            : $usuario . '-homologacion';
     }
 
     /**
@@ -246,6 +337,7 @@ class ApiSincronizarS10 extends Controller
             'Auxiliar2' => null,
             'Activo' => $proveedor->estado == '1',
             'CodTipoIdentificador' => '02',   // 02 = Proveedor
+            'CreacionUsuario' => $this->usuarioHomologacionS10(),
         ];
     }
 
@@ -282,6 +374,7 @@ class ApiSincronizarS10 extends Controller
 
             // 👇 Agrega esta línea
         $data['CodTipoIdentificador'] = '02';
+        $data['ModificacionUsuario'] = $this->usuarioHomologacionS10();
 
         return $data;
     }
@@ -351,7 +444,7 @@ class ApiSincronizarS10 extends Controller
 
 
             } else {
-                $mensaje = 'Error al sincronizar el cliente.';
+                $mensaje = $this->mensajeRespuestaS10($respuesta ?? null, 'Error al sincronizar el cliente.');
                 $data = [];
                 $tipo = 'error';
             }
@@ -368,10 +461,7 @@ class ApiSincronizarS10 extends Controller
 
         } catch (RequestException $e) {
             report($e);
-            $errorMsg = 'Error de comunicación con S10.';
-            if ($e->response) {
-                $errorMsg .= ' Código: ' . $e->response->status();
-            }
+            $errorMsg = $this->mensajeExceptionS10($e, 'Error de comunicacion con S10.');
             if ($request->wantsJson()) {
                 return $this->errorS10Json($errorMsg, 502);
             }
@@ -467,6 +557,7 @@ class ApiSincronizarS10 extends Controller
             'Auxiliar2' => null,
             'Activo' => $proveedor->estado == '1',
             'CodTipoIdentificador' => '01',
+            'CreacionUsuario' => $this->usuarioHomologacionS10(),
         ];
     }
 
@@ -503,6 +594,7 @@ class ApiSincronizarS10 extends Controller
 
             // 👇 Agrega esta línea
         $data['CodTipoIdentificador'] = '01';
+        $data['ModificacionUsuario'] = $this->usuarioHomologacionS10();
 
         return $data;
     }
@@ -557,6 +649,7 @@ class ApiSincronizarS10 extends Controller
                         // Ya existe → obtenemos el ID del campo correcto
                         $idS10 = $existente['NoIdentificadorCuentaBanco'] 
                             ?? $existente['NroIdentificadorCuentaBanco'] 
+                            ?? $existente['NroIdentificadorCuentaBancos10']
                             ?? null;
                         if (empty($cuenta->NroIdentificadorCuentaBancos10) && $idS10) {
                             $cuenta->NroIdentificadorCuentaBancos10 = $idS10;
@@ -593,7 +686,7 @@ class ApiSincronizarS10 extends Controller
                     }
 
                 } catch (\Exception $e) {
-                    $errores[] = "Cuenta ID {$cuenta->idpersona_cuentabancaria}: " . $e->getMessage();
+                    $errores[] = "Cuenta ID {$cuenta->idpersona_cuentabancaria}: " . $this->mensajeExceptionS10($e, 'Error al sincronizar cuenta bancaria en S10.');
                     Log::error('Error sincronizando cuenta bancaria', [
                         'cuenta_id' => $cuenta->idpersona_cuentabancaria,
                         'error' => $e->getMessage()
@@ -630,6 +723,7 @@ class ApiSincronizarS10 extends Controller
 
         return [
             'CodIdentificador'          => $proveedor->codigo_s10,
+            'NroIdentificadorCuentaBancos10' => $cuenta->NroIdentificadorCuentaBancos10,
             'Banco_ID'                  => Banco::getCodigos10Idbn($cuenta->idbanco), // o el método que tengas para obtener el código de banco para S10
             'NoCuenta'                  => $cuenta->numero_cuenta,
             'TipoCuentaBanco'           => $cuenta->tipocuenta, // ej. 'Corriente', 'Ahorros'
@@ -642,6 +736,7 @@ class ApiSincronizarS10 extends Controller
             'CIB'                       => $cuenta->cuenta_interbancaria ?? '',
             'NoCuentaCargo'             => $cuenta->numero_cuenta,
             'CodIdentificadorEmpresa'   => null,
+            'CreacionUsuario'           => $this->usuarioHomologacionS10(),
             // Los campos de auditoría los genera S10 (CreacionUsuario, CreacionFecha)
         ];
     }

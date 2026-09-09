@@ -12,15 +12,48 @@ function s10BaseUrl() {
 }
 
 function mensajeErrorS10(xhr, mensajeDefault) {
-    if (xhr.responseJSON && xhr.responseJSON.message) {
-        return xhr.responseJSON.message;
+    if (xhr.responseJSON) {
+        return formatearMensajeErrorS10(xhr.responseJSON, mensajeDefault);
     }
 
     if (xhr.responseText) {
-        return xhr.responseText;
+        try {
+            return formatearMensajeErrorS10(JSON.parse(xhr.responseText), mensajeDefault);
+        } catch (e) {
+            return xhr.responseText;
+        }
     }
 
     return xhr.statusText || mensajeDefault;
+}
+
+function formatearMensajeErrorS10(data, mensajeDefault) {
+    let mensaje = data.message || mensajeDefault;
+    const errores = normalizarErroresS10(data.errors);
+
+    if (errores.length > 0) {
+        mensaje += "\n" + errores.map((error) => `- ${error}`).join("\n");
+    }
+
+    return mensaje;
+}
+
+function normalizarErroresS10(errors) {
+    if (!errors) {
+        return [];
+    }
+
+    if (typeof errors === "string") {
+        return [errors];
+    }
+
+    if (!Array.isArray(errors)) {
+        return [String(errors)];
+    }
+
+    return errors.reduce((resultado, error) => {
+        return resultado.concat(normalizarErroresS10(error));
+    }, []);
 }
 
 function refrescarTablaPrincipalS10() {
@@ -319,20 +352,7 @@ function sincronizarproveedors10() {
             }
         },
         error: function (xhr) {
-            let errorMsg = "Error en la sincronización.";
-
-            // Intentar obtener el mensaje desde la respuesta JSON de Laravel (ApiResponse)
-            if (xhr.responseJSON && xhr.responseJSON.message) {
-                errorMsg = xhr.responseJSON.message;
-            }
-            // Si no hay JSON, usar el texto de respuesta
-            else if (xhr.responseText) {
-                errorMsg = xhr.responseText;
-            }
-            // Último recurso: el estado del error
-            else {
-                errorMsg = xhr.statusText || "Ocurrió un error inesperado";
-            }
+            const errorMsg = mensajeErrorS10(xhr, "Error en la sincronizacion.");
 
             // Mostrar SweetAlert2
             Swal.fire({
@@ -396,20 +416,7 @@ function sincronizarcuentabancarias10() {
             }
         },
         error: function (xhr) {
-            let errorMsg = "Error en la sincronización.";
-
-            // Intentar obtener el mensaje desde la respuesta JSON de Laravel (ApiResponse)
-            if (xhr.responseJSON && xhr.responseJSON.message) {
-                errorMsg = xhr.responseJSON.message;
-            }
-            // Si no hay JSON, usar el texto de respuesta
-            else if (xhr.responseText) {
-                errorMsg = xhr.responseText;
-            }
-            // Último recurso: el estado del error
-            else {
-                errorMsg = xhr.statusText || "Ocurrió un error inesperado";
-            }
+            const errorMsg = mensajeErrorS10(xhr, "Error en la sincronizacion.");
 
             // Mostrar SweetAlert2
             Swal.fire({
