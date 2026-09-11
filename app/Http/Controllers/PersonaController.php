@@ -166,7 +166,7 @@ class PersonaController extends Controller
                     ->orWhereRaw("LOWER(p.departamento) LIKE ?", ["%{$q}%"])
                     ->orWhereRaw("LOWER(p.email) LIKE ?", ["%{$q}%"])
                     ->orWhereRaw("LOWER(p.tipo_entidad_sunat) LIKE ?", ["%{$q}%"])
-                    ->orWhereRaw("LOWER(p.area_persona) LIKE ?", ["%{$q}%"])
+                    ->orWhereRaw("LOWER(ap.descripcion) LIKE ?", ["%{$q}%"])
                     ->orWhereRaw("LOWER(p.estado) LIKE ?", ["%{$q}%"]);
             });
         }

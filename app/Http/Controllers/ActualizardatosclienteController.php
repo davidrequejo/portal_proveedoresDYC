@@ -37,6 +37,63 @@ class ActualizardatosclienteController extends Controller
     {
        $cliente = Cliente::findOrFail($request->idpersonaUpdate);
 
+        /* ================== VALIDACIÓN BASE ================== */
+        $rules = [
+            'tipo_entidad_sunat' => ['required'],
+        ];
+
+        /* ================== PERSONA NATURAL ================== */
+        if ($request->tipo_entidad_sunat === 'NATURAL') {
+            $rules = array_merge($rules, [
+                'tipo_documento_input1'        => ['required'],
+                'numero_documento_input1'      => ['required'],
+                'nombre_razonsocial_input1'    => ['required'],
+                'nombre_persona_natural'       => ['required'],
+                'apellido_paterno_per_natural' => ['required'],
+                'apellido_materno_per_natural' => ['required'],
+                'sexo'                         => ['required'],
+                'fecha_nacimiento'             => ['required', 'date'],
+                'ruc_pers_nat'                 => ['nullable', 'digits:8'],
+                'tratamiento_pers_nat'         => ['required'],
+                'celular'                      => ['required'],
+                'email'                        => ['required', 'email'],
+                'direccion'                    => ['required'],
+                'departamento'                 => ['required'],
+                'provincia'                    => ['required'],
+                'distrito'                     => ['required'],
+            ]);
+        }
+
+        /* ================== PERSONA JURÍDICA ================== */
+        if ($request->tipo_entidad_sunat === 'JURIDICA') {
+            $rules = array_merge($rules, [
+                'tipo_documento_input1'                   => ['required'],
+                'numero_documento_input1'                 => ['required'],
+                'nombre_razonsocial_input1'               => ['required'],
+                'nombre_apellidos_representante_legal'    => ['required'],
+                'telefono_representante'                  => ['required'],
+                'nombre_apellidos_contacto_comercial'     => ['required'],
+                'cargo_contacto_comercial'                => ['required'],
+                'telefono_contacto_comercial'             => ['required'],
+                'email_contacto_comercial'                => ['required', 'email'],
+                'celular'                                 => ['required'],
+                'email'                                   => ['required', 'email'],
+                'direccion'                               => ['required'],
+                'departamento'                            => ['required'],
+                'provincia'                               => ['required'],
+                'distrito'                                => ['required'],
+            ]);
+        }
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return ApiResponse::validation(
+                $validator->errors()->toArray(),
+                'Campos Por Rellenar Correctamente'
+            );
+        }
+
         $data = [
 
             /* ================== SUNAT ================== */

@@ -66,10 +66,40 @@ function show_hide_escenario(flag) {
 }
 
 //**activamso el bton si el estado de la sunat es favorable */
-$('#estado_sunat').on('change', function () {
-  const estado = $(this).val();
-  $('.guardar_registro_cliente').toggle(estado === 'ACTIVO');
+function toggleBotonGuardar() {
+  const tipoDoc = $('#tipo_documento').val();
+  const estadoSunat = $('#estado_sunat').val();
+  const validacionManualSunat = $('#validacion_manual_sunat').is(':checked');
+
+  if (tipoDoc === '7') {
+    $('.guardar_registro_cliente').show();
+  } else if (tipoDoc === '6') {
+    $('.guardar_registro_cliente').toggle(estadoSunat === 'ACTIVO' || validacionManualSunat);
+  } else {
+    $('.guardar_registro_cliente').hide();
+  }
+
+  if (tipoDoc === '7') {
+    $('#numero_documento').removeAttr('maxlength');
+  } else if (tipoDoc === '6') {
+    $('#numero_documento').attr('maxlength', 11);
+  }
+}
+
+$('#tipo_documento').on('change', function () {
+  $('#validacion_manual_sunat').prop('checked', false);
+  toggleBotonGuardar();
 });
+
+$('#estado_sunat, #validacion_manual_sunat').on('change', toggleBotonGuardar);
+
+$('#numero_documento').on('input', function () {
+  $('#validacion_manual_sunat').prop('checked', false);
+  $('#estado_sunat').val('').trigger('change');
+  $(".valido_novalido").html(`<span class="badge badge-secondary">Por Verificar</span>`);
+});
+
+toggleBotonGuardar();
 
 $(document).ready(function() {
     // Cuando el valor del select cambia
@@ -334,6 +364,7 @@ function limpiar_form_cliente(){
 
   $("#tipo_entidad_sunat").val("").trigger('change');
   $("#distrito").val("").trigger('change');
+  $("#validacion_manual_sunat").prop('checked', false);
   $("#estado_sunat").val("").trigger('change');
   $(".valido_novalido").html(`<span class="badge badge-secondary">Por Verificar</span>`);
 
@@ -689,4 +720,3 @@ $(function () {
   $('#tipo_documento').rules('add', { required: true, messages: {  required: "Campo requerido" } });
 
 });
-

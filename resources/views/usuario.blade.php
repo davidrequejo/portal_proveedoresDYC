@@ -25,6 +25,12 @@
 
     .fila-proyecto.selected {  background-color: #e7f1ff !important; }
     .fila-proyecto-presupuesto.selected {  background-color: #e7f1ff !important; }
+    #toggle_password {
+      width: 32px;
+      padding: 0;
+      font-size: 11px;
+      line-height: 1;
+    }
   </style>
 
 </head>
@@ -222,7 +228,14 @@
                       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-group">
                           <label for="password">Contraseña</label>
-                          <input type="password" name="password" id="password" class="form-control fs-h-input" >
+                          <div class="input-group">
+                            <input type="password" name="password" id="password" class="form-control fs-h-input" >
+                            <div class="input-group-append">
+                              <button type="button" class="btn btn-outline-secondary fs-h-input" id="toggle_password" data-toggle="tooltip" data-original-title="Ver contraseña">
+                                <i class="fas fa-eye"></i>
+                              </button>
+                            </div>
+                          </div>
                         </div>  
                       </div>
 
@@ -296,7 +309,7 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/usuario.js') }}?version_erp=01.05"></script>
+  <script src="{{ asset('assets/js/usuario.js') }}?version_erp=01.20"></script>
 
   <script>
     $(function() {

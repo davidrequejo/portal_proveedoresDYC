@@ -226,14 +226,14 @@
 
                             <div class="col-12 col-sm-12 col-md-3 col-lg-3  div_campos_pers_nat" style="display: none;">
                               <div class="form-group">
-                                <label>F. Nacimiento</label>
+                                <label>F. Nacimiento <span class="text-danger">*</span></label>
                                 <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" class="form-control form-control-sm">
                               </div>
                             </div>
 
                             <div class="col-12 col-sm-12 col-md-4 col-lg-4  div_campos_pers_nat" style="display: none;">
                               <div class="form-group">
-                                <label>D.N.I <span class="d-inline-block text-danger" tabindex="0" data-toggle="tooltip" title="Click Para Verificar DNI" onclick="buscar_sunat_reniec('_input2');"> 
+                                <label>D.N.I <span class="d-inline-block text-danger" tabindex="0" data-toggle="tooltip" title="Click Para Verificar DNI" onclick="buscar_sunat_reniec('_input2');">
                                 <svg id="Capa_1" data-name="Capa 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 424.89 470.84" height="15px" width="15px" >
                                   <defs>
                                     <style>.cls-1{fill:#0056bd;}.cls-2{fill:#c70034;}</style>
@@ -418,6 +418,9 @@
                               
                         <h3 class="card-title m-2 font-weight-bold text-principal">Cuentas Bancarias
                         </h3>
+                        <div class="alert alert-warning py-1 px-2 m-2 d-none aviso-cuenta-predeterminada">
+                          No hay cuenta predeterminada. Se sugiere crear o actualizar una cuenta.
+                        </div>
                         <div class="float-right">
 
                           <div class="btn-group btn-agregar-proyecto">
@@ -622,8 +625,8 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/actualizardatoscliente.js') }}?version_erp=01.15"></script>
-  <script src="{{ asset('assets/js/persona_cuentabancaria.js') }}?version_erp=01.15"></script>
+  <script src="{{ asset('assets/js/actualizardatoscliente.js') }}?version_erp=01.20"></script>
+  <script src="{{ asset('assets/js/persona_cuentabancaria.js') }}?version_erp=01.20"></script>
 
   <script>
     $(function() {

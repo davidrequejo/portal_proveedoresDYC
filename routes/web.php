@@ -134,6 +134,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::get( '/persona-cuenta-bancaria/{id}/ver-editar', [PersonaCuentaBancariaController::class, 'mostrar'])->whereNumber('id') ->name('persona_cuenta_bancaria.mostrar');
     Route::put( '/persona-cuenta-bancaria/editar/{id}', [PersonaCuentaBancariaController::class, 'editar'])->whereNumber('id') ->name('persona_cuenta_bancaria.editar');
     Route::put( '/persona-cuenta-bancaria/eliminar/{id}', [PersonaCuentaBancariaController::class, 'eliminar'])->whereNumber('id') ->name('persona_cuenta_bancaria.eliminar'); 
+    Route::put( '/persona-cuenta-bancaria/restaurar/{id}', [PersonaCuentaBancariaController::class, 'restaurar'])->whereNumber('id') ->name('persona_cuenta_bancaria.restaurar');
      Route::get( '/select2/bancos', [PersonaCuentaBancariaController::class, 'selec2banco']); //  ← select2 bancos
     Route::resource( 'persona-cuenta-bancaria', PersonaCuentaBancariaController::class);
 

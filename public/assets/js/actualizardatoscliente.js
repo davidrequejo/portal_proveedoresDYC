@@ -98,8 +98,8 @@ if ( tipoentidadTexto=='NATURAL') {
   $('#apellido_paterno_per_natural').prop('required', true);
   $('#apellido_materno_per_natural').prop('required', true);
   $('#sexo').prop('required', true);
+  $('#fecha_nacimiento').prop('required', true);
   $('#tratamiento_pers_nat').prop('required', true);
-  $('#numero_documento_input2').prop('required', true);
 
   $('.div_campos_pers_jud').hide();
   $('.div_campos_pers_nat').show();
@@ -115,6 +115,7 @@ if ( tipoentidadTexto=='NATURAL') {
   
   $('#nombre_razonsocial').prop('required', true);
   $('#numero_documento_input2').prop('required', false);
+  $('#fecha_nacimiento').prop('required', false);
   
   $('#sexo').prop('required', false);
   $('#tratamiento_pers_nat').prop('required', false);
@@ -143,7 +144,7 @@ function editar_datosproveedor(e){
   if (id === '') {
     url =`${BASE_URL}/persona-cuenta-bancaria/crear`;
   } else {
-    url = `${BASE_URL}/actualizardatosproveedor/editarProveedor`;
+    url = `${BASE_URL}/actualizardatoscliente/editarcliente`;
     formData.append('_method', 'PUT');
   }
 
@@ -205,6 +206,7 @@ $(function () {
 
   $('#sexo').on('change', function() { $(this).trigger('blur'); });
   $('#nombre_razonsocial').on('change', function() { $(this).trigger('blur'); });
+  $('#fecha_nacimiento').on('change input', function() { $(this).valid(); });
 
   $("#form-editar-cliente").validate({
     rules: {
@@ -213,6 +215,11 @@ $(function () {
       moneda:     { required: true },
       predeterminado:     { required: true },
       numero_cuenta: { required: true, number: true },
+      fecha_nacimiento: {
+        required: function () {
+          return $('#tipo_entidad_sunat').val() === 'NATURAL';
+        },
+      },
       //cuenta_interbancaria: { required: true, number: true },
     },
     messages: {
@@ -221,6 +228,9 @@ $(function () {
       moneda:     { required: "Campo requerido" },
       predeterminado:     { required: "Campo requerido" },
       numero_cuenta: { required: "Campo requerido", number: "Ingrese un valor numérico" },
+      fecha_nacimiento: {
+        required: "Este campo es obligatorio.",
+      },
       //cuenta_interbancaria: { required: "Campo requerido", number: "Ingrese un valor numérico" },
 
     },
@@ -247,6 +257,7 @@ $(function () {
 
   $('#sexo').on('change', function() { $(this).trigger('blur'); });
   $('#nombre_razonsocial').on('change', function() { $(this).trigger('blur'); });
+  $('#fecha_nacimiento').on('change input', function() { $(this).valid(); });
 
 });
 
@@ -274,6 +285,3 @@ $(document).ready(function() {
     });
 
 });
-
-
-

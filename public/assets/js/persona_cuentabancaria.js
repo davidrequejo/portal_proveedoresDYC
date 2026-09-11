@@ -58,6 +58,7 @@ function tabla_principal_cnta_bank(){
 // Render filas de la tabla
 function renderFilas(rows){
   const $tb = $("#tbl_lista_cuentas_bancarias tbody").empty();
+  actualizarAvisoCuentaPredeterminada(rows || []);
 
   if (!rows || rows.length === 0){
     $tb.append('<tr><td colspan="9" class="text-center text-muted">Sin resultados</td></tr>');
@@ -66,6 +67,21 @@ function renderFilas(rows){
 
   rows.forEach(r => {
     let estado = r.estado_trash == '1' ? '<span class="badge badge-new">Activo</span>' : '<span class="badge badge-danger">Inactivo</span>';
+    const nombreBanco = JSON.stringify(r.banco ?? '');
+    let acciones = r.estado_trash == '1'
+      ? `
+          <button type="button" class="btn btn-editar-cuentabancaria" data-id="${r.idpersona_cuentabancaria}" data-toggle="tooltip" data-original-title="Editar">
+            <i class="fas fa-pencil-alt color_icon_opt"></i>
+          </button>
+          <button type="button" class="btn btn-eliminar-cuentabancaria" data-id="${r.idpersona_cuentabancaria}" data-banco="${String(r.banco ?? '').replace(/"/g, '&quot;')}" data-toggle="tooltip" data-original-title="Eliminar">
+            <i class="fas fa-trash color_icon_opt"></i>
+          </button>
+        `
+      : `
+          <button type="button" class="btn btn-outline-success btn-restaurar-cuentabancaria" data-id="${r.idpersona_cuentabancaria}" data-banco="${String(r.banco ?? '').replace(/"/g, '&quot;')}" data-toggle="tooltip" data-original-title="Restaurar / Activar">
+            <i class="fas fa-undo"></i>
+          </button>
+        `;
 
     let tipoCuenta = '';
     let moneda = '';
@@ -88,15 +104,10 @@ function renderFilas(rows){
 
 
     $tb.append(`
-      <tr class="fila-banco" data-id="${r.idpersona_cuentabancaria}">
+      <tr class="fila-banco ${r.estado_trash == '1' ? '' : 'table-danger'}" data-id="${r.idpersona_cuentabancaria}">
         <td>
           <div class="btn-group btn-group-sm">
-            <button class="btn" onclick="ver_editar_cuentabancaria(${r.idpersona_cuentabancaria})">
-              <i class="fas fa-pencil-alt color_icon_opt"></i>
-            </button>
-            <button class="btn" onclick="eliminar_cuentabancaria(${r.idpersona_cuentabancaria}, '${r.banco}')">
-              <i class="fas fa-trash color_icon_opt"></i>
-            </button>
+            ${acciones}
           </div>
         </td>
         <td>${r.banco ?? ''}</td>
@@ -110,6 +121,16 @@ function renderFilas(rows){
       </tr>
     `);
   });
+
+  $('[data-toggle="tooltip"]').tooltip();
+}
+
+function actualizarAvisoCuentaPredeterminada(rows) {
+  const tienePredeterminadaActiva = rows.some((cuenta) => {
+    return String(cuenta.estado_trash) === '1' && String(cuenta.predeterminado) === '1';
+  });
+
+  $(".aviso-cuenta-predeterminada").toggleClass("d-none", tienePredeterminadaActiva);
 }
 
 // Render paginación Bootstrap (ventana de 5 páginas)
@@ -305,6 +326,60 @@ function eliminar_cuentabancaria(id, descripcion) {
 
   });
 }
+
+$(document).on("click", ".btn-editar-cuentabancaria", function () {
+  ver_editar_cuentabancaria($(this).data("id"));
+});
+
+$(document).on("click", ".btn-eliminar-cuentabancaria", function () {
+  eliminar_cuentabancaria($(this).data("id"), $(this).data("banco") || "");
+});
+
+function restaurar_cuentabancaria(id, descripcion) {
+
+  Swal.fire({
+    title: "¿Restaurar banco?",
+    html: `<b class="text-success">${descripcion}</b>`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, restaurar",
+    showLoaderOnConfirm: true,
+    allowOutsideClick: () => !Swal.isLoading(),
+
+    preConfirm: () => {
+      return $.ajax({
+        url: `${BASE_URLl}/persona-cuenta-bancaria/restaurar/${id}`,
+        type: "PUT",
+        dataType: "json",
+        data: {
+          _token: $('meta[name="csrf-token"]').attr('content')
+        }
+      })
+      .then((e) => {
+        if (e.status !== true) {
+          throw new Error(e.message || 'Error al restaurar');
+        }
+        return e;
+      })
+      .catch((error) => {
+        Swal.showValidationMessage(`❌ ${error.message}`);
+      });
+    }
+  }).then((result) => {
+    if (result.isConfirmed) {
+      Swal.fire(
+        "Restaurado!",
+        "Banco restaurado correctamente",
+        "success"
+      );
+      tabla_principal_cnta_bank();
+    }
+  });
+}
+
+$(document).on("click", ".btn-restaurar-cuentabancaria", function () {
+  restaurar_cuentabancaria($(this).data("id"), $(this).data("banco") || "");
+});
 
 
 /*let idcuentabn_delete = null;

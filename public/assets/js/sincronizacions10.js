@@ -62,12 +62,25 @@ function refrescarTablaPrincipalS10() {
     }
 }
 
+function entidadSincronizacionS10() {
+    return tipo_sincronizacion === "cliente" ? "Cliente" : "Proveedor";
+}
+
+function actualizarTextosSincronizacionS10() {
+    const entidad = entidadSincronizacionS10();
+    $(".titulo_datos_s10").text(`DATOS DEL ${entidad.toUpperCase()}`);
+    $(".titulo_cuentas_s10").text("DATOS CUENTAS BANCARIAS");
+    $(".btn_sincronizars10").html(`Sincronizar ${entidad} Con S10`);
+    $(".btn_sincronizarcbs10").html("Sincronizar Cuentas Bancarias Con S10");
+}
+
 function sincronizacions10(idpersona, nombre_razonsocial, tipo) {
 
     console.log("Iniciando sincronización para:", { idpersona, nombre_razonsocial, tipo });
     idpersona_sincronizacion = idpersona;
     razonsocial_sincronizacion = nombre_razonsocial;
     tipo_sincronizacion = tipo;
+    actualizarTextosSincronizacionS10();
     show_hide_escenario(3);
     $(".lista_cambios_proveedor").empty();
     $(".lista_cuentas_bancarias_proveedor").empty();
@@ -366,7 +379,7 @@ function sincronizarproveedors10() {
         },
         complete: function () {
             sincronizandoProveedorS10 = false;
-            $boton.html('Sincronizar Con S10').removeClass('disabled').prop('disabled', false);
+            $boton.html(`Sincronizar ${entidadSincronizacionS10()} Con S10`).removeClass('disabled').prop('disabled', false);
         },
     });
 }
@@ -430,7 +443,7 @@ function sincronizarcuentabancarias10() {
         },
         complete: function () {
             sincronizandoCuentasS10 = false;
-            $boton.html('Sincronizar Con S10').removeClass('disabled').prop('disabled', false);
+            $boton.html('Sincronizar Cuentas Bancarias Con S10').removeClass('disabled').prop('disabled', false);
         },
     });
 }

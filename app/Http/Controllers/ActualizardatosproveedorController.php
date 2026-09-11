@@ -156,7 +156,7 @@ class ActualizardatosproveedorController extends Controller
                 'apellido_materno_per_natural' => ['required'],
                 'sexo'                         => ['required'],
                 'fecha_nacimiento'             => ['required', 'date'],
-                'ruc_pers_nat'                 => ['required'],
+                'ruc_pers_nat'                 => ['nullable', 'digits:8'],
                 'tratamiento_pers_nat'         => ['required'],
 
                 // CONTACTO GENERAL

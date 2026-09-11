@@ -255,7 +255,7 @@ class PersonaCuentaBancariaController extends Controller
             $this->registrarCambios(
                 $cuenta,
                 'persona_cuentabancaria',
-                $cuenta->idpersona,
+                $cuenta->idpersona_cuentabancaria,
                 $cambios,
                 'ELIMINADO'
             );
@@ -295,6 +295,53 @@ class PersonaCuentaBancariaController extends Controller
         }
     }
 
+    public function restaurar(Request $r, int $id)
+    {
+        try {
+
+            $cuenta = PersonaCuentaBancaria::findOrFail($id);
+
+            if ($cuenta->predeterminado === '1') {
+                PersonaCuentaBancaria::where('idpersona', $cuenta->idpersona)
+                    ->where('idpersona_cuentabancaria', '!=', $id)
+                    ->update(['predeterminado' => '0']);
+            }
+
+            $cuenta->update([
+                'estado_trash' => '1',
+                'user_updated' => auth()->id() ?? null,
+            ]);
+
+            DB::table('logbd')
+                ->where('nombre_tabla', 'persona_cuentabancaria')
+                ->where('idpersona', $cuenta->idpersona)
+                ->where('id_registrotabla', $cuenta->idpersona_cuentabancaria)
+                ->where('accion_realizada', 'ELIMINADO')
+                ->where('estado_sincronizacions10', 0)
+                ->update(['estado_sincronizacions10' => 1]);
+
+            $cuenta->load('banco');
+            $cambios = $cuenta->getChanges();
+            $cambios['idbanco'] = $cuenta->idbanco;
+
+            $this->registrarCambios(
+                $cuenta,
+                'persona_cuentabancaria',
+                $cuenta->idpersona_cuentabancaria,
+                $cambios,
+                'RESTAURADO'
+            );
+
+            return ApiResponse::success([
+                'idpersona_cuentabancaria' => $id,
+                'estado_trash' => 1
+            ], 'Cuenta bancaria restaurada correctamente');
+
+        } catch (\Throwable $e) {
+            return ApiResponse::error($e);
+        }
+    }
+
     /* =========================
      * LISTAR
      * ========================= */
@@ -316,7 +363,6 @@ class PersonaCuentaBancariaController extends Controller
                 'pcb.estado_trash',
                 'b.descripcion as banco'
             )
-            ->where('pcb.estado_trash', '1')
             ->where('pcb.estado_delete', '1');
 
         if ($idpersona) {

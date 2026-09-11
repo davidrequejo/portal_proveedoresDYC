@@ -270,8 +270,8 @@
 
                         <div class="card">
                           <div class="card-header">
-                            <h3 class="card-title">DATOS DEL PROVEEDOR
-                               <button type="button" class="btn btn-sm btn-principal btn_sincronizars10" onclick="sincronizarproveedors10()">Sincronizar Proveedor Con S10 </button>
+                            <h3 class="card-title"><span class="titulo_datos_s10">DATOS DEL CLIENTE</span>
+                               <button type="button" class="btn btn-sm btn-principal btn_sincronizars10" onclick="sincronizarproveedors10()">Sincronizar Cliente Con S10 </button>
                             </h3>
                           </div>
                           <!-- /.card-header -->
@@ -292,7 +292,7 @@
 
                         <div class="card">
                           <div class="card-header">
-                            <h3 class="card-title">DATOS CUENTAS BANCARIAS 
+                            <h3 class="card-title"><span class="titulo_cuentas_s10">DATOS CUENTAS BANCARIAS</span>
                               <button type="button" class="btn btn-sm btn-principal  btn_sincronizarcbs10" onclick="sincronizarcuentabancarias10()">Sincronizar Cuentas Bancarias Con S10</button>
                             </h3>
 
@@ -442,6 +442,10 @@
                                 </span>
                               </div>
                               <input type="hidden" class="input_hidden_ss"  id="estado_sunat"  />
+                            </div>
+                            <div class="custom-control custom-checkbox mt-2">
+                              <input type="checkbox" class="custom-control-input" id="validacion_manual_sunat">
+                              <label class="custom-control-label font-weight-normal" for="validacion_manual_sunat">Validacion manual</label>
                             </div>
                         </div>
                       </div>

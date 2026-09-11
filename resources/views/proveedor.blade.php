@@ -391,7 +391,7 @@
 
                         <div class="card">
                           <div class="card-header">
-                            <h3 class="card-title">DATOS DEL PROVEEDOR
+                            <h3 class="card-title"><span class="titulo_datos_s10">DATOS DEL PROVEEDOR</span>
                                <button type="button" class="btn btn-sm btn-principal btn_sincronizars10" onclick="sincronizarproveedors10()">Sincronizar Proveedor Con S10 </button>
                             </h3>
                           </div>
@@ -413,7 +413,7 @@
 
                         <div class="card">
                           <div class="card-header">
-                            <h3 class="card-title">DATOS CUENTAS BANCARIAS 
+                            <h3 class="card-title"><span class="titulo_cuentas_s10">DATOS CUENTAS BANCARIAS</span>
                               <button type="button" class="btn btn-sm btn-principal  btn_sincronizarcbs10" onclick="sincronizarcuentabancarias10()">Sincronizar Cuentas Bancarias Con S10</button>
                             </h3>
 

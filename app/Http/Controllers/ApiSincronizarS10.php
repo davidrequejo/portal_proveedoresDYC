@@ -614,10 +614,15 @@ class ApiSincronizarS10 extends Controller
                 return $this->handleResponse($request, $mensaje, 'error');
             }
 
-            // 2. Obtener las cuentas bancarias activas del proveedor (no eliminadas)
+            // 2. Obtener las cuentas bancarias activas y eliminadas pendientes.
             $cuentasLocales = PersonaCuentaBancaria::obtenerCuentasActivasProveedor($proveedor->idpersona);
+            $logsEliminados = Logbd::where('nombre_tabla', 'persona_cuentabancaria')
+                ->where('idpersona', $proveedor->idpersona)
+                ->where('accion_realizada', 'ELIMINADO')
+                ->where('estado_sincronizacions10', 0)
+                ->get();
 
-            if ($cuentasLocales->isEmpty()) {
+            if ($cuentasLocales->isEmpty() && $logsEliminados->isEmpty()) {
                 $mensaje = 'El proveedor no tiene cuentas bancarias activas para sincronizar.';
                 return $this->handleResponse($request, $mensaje, 'warning');
             }
@@ -625,7 +630,78 @@ class ApiSincronizarS10 extends Controller
 
             $creadas = 0;
             $existentes = 0;
+            $actualizadas = 0;
+            $desactivadas = 0;
+            $omitidasSinS10 = 0;
             $errores = [];
+
+            foreach ($logsEliminados as $logEliminado) {
+                try {
+                    $cuentaEliminada = PersonaCuentaBancaria::whereKey($logEliminado->id_registrotabla)
+                        ->where('idpersona', $proveedor->idpersona)
+                        ->first();
+
+                    if (!$cuentaEliminada) {
+                        $observacion = json_decode((string) $logEliminado->observacion, true);
+                        $idBancoLog = $observacion['Banco']['id'] ?? null;
+
+                        if ($idBancoLog) {
+                            $cuentaEliminada = PersonaCuentaBancaria::where('idpersona', $proveedor->idpersona)
+                                ->where('idbanco', $idBancoLog)
+                                ->where('estado_trash', 0)
+                                ->orderByRaw("CASE WHEN NroIdentificadorCuentaBancos10 IS NULL OR NroIdentificadorCuentaBancos10 = '' THEN 1 ELSE 0 END")
+                                ->latest('updated_at')
+                                ->first();
+                        }
+                    }
+
+                    if (!$cuentaEliminada) {
+                        $errores[] = "Log ID {$logEliminado->idlogbd}: No se encontro la cuenta bancaria local.";
+                        continue;
+                    }
+
+                    $idCuentaS10 = trim((string) $cuentaEliminada->NroIdentificadorCuentaBancos10);
+
+                    if ($idCuentaS10 === '') {
+                        DB::table('logbd')
+                            ->where('idlogbd', $logEliminado->idlogbd)
+                            ->update(['estado_sincronizacions10' => 1]);
+
+                        $omitidasSinS10++;
+                        continue;
+                    }
+
+                    $dataS10 = $this->mapCuentaToS10($cuentaEliminada, $proveedor);
+                    $dataS10['NroIdentificadorCuentaBancos10'] = $idCuentaS10;
+                    $dataS10['Activo'] = false;
+                    $dataS10['ModificacionUsuario'] = $this->usuarioHomologacionS10();
+
+                    Log::info('Desactivando cuenta en S10 por actualizacion', [
+                        'idCuentaS10' => $idCuentaS10,
+                        'data' => $dataS10,
+                    ]);
+
+                    $respuesta = $s10Api->actualizarCuentaBancaria($idCuentaS10, $dataS10);
+
+                    if ($this->respuestaS10Ok($respuesta)) {
+                        DB::table('logbd')
+                            ->where('idlogbd', $logEliminado->idlogbd)
+                            ->update(['estado_sincronizacions10' => 1]);
+
+                        $desactivadas++;
+                    } else {
+                        $errores[] = "Cuenta ID {$cuentaEliminada->idpersona_cuentabancaria}: "
+                            . $this->mensajeRespuestaS10($respuesta, 'No se pudo desactivar la cuenta bancaria en S10.');
+                    }
+                } catch (\Exception $e) {
+                    $errores[] = "Log ID {$logEliminado->idlogbd}: " . $this->mensajeExceptionS10($e, 'Error al desactivar cuenta bancaria en S10.');
+                    Log::error('Error desactivando cuenta bancaria en S10', [
+                        'log_id' => $logEliminado->idlogbd,
+                        'cuenta_id' => $logEliminado->id_registrotabla,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
 
             foreach ($cuentasLocales as $cuenta) {
                 try {
@@ -635,6 +711,7 @@ class ApiSincronizarS10 extends Controller
 
                     Log::info('Buscando cuenta con:', [
                         'codigo_s10' => $proveedor->codigo_s10,
+                        'NroIdentificadorCuentaBancos10' => $dataS10['NroIdentificadorCuentaBancos10'],
                         'Banco_ID' => $dataS10['Banco_ID'],
                         'NoCuenta' => $dataS10['NoCuenta']
                     ]);
@@ -642,7 +719,8 @@ class ApiSincronizarS10 extends Controller
                     $existente = $s10Api->buscarCuentaBancaria(
                         $proveedor->codigo_s10,
                         $dataS10['Banco_ID'],
-                        $dataS10['NoCuenta']
+                        $dataS10['NoCuenta'],
+                        $dataS10['NroIdentificadorCuentaBancos10']
                     );
 
                     if ($existente) {
@@ -651,20 +729,38 @@ class ApiSincronizarS10 extends Controller
                             ?? $existente['NroIdentificadorCuentaBanco'] 
                             ?? $existente['NroIdentificadorCuentaBancos10']
                             ?? null;
-                        if (empty($cuenta->NroIdentificadorCuentaBancos10) && $idS10) {
+                        if (empty($idS10)) {
+                            $errores[] = "Cuenta ID {$cuenta->idpersona_cuentabancaria}: S10 encontro la cuenta, pero no devolvio identificador para actualizar";
+                            continue;
+                        }
+
+                        if (empty($cuenta->NroIdentificadorCuentaBancos10)) {
                             $cuenta->NroIdentificadorCuentaBancos10 = $idS10;
                             $cuenta->save();
-                            DB::table('logbd')
-                            ->where('idpersona', $proveedor->idpersona)
-                            ->where('id_registrotabla', $cuenta->idpersona_cuentabancaria)
-                            ->where('nombre_tabla', 'persona_cuentabancaria')
-                            ->update(['estado_sincronizacions10' => 1]);
                         }
+
+                        $dataS10['NroIdentificadorCuentaBancos10'] = $idS10;
+
+                        Log::info('Actualizando cuenta en S10', [
+                            'idCuentaS10' => $idS10,
+                            'data' => $dataS10,
+                        ]);
+
+                        $respuesta = $s10Api->actualizarCuentaBancaria($idS10, $dataS10);
+
+                        if ($this->respuestaS10Ok($respuesta)) {
                             DB::table('logbd')
                             ->where('idpersona', $proveedor->idpersona)
                             ->where('id_registrotabla', $cuenta->idpersona_cuentabancaria)
                             ->where('nombre_tabla', 'persona_cuentabancaria')
                             ->update(['estado_sincronizacions10' => 1]);
+
+                            $actualizadas++;
+                        } else {
+                            $errores[] = "Cuenta ID {$cuenta->idpersona_cuentabancaria}: S10 no confirmo la actualizacion";
+                            continue;
+                        }
+
                         $existentes++;
                     } else {
                         Log::info('Creando cuenta en S10', $dataS10);
@@ -694,7 +790,10 @@ class ApiSincronizarS10 extends Controller
                 }
             }
 
-            $mensaje = "Sincronización completada. Creadas: $creadas, ya existentes: $existentes.";
+            $mensaje = "Sincronizacion completada. Creadas: $creadas, ya existentes: $existentes, actualizadas: $actualizadas, desactivadas: $desactivadas.";
+            if ($omitidasSinS10 > 0) {
+                $mensaje .= " Omitidas sin ID S10: $omitidasSinS10.";
+            }
             if (!empty($errores)) {
                 $mensaje .= " Errores: " . implode('; ', $errores);
                 $tipo = 'warning';
@@ -731,8 +830,8 @@ class ApiSincronizarS10 extends Controller
             'CodMoneda'                 => $cuenta->moneda, // ej. 'PEN', 'USD'
             'IBAN'                      => '',
             'BBAN'                      => '',
-            'Activo'                    => true, // Porque ya filtramos activas
-            'Predeterminado'            => $cuenta->predeterminado == '1' ? true : false    , // Convertir a booleano
+            'Activo'                    => (bool) ($cuenta->estado_trash == '1'),
+            'Predeterminado'            => (bool) ($cuenta->predeterminado == '1'),
             'CIB'                       => $cuenta->cuenta_interbancaria ?? '',
             'NoCuentaCargo'             => $cuenta->numero_cuenta,
             'CodIdentificadorEmpresa'   => null,

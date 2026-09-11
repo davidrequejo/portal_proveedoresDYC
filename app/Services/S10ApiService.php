@@ -237,13 +237,15 @@ class S10ApiService
      * @param string $codIdentificador Código del proveedor en S10 (CodIdentificador)
      * @param mixed $bancoId ID del banco en S10 (Banco_ID)
      * @param string $noCuenta Número de cuenta (NoCuenta)
+     * @param string|null $nroIdentificadorCuentaBancos10 Identificador de la cuenta en S10
      * @return array|null
      */
-public function buscarCuentaBancaria(string $codIdentificador, $bancoId, string $noCuenta): ?array
+public function buscarCuentaBancaria(string $codIdentificador, $bancoId, string $noCuenta, ?string $nroIdentificadorCuentaBancos10 = null): ?array
 {
     try {
         $response = $this->client()->get('/cuenta-banco/buscar', [
             'CodIdentificador' => $codIdentificador,
+            'NroIdentificadorCuentaBancos10' => $nroIdentificadorCuentaBancos10,
             'Banco_ID'         => $bancoId,
             'NoCuenta'         => $noCuenta,
         ]);
@@ -277,6 +279,7 @@ public function buscarCuentaBancaria(string $codIdentificador, $bancoId, string 
         $responseBody = $e->response ? $e->response->body() : null;
         Log::error('Error al buscar cuenta bancaria en S10', [
             'codIdentificador' => $codIdentificador,
+            'nroIdentificadorCuentaBancos10' => $nroIdentificadorCuentaBancos10,
             'bancoId'          => $bancoId,
             'noCuenta'         => $noCuenta,
             'status'           => $e->response?->status(),

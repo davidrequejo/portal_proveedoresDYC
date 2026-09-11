@@ -256,6 +256,9 @@ function limpiar_form_proyecto(){
   $("#ubicacion").val("");
   $("#fecha_inicio").val("");
   $("#fecha_fin").val("");
+  $("#password").attr("type", "password");
+  $("#toggle_password i").removeClass("fa-eye-slash").addClass("fa-eye");
+  $("#toggle_password").attr("data-original-title", "Ver contraseña");
 
   $("#idempresa").val("").trigger('change');
   $("#idsocio_negocio").val("").trigger('change');
@@ -320,9 +323,19 @@ function guardar_y_editar_proveedor(e) {
     success: function (e) {
       try {        
         if (e.status == true) {          
+          const warnings = e.data && Array.isArray(e.data.warnings) ? e.data.warnings : [];
+          if (e.data && e.data.blocking_warning === true) {
+            Swal.fire("Advertencia", warnings.join("<br>") || e.message, "warning");
+            $("#guardar_registro_usuario").html('Guardar Cambios').removeClass('disabled');
+            return;
+          }
           tabla_principal_usuario();
           limpiar_form_proyecto();
-          Swal.fire("Correcto!", "Proyecto guardado correctamente", "success");          
+          if (warnings.length > 0) {
+            Swal.fire("Guardado con advertencia", warnings.join("<br>"), "warning");
+          } else {
+            Swal.fire("Correcto!", "Proyecto guardado correctamente", "success");
+          }
           $("#modal-agregar-usuario").modal("hide");           
         }else{
           ver_errores(e);				 
@@ -518,6 +531,15 @@ $("#opcion-ap-eliminar").on("click", function (e) {
 $(function () {    
 
   // validamos el formulario  
+
+  $("#toggle_password").on("click", function () {
+    const $password = $("#password");
+    const mostrando = $password.attr("type") === "text";
+
+    $password.attr("type", mostrando ? "password" : "text");
+    $(this).find("i").toggleClass("fa-eye", mostrando).toggleClass("fa-eye-slash", !mostrando);
+    $(this).attr("data-original-title", mostrando ? "Ver contraseña" : "Ocultar contraseña").tooltip("dispose").tooltip();
+  });
 
   $('#tipo_entidad_sunat').on('change', function() { $(this).trigger('blur'); });
   $('#tipo_documento').on('change', function() { $(this).trigger('blur'); });

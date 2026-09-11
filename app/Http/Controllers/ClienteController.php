@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\CredencialesClientesMail;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 
@@ -30,14 +31,26 @@ class ClienteController extends Controller
             'idtipo_persona'                 => 'required|integer',
             'tipo_entidad_sunat'             => 'required',
             'tipo_documento'                 => 'required',
-            'numero_documento'               => 'required|string|unique:persona,numero_documento',
+            'numero_documento'               => [
+                'required',
+                'string',
+                Rule::unique('persona', 'numero_documento')->where(function ($query) {
+                    return $query->where('idtipo_persona', 5);
+                }),
+            ],
             'nombre_razonsocial'             => 'required|string|max:255',
             'nombre_persona_natural'         => 'nullable|string|max:255',
             'apellido_paterno_per_natural'   => 'nullable|string|max:255',
             'apellido_materno_per_natural'   => 'nullable|string|max:255',
             'celular'                        => 'required|string|max:15',
             'direccion'                      => 'required|string|max:255',
-            'email'                          => 'required|email|unique:persona,email',
+            'email'                          => [
+                'required',
+                'email',
+                Rule::unique('persona', 'email')->where(function ($query) {
+                    return $query->where('idtipo_persona', 5);
+                }),
+            ],
             'distrito'                       => 'nullable',
             'provincia'                      => 'nullable',
             'departamento'                   => 'nullable',
@@ -384,6 +397,14 @@ class ClienteController extends Controller
                                     AND lbd.estado_sincronizacions10 = 0
                                 )
                             )
+                        ) THEN 1
+                        WHEN EXISTS (
+                            SELECT 1
+                            FROM logbd lbd
+                            WHERE lbd.nombre_tabla = \'persona_cuentabancaria\'
+                            AND lbd.idpersona = p.idpersona
+                            AND lbd.accion_realizada = \'ELIMINADO\'
+                            AND lbd.estado_sincronizacions10 = 0
                         ) THEN 1
                         ELSE 2
                     END

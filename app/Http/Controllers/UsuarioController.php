@@ -25,11 +25,28 @@ class UsuarioController extends Controller{
         $data = $r->validate([
             'idpersona'   => 'required|integer',
             'tipoPersona' => 'required|string',
-            'email'       => 'required|string|unique:users,email',
-            'password'    => 'required|string|min:8',
+            'email'       => 'required|string',
+            'password'    => 'required|string',
             'permisos'    => 'nullable|array',
             'permisos.*'  => 'integer'
         ]);
+
+        if (strlen((string) $r->password) < 8) {
+            return ApiResponse::success([
+                'id' => null,
+                'warnings' => ['La contraseña debe tener 8 caracteres mínimos.'],
+                'blocking_warning' => true,
+            ], 'La contraseña debe tener 8 caracteres mínimos');
+        }
+
+        $usuarioExistente = User::where('email', $r->email)->first();
+        if ($usuarioExistente) {
+            return ApiResponse::success([
+                'id' => null,
+                'warnings' => ['El usuario ya existe. Debe cambiar el usuario.'],
+                'blocking_warning' => true,
+            ], 'Debe cambiar el usuario');
+        }
 
         // 2. Crear usuario
         $user = User::create([
@@ -80,10 +97,9 @@ class UsuarioController extends Controller{
             DB::table('usuario_permiso')->insert($data);
         }
 
-
-
         return ApiResponse::success([
-            'id' => 'nuevo'
+            'id' => 'nuevo',
+            'warnings' => [],
         ], 'Usuario creado correctamente');
 
     } catch (\Throwable $e) {
@@ -130,13 +146,21 @@ class UsuarioController extends Controller{
               'idpersona'   => 'required|integer',
               'tipoPersona' => 'required|string',
               'email'       => [ 'required', Rule::unique('users','email')->ignore($r->id, 'id'), ],
-              'password'    => 'nullable|string|min:8',
+              'password'    => 'nullable|string',
               'permisos'    => 'nullable|array',
               'permisos.*'  => 'integer'
           ]);
 
           // 2️⃣ Buscar usuario
           $user = User::findOrFail($r->id);
+
+          if (!empty($r->password) && strlen((string) $r->password) < 8) {
+              return ApiResponse::success([
+                  'id' => null,
+                  'warnings' => ['La contraseña debe tener 8 caracteres mínimos.'],
+                  'blocking_warning' => true,
+              ], 'La contraseña debe tener 8 caracteres mínimos');
+          }
 
           // 3️⃣ Actualizar datos básicos
           $user->update([
@@ -167,7 +191,8 @@ class UsuarioController extends Controller{
           }
 
           return ApiResponse::success([
-              'id' => $user->id
+              'id' => $user->id,
+              'warnings' => [],
           ], 'Usuario actualizado correctamente');
 
       } catch (\Throwable $e) {
@@ -331,9 +356,3 @@ class UsuarioController extends Controller{
 }
 
   
-
-
-
-
-
-
