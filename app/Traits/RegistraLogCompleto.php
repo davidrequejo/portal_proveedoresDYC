@@ -11,6 +11,16 @@ trait RegistraLogCompleto
      * Obtener la configuración según la tabla
      */
     abstract public function getConfigLog($tabla);
+
+    private function resolverIdPersonaLog($modelo)
+    {
+        if (isset($modelo->idpersona) && $modelo->idpersona) {
+            return $modelo->idpersona;
+        }
+
+        $user = Auth::user();
+        return $user ? $user->idpersona : null;
+    }
     
     /**
      * Registrar un snapshot completo
@@ -41,7 +51,7 @@ trait RegistraLogCompleto
             'nombre_tabla'     => $tabla,
             'id_registrotabla' => $id_registro,
             'id_user'          => Auth::id() ?? 1,
-            'idpersona'        => Auth()->user()->idpersona,
+            'idpersona'        => $this->resolverIdPersonaLog($modelo),
             'observacion'      => json_encode($datosFormateados, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
             'accion_realizada' => $accion,
             'user_created'     => Auth::id() ?? 1,
@@ -84,7 +94,7 @@ trait RegistraLogCompleto
             'nombre_tabla'     => $tabla,
             'id_registrotabla' => $id_registro,
             'id_user'          => Auth::id() ?? 1,
-            'idpersona'        => Auth()->user()->idpersona,
+            'idpersona'        => $this->resolverIdPersonaLog($modelo),
             'observacion'      => json_encode($cambiosFormateados, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
             'accion_realizada' => $accion,
             'user_created'     => Auth::id() ?? 1,

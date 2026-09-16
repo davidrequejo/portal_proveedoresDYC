@@ -626,7 +626,7 @@
   @include('layouts.lte_script')  
 
 
-  <script src="{{ asset('assets/js/actualizardatosproveedor.js') }}?version_erp=01.20"></script>
+  <script src="{{ asset('assets/js/actualizardatosproveedor.js') }}?v={{ filemtime(public_path('assets/js/actualizardatosproveedor.js')) }}"></script>
   <script src="{{ asset('assets/js/persona_cuentabancaria.js') }}?version_erp=01.19"></script>
 
   <script>

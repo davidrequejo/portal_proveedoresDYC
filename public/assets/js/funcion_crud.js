@@ -33,7 +33,7 @@ function crud_listar_tabla(url, nombre_modulo) {
 
 function lista_select2(url, nombre_input, id_tabla = null, span_charge = null) {
   if (span_charge == null || span_charge == '' || span_charge == false ) { } else {$(span_charge).html('<i class="fas fa-spinner fa-pulse fa-lg text-danger"></i>');}
-  $.get(url, function (e, status) {
+  return $.get(url, function (e, status) {
     try {
       if (e.status==true) {
         $(nombre_input).html(e.data); 

@@ -411,6 +411,8 @@
                           <!--<textarea class="form-control" name="descripcion" id="descripcion" cols="30" rows="1" placeholder="ejmpl. Los Jardines"></textarea>-->
                           <select name="tipo_documento" id="tipo_documento" class="form-control fs-h-input is-valid select2" placeholder="Tipo de documento" aria-invalid="false">
                             <option value="6">RUC</option>
+                            <option value="1">DNI</option>
+                            <option value="7">EXTRANJERO</option>
                           </select>
                         </div>
                       </div>

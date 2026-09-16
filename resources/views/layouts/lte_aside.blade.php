@@ -115,10 +115,10 @@
             </li>
           @endif
 
-          <li class="nav-header hidden">PROCESO EVALUACIÓN</li>
+          <li class="nav-header d-none">PROCESO EVALUACIÓN</li>
 
           @if (auth()->user()->perm_proveedor_vista_adm)
-            <li class="nav-item hidden">
+            <li class="nav-item d-none">
               <a href="{{ route('plantilla_evaluacion.index') }}" class="nav-link {{ request()->routeIs('plantillas_evaluacion.*') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-edit"></i>
                 <p>Plantillas</p>
@@ -126,7 +126,7 @@
             </li>
           @endif
           @if (auth()->user()->perm_proveedor_vista_adm)
-            <li class="nav-item hidden">
+            <li class="nav-item d-none">
               <a href="{{ route('selecc_evaluacion.index') }}" class="nav-link {{ request()->routeIs('selecc_evaluacion.*') ? 'active' : '' }}">
                 <i class="nav-icon fas fa-edit"></i>
                 <p> Selección Evaluación</p>

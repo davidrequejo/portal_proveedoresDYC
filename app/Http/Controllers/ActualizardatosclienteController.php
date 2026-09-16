@@ -10,10 +10,64 @@ use Illuminate\Support\Facades\Validator;
 use App\Mail\ProveedorActualizadoLogisticaMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
+use App\Traits\RegistraLogCompleto;
 
 
 class ActualizardatosclienteController extends Controller
 {
+    use RegistraLogCompleto;
+
+    public function getConfigLog($tabla)
+    {
+        $configs = [
+            'persona' => [
+                'labels' => [
+                    'nombre_razonsocial' => 'Razon Social',
+                    'nombre_persona_natural' => 'Nombres',
+                    'apellido_paterno_per_natural' => 'Apellido Paterno',
+                    'apellido_materno_per_natural' => 'Apellido Materno',
+                    'sexo' => 'Sexo',
+                    'fecha_nacimiento' => 'Fecha Nacimiento',
+                    'tipo_documento' => 'Tipo Documento',
+                    'numero_documento' => 'Nro Documento',
+                    'celular' => 'Celular',
+                    'email' => 'Correo',
+                    'direccion' => 'Direccion',
+                    'departamento' => 'Departamento',
+                    'provincia' => 'Provincia',
+                    'distrito' => 'Distrito',
+                    'tipo_entidad_sunat' => 'Tipo Persona',
+                    'codigo_s10' => 'Codigo S10',
+                    'ruc_persona_natural' => 'DNI Persona Natural',
+                    'tratamiento_pers_natural' => 'Tratamiento',
+                    'nombre_apellidos_representante_legal' => 'Representante Legal',
+                    'numerotelefo_representante_legal' => 'Telefono Representante',
+                    'nombres_contacto_comercial' => 'Contacto Comercial',
+                    'cargo_contacto_comercial' => 'Cargo Contacto Comercial',
+                    'telefono_contacto_comercial' => 'Telefono Contacto Comercial',
+                    'correo_contacto_comercial' => 'Correo Contacto Comercial',
+                ],
+                'formatters' => [
+                    'sexo' => 'sexo',
+                    'fecha_nacimiento' => 'fecha',
+                    'celular' => 'celular',
+                    'numero_documento' => 'documento',
+                    'ruc_persona_natural' => 'documento',
+                    'email' => 'email',
+                    'correo_contacto_comercial' => 'email',
+                    'tipo_documento' => 'tipo_documento',
+                ],
+                'ignorar' => ['updated_at', 'user_updated', 'created_at', 'user_created']
+            ],
+        ];
+
+        return $configs[$tabla] ?? [
+            'labels' => [],
+            'formatters' => [],
+            'ignorar' => ['updated_at', 'user_updated', 'created_at', 'user_created']
+        ];
+    }
+
     public function index()
     {
        return view('actualizardatoscliente');
@@ -36,6 +90,21 @@ class ActualizardatosclienteController extends Controller
     public function editarcliente(Request $request)
     {
        $cliente = Cliente::findOrFail($request->idpersonaUpdate);
+       $dniPersonaNatural = $request->ruc_pers_nat;
+
+       if ($request->tipo_entidad_sunat === 'NATURAL') {
+            if ($request->tipo_documento_input1 === '1') {
+                $dniPersonaNatural = $request->numero_documento_input1;
+            } elseif (
+                empty($dniPersonaNatural)
+                && $request->tipo_documento_input1 === '6'
+                && strlen((string) $request->numero_documento_input1) === 11
+            ) {
+                $dniPersonaNatural = substr((string) $request->numero_documento_input1, 2, -1);
+            }
+       }
+
+       $request->merge(['ruc_pers_nat' => $dniPersonaNatural]);
 
         /* ================== VALIDACIÓN BASE ================== */
         $rules = [
@@ -139,59 +208,31 @@ class ActualizardatosclienteController extends Controller
 
         // Evita sobrescribir con NULL
         $data = array_filter($data, fn ($v) => $v !== null);
-
-
         // Actualizar cliente
         $cliente->update($data);
 
-                // Obtener valores después de la actualización
-        $cambios = $cliente->getChanges();
+        $primerLog = Logbd::where('nombre_tabla', 'persona')
+            ->where('id_registrotabla', $cliente->idpersona)
+            ->doesntExist();
 
-        // Etiquetas legibles (opcional pero recomendado)
-        $labels = [
-            'nombre_razonsocial'             => 'razon_social',
-
-            'nombre_persona_natural'         => 'nombre_persona_natural',
-            'apellido_paterno_per_natural'   => 'apellido_paterno_per_natural',
-            'apellido_materno_per_natural'   => 'apellido_materno_per_natural',
-            'sexo'                           => 'sexo',
-            'fecha_nacimiento'               => 'fecha_nacimiento',
-            'Doc. DNI'                       => 'ruc_persona_natural',
-            'tratamiento_pers_natural'       => 'tratamiento_pers_natural',
-            'Documento de Identidad'         => 'numero_documento',
-
-            'email'            => 'email',
-            'celular'            => 'celular',
-            'direccion'          => 'direccion',
-            'departamento'       => 'departamento',
-            'provincia'          => 'provincia',
-            'distrito'           => 'distrito',
-
-        ];
-
-        $observacion = '';
-
-        foreach ($cambios as $campo => $valor) {
-
-            // ignorar campos que no quieres loguear
-            if (!isset($labels[$campo])) { continue; }
-
-            // evitar campos técnicos
-            if (in_array($campo, ['updated_at', 'user_updated'])) { continue; }
-
-            $observacion .= $labels[$campo] . ' : ' . ($valor ?? '-') . "\n";
+        if ($primerLog) {
+            $this->registrarSnapshot(
+                $cliente,
+                'persona',
+                $cliente->idpersona,
+                'REGISTRO_INICIAL_CLIENTE'
+            );
+        } else {
+            $cambios = $cliente->getChanges();
+            $this->registrarCambios(
+                $cliente,
+                'persona',
+                $cliente->idpersona,
+                $cambios,
+                'ACTUALIZAR'
+            );
         }
 
-        if (trim($observacion) !== '') {
-            Logbd::create([
-                'nombre_tabla'     => 'persona',
-                'id_registrotabla' => $cliente->idpersona,
-                'id_user'          => auth()->id(),
-                'observacion'      => trim($observacion),
-                'accion_realizada' => 'Registro Actualizado',
-                'user_created'     => auth()->id(),
-            ]);
-        }
 
         /** Enviar correo de notificación a logística */
         $logistica = DB::table('persona')

@@ -70,30 +70,49 @@ function toggleBotonGuardar() {
   const tipoDoc = $('#tipo_documento').val();
   const estadoSunat = $('#estado_sunat').val();
   const validacionManualSunat = $('#validacion_manual_sunat').is(':checked');
+  const documentoValido = estadoSunat === 'ACTIVO' || validacionManualSunat;
 
   if (tipoDoc === '7') {
     $('.guardar_registro_cliente').show();
-  } else if (tipoDoc === '6') {
-    $('.guardar_registro_cliente').toggle(estadoSunat === 'ACTIVO' || validacionManualSunat);
+  } else if (tipoDoc === '1' || tipoDoc === '6') {
+    $('.guardar_registro_cliente').toggle(documentoValido);
   } else {
     $('.guardar_registro_cliente').hide();
   }
 
   if (tipoDoc === '7') {
+    $('#numero_documento').attr('type', 'text');
+    $('#numero_documento').removeAttr('onkeypress');
     $('#numero_documento').removeAttr('maxlength');
+  } else if (tipoDoc === '1') {
+    $('#numero_documento').attr('type', 'number');
+    $('#numero_documento').attr('onkeypress', 'return soloNumeros(event)');
+    $('#numero_documento').attr('maxlength', 8);
   } else if (tipoDoc === '6') {
+    $('#numero_documento').attr('type', 'number');
+    $('#numero_documento').attr('onkeypress', 'return soloNumeros(event)');
     $('#numero_documento').attr('maxlength', 11);
   }
 }
+window.toggleBotonGuardar = toggleBotonGuardar;
 
 $('#tipo_documento').on('change', function () {
   $('#validacion_manual_sunat').prop('checked', false);
+  $('#estado_sunat').val('').trigger('change');
+  $(".valido_novalido").html(`<span class="badge badge-secondary">Por Verificar</span>`);
   toggleBotonGuardar();
 });
 
 $('#estado_sunat, #validacion_manual_sunat').on('change', toggleBotonGuardar);
 
 $('#numero_documento').on('input', function () {
+  const tipoDoc = $('#tipo_documento').val();
+  if (tipoDoc === '1') {
+    this.value = this.value.slice(0, 8);
+  } else if (tipoDoc === '6') {
+    this.value = this.value.slice(0, 11);
+  }
+
   $('#validacion_manual_sunat').prop('checked', false);
   $('#estado_sunat').val('').trigger('change');
   $(".valido_novalido").html(`<span class="badge badge-secondary">Por Verificar</span>`);

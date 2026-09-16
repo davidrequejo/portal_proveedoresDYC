@@ -4,7 +4,7 @@ const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 $("#editar_registro_proveedor").on("click", function (e) { $("#submit-form-editarproveedor").submit(); });   
 
 lista_select2(`${BASE_URL}/select2/bancos`, '#idbanco');
-lista_select2(`${BASE_URL}/select2/obtener`, '#distrito'); 
+const distritosRequest = lista_select2(`${BASE_URL}/select2/obtener`, '#distrito'); 
 
 $("#idbanco").select2({ theme: "bootstrap4", placeholder: "Selec. Banco", allowClear: true, });
 $("#distrito").select2({ theme: "bootstrap4", placeholder: "Seleccionar Distrito", allowClear: true, });
@@ -13,6 +13,27 @@ $("#sexo").select2({ theme: "bootstrap4", placeholder: "Seleccionar Sexo", allow
 
 $("#tratamiento_pers_nat").val('').trigger('change');
 $("#sexo").val('').trigger('change');
+
+function cargarDistritoSeleccionado(distrito, provincia, departamento) {
+  const aplicarDistrito = function () {
+    const valorDistrito = distrito == null ? '' : String(distrito);
+    const $distrito = $("#distrito");
+
+    if (valorDistrito !== '' && $distrito.find(`option[value="${valorDistrito}"]`).length > 0) {
+      $distrito.val(valorDistrito).trigger('change');
+    } else {
+      $distrito.val(null).trigger('change');
+      $("#provincia").val(provincia ?? '');
+      $("#departamento").val(departamento ?? '');
+    }
+  };
+
+  if (distritosRequest && typeof distritosRequest.done === 'function') {
+    distritosRequest.done(aplicarDistrito);
+  } else {
+    aplicarDistrito();
+  }
+}
 
 function limpiar_form_banco(){
   $("#idpersona_CuentaBancaria").val('');
@@ -51,9 +72,7 @@ function ver_editar_proveedor(){
       $("#apellido_materno_per_natural").val(e.data.proveedor.apellido_materno_per_natural);
       $("#celular").val(e.data.proveedor.celular);
       $("#direccion").val(e.data.proveedor.direccion);
-      $("#distrito").val(e.data.proveedor.distrito).trigger('change');
-      $("#provincia").val(e.data.proveedor.provincia);
-      $("#departamento").val(e.data.proveedor.departamento);
+      cargarDistritoSeleccionado(e.data.proveedor.distrito, e.data.proveedor.provincia, e.data.proveedor.departamento);
       $("#email").val(e.data.proveedor.email);
 
       $('#tratamiento_pers_nat').val(e.data.proveedor.tratamiento_pers_natural).trigger('change');

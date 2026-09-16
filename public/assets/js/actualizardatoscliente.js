@@ -4,7 +4,7 @@ const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 $(".editar_registro_cliente").on("click", function (e) { $("#submit-form-editarcliente").submit(); });   
 
 lista_select2(`${BASE_URL}/select2/bancos`, '#idbanco');
-lista_select2(`${BASE_URL}/select2/obtener`, '#distrito'); 
+const distritosRequest = lista_select2(`${BASE_URL}/select2/obtener`, '#distrito'); 
 
 $("#idbanco").select2({ theme: "bootstrap4", placeholder: "Selec. Banco", allowClear: true, });
 $("#distrito").select2({ theme: "bootstrap4", placeholder: "Seleccionar Distrito", allowClear: true, });
@@ -13,6 +13,27 @@ $("#sexo").select2({ theme: "bootstrap4", placeholder: "Seleccionar Sexo", allow
 
 $("#tratamiento_pers_nat").val('').trigger('change');
 $("#sexo").val('').trigger('change');
+
+function cargarDistritoSeleccionado(distrito, provincia, departamento) {
+  const aplicarDistrito = function () {
+    const valorDistrito = distrito == null ? '' : String(distrito);
+    const $distrito = $("#distrito");
+
+    if (valorDistrito !== '' && $distrito.find(`option[value="${valorDistrito}"]`).length > 0) {
+      $distrito.val(valorDistrito).trigger('change');
+    } else {
+      $distrito.val(null).trigger('change');
+      $("#provincia").val(provincia ?? '');
+      $("#departamento").val(departamento ?? '');
+    }
+  };
+
+  if (distritosRequest && typeof distritosRequest.done === 'function') {
+    distritosRequest.done(aplicarDistrito);
+  } else {
+    aplicarDistrito();
+  }
+}
 
 function limpiar_form_banco(){
   $("#idpersona_CuentaBancaria").val('');
@@ -48,9 +69,7 @@ function ver_editar_cliente(){
       $("#apellido_materno_per_natural").val(e.data.cliente.apellido_materno_per_natural);
       $("#celular").val(e.data.cliente.celular);
       $("#direccion").val(e.data.cliente.direccion);
-      $("#distrito").val(e.data.cliente.distrito).trigger('change');
-      $("#provincia").val(e.data.cliente.provincia);
-      $("#departamento").val(e.data.cliente.departamento);
+      cargarDistritoSeleccionado(e.data.cliente.distrito, e.data.cliente.provincia, e.data.cliente.departamento);
       $("#email").val(e.data.cliente.email);
 
       $('#tratamiento_pers_nat').val(e.data.cliente.tratamiento_pers_natural).trigger('change');
@@ -69,8 +88,17 @@ function ver_editar_cliente(){
       let tipoDocumentoTexto = $('#tipo_documento_input1 option:selected').text();
       let tipoentidadTexto = $('#tipo_entidad_sunat option:selected').text();
 
-      if (e.data.cliente.ruc_persona_natural==null || e.data.cliente.ruc_persona_natural=='' ) {
-        $('#numero_documento_input2').val(e.data.cliente.numero_documento.substring(2, e.data.cliente.numero_documento.length - 1));
+      const tipoDocumento = String(e.data.cliente.tipo_documento ?? '');
+      const numeroDocumento = String(e.data.cliente.numero_documento ?? '');
+
+      if (tipoDocumento === '1') {
+        $('#numero_documento_input2').val(numeroDocumento);
+      } else if (e.data.cliente.ruc_persona_natural == null || e.data.cliente.ruc_persona_natural == '') {
+        if (tipoDocumento === '6' && numeroDocumento.length === 11) {
+          $('#numero_documento_input2').val(numeroDocumento.substring(2, numeroDocumento.length - 1));
+        } else {
+          $('#numero_documento_input2').val('');
+        }
       }
 
       controlarCampos(tipoDocumentoTexto, tipoentidadTexto);

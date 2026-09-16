@@ -1239,6 +1239,10 @@ function buscar_sunat_reniec(input='') {
 
         if (data == null) {
 
+          $(`.valido_novalido`).html('<span class="badge badge-danger">NO ENCONTRADO</span>');
+          $(`.input_hidden_ss`).val('NO ACTIVO').trigger('change');
+          if (typeof toggleBotonGuardar === 'function') { toggleBotonGuardar(); }
+
           $(`#search${input}`).show();
   
           $(`#charge${input}`).hide();
@@ -1250,6 +1254,10 @@ function buscar_sunat_reniec(input='') {
         } else {
           if (data.success == false) {
 
+            $(`.valido_novalido`).html('<span class="badge badge-danger">NO ENCONTRADO</span>');
+            $(`.input_hidden_ss`).val('NO ACTIVO').trigger('change');
+            if (typeof toggleBotonGuardar === 'function') { toggleBotonGuardar(); }
+
             $(`#search${input}`).show();
 
             $(`#charge${input}`).hide();
@@ -1257,6 +1265,10 @@ function buscar_sunat_reniec(input='') {
             toastr.error("Es probable que el sistema de busqueda esta en mantenimiento o los datos no existe en la RENIEC!!!");
 
           } else {
+
+            $(`.valido_novalido`).html('<span class="badge badge-info" >ACTIVO</span>');
+            $(`.input_hidden_ss`).val('ACTIVO').trigger('change');
+            if (typeof toggleBotonGuardar === 'function') { toggleBotonGuardar(); }
 
             $(`#search${input}`).show();
 
@@ -1275,6 +1287,10 @@ function buscar_sunat_reniec(input='') {
         
       });
     } else {
+
+      $(`.valido_novalido`).html('<span class="badge badge-danger">NO ENCONTRADO</span>');
+      $(`.input_hidden_ss`).val('NO ACTIVO').trigger('change');
+      if (typeof toggleBotonGuardar === 'function') { toggleBotonGuardar(); }
 
       $(`#num_documento${input}`).addClass("is-invalid");
 
@@ -1441,7 +1457,11 @@ function buscar_sunat_reniec(input='') {
         toastr.info("Asegurese de que el RUC tenga 11 dígitos!!!");
       }
     } else {
-      if (tipo_doc == "CEDULA" || tipo_doc == "OTRO") {
+      if (tipo_doc == "7" || tipo_doc == "CEDULA" || tipo_doc == "OTRO") {
+
+        $(`.valido_novalido`).html('<span class="badge badge-info">NO REQUIERE</span>');
+        $(`.input_hidden_ss`).val('ACTIVO').trigger('change');
+        if (typeof toggleBotonGuardar === 'function') { toggleBotonGuardar(); }
 
         $(`#search${input}`).show();
 
