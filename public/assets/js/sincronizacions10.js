@@ -6,6 +6,15 @@ let tipo_sincronizacion = '';
 let sincronizandoProveedorS10 = false;
 let sincronizandoCuentasS10 = false;
 
+function escapeHtmlS10(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function s10BaseUrl() {
     const meta = document.querySelector('meta[name="app-url"]');
     return meta && meta.content ? meta.content.replace(/\/$/, "") : window.location.origin;
@@ -86,7 +95,7 @@ function sincronizacions10(idpersona, nombre_razonsocial, tipo) {
     $(".lista_cuentas_bancarias_proveedor").empty();
 
     $(".Nombre_inicial").html(
-        `Sincronización con S10 Para <span class="text-principal hove-negrita"> : ${nombre_razonsocial} </span>`,
+        `Sincronización con S10 Para <span class="text-principal hove-negrita"> : ${escapeHtmlS10(nombre_razonsocial)} </span>`,
     );
 
     $.getJSON(

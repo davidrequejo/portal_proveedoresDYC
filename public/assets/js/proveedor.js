@@ -11,6 +11,15 @@ let tipo_editar_homologacion =null;
 var idfechaperso_homol_edit = null;
 var  descrp_homol_edit = null;
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
  $('#fecha_inicio_proceso').val(new Date().toISOString().slice(0,10));
  $('#descripcion_homologacion').val(`Periodo - ${new Date().getFullYear()}` );
  
@@ -229,6 +238,9 @@ function renderFilas(rows){
   rows.forEach(r => {
     var totalHomologaciones = r.total_homologaciones != 0 ? `<span class="badge badge-info"> ${r.total_homologaciones}</span>` : '<span class="badge badge-warning"> 0</span> ';
     const estadoSync = Number(r.estado_sincronizacion);
+    const nombreRazonSocial = escapeHtml(r.nombre_razonsocial);
+    const email = escapeHtml(r.email);
+    const direccion = escapeHtml(r.direccion);
     let est_sub_sync = '';
     let estadoSyncTitulo = 'Estado S10 no disponible';
 
@@ -257,22 +269,22 @@ function renderFilas(rows){
         <td class="py-1"> 
           <div class="btn-group btn-group-sm">
             <button class="btn btn-xs text-nowrap bnt-editar-proyecto" onclick="ver_editar_proveedor(${r.idpersona})" > <i class="fas fa-pencil-alt color_icon_opt"></i></button>
-            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="lista_homologaciones(${r.idpersona}, '${r.nombre_razonsocial ?? ''}','${r.email ?? ''}')" ><i class="fas fa-folder fa-0 color_icon_opt"> <sup>${totalHomologaciones}</sup> </i></button>
-            <button class="btn btn-xs text-nowrap bn-ver-proyecto hidden show_view_eliminar" onclick="eliminar_proveedor(${r.idpersona}, '${r.nombre_razonsocial ?? ''}')"><i class="fas fa-trash color_icon_opt"></i></button>
-            <button class="btn btn-xs text-nowrap" title="${estadoSyncTitulo}" onclick="sincronizacions10(${r.idpersona}, '${r.nombre_razonsocial ?? ''}','proveedor')" ><i class="fas fa-globe color_icon_opt">
+            <button class="btn btn-xs text-nowrap bn-ver-proyecto js-lista-homologaciones" data-id="${r.idpersona}" data-nombre="${nombreRazonSocial}" data-email="${email}"><i class="fas fa-folder fa-0 color_icon_opt"> <sup>${totalHomologaciones}</sup> </i></button>
+            <button class="btn btn-xs text-nowrap bn-ver-proyecto hidden show_view_eliminar js-eliminar-proveedor" data-id="${r.idpersona}" data-nombre="${nombreRazonSocial}"><i class="fas fa-trash color_icon_opt"></i></button>
+            <button class="btn btn-xs text-nowrap js-sincronizar-s10" title="${estadoSyncTitulo}" data-id="${r.idpersona}" data-nombre="${nombreRazonSocial}" data-tipo="proveedor"><i class="fas fa-globe color_icon_opt">
             <sup>${est_sub_sync}</sup></i> 
             
              </button>
           </div>
         </td>
         <td class="py-1 text-center"> ${r.codigo_s10 ?? ''} </td>
-        <td class="py-1" style="max-width: 220px; white-space: normal; overflow-wrap: anywhere; word-break: break-word;">${r.nombre_razonsocial ?? ''}</td>
-        <td class="py-1" >${r.tipo_entidad_sunat ?? ''}</td>
-        <td class="py-1" >${r.abreviatura ?? ''}</td>
-        <td class="py-1 text-nowrap">${r.numero_documento ?? ''}</td>
-        <td class="py-1 text-nowrap">${r.celular ?? ''}</td>
-        <td class="py-1 text-nowrap">${r.email ?? ''}</td>
-        <td class="py-1" style="max-width: 220px; white-space: normal; overflow-wrap: anywhere; word-break: break-word;">${ r.direccion ?? ''} </td>
+        <td class="py-1" style="max-width: 220px; white-space: normal; overflow-wrap: anywhere; word-break: break-word;">${nombreRazonSocial}</td>
+        <td class="py-1" >${escapeHtml(r.tipo_entidad_sunat)}</td>
+        <td class="py-1" >${escapeHtml(r.abreviatura)}</td>
+        <td class="py-1 text-nowrap">${escapeHtml(r.numero_documento)}</td>
+        <td class="py-1 text-nowrap">${escapeHtml(r.celular)}</td>
+        <td class="py-1 text-nowrap">${email}</td>
+        <td class="py-1" style="max-width: 220px; white-space: normal; overflow-wrap: anywhere; word-break: break-word;">${direccion} </td>
       </tr>
     `);
     $('[data-toggle="tooltip"]').tooltip(); 
@@ -280,6 +292,18 @@ function renderFilas(rows){
 
   if (idTipoPersonauser=='2') { $(".show_view_eliminar").show(); }else{ $(".show_view_eliminar").hide(); }
 }
+
+$(document).on("click", ".js-lista-homologaciones", function () {
+  lista_homologaciones($(this).data("id"), $(this).data("nombre") || "", $(this).data("email") || "");
+});
+
+$(document).on("click", ".js-eliminar-proveedor", function () {
+  eliminar_proveedor($(this).data("id"), $(this).data("nombre") || "");
+});
+
+$(document).on("click", ".js-sincronizar-s10", function () {
+  sincronizacions10($(this).data("id"), $(this).data("nombre") || "", $(this).data("tipo"));
+});
 
 // Render paginación Bootstrap (ventana de 5 páginas)
 function renderPaginacion(actual, total){
@@ -569,7 +593,7 @@ function eliminar_proveedor(id, nombres) {
 
   Swal.fire({
     title: "¿Está Seguro de eliminar el registro?",
-    html: `<b class="text-danger"><del>${nombres}</del></b>`,
+    html: `<b class="text-danger"><del>${escapeHtml(nombres)}</del></b>`,
     icon: "warning",
     showCancelButton: true,
     confirmButtonColor: "#28a745",
@@ -626,7 +650,7 @@ function lista_homologaciones(idpersona, nombre_razonsocial, email) {
 
 
   $("#idproveedor").val(idpersona);
-  $(".Nombre_inicial").html(`Proveedor <span class="text-principal hove-negrita"> : ${nombre_razonsocial} </span>`);
+  $(".Nombre_inicial").html(`Proveedor <span class="text-principal hove-negrita"> : ${escapeHtml(nombre_razonsocial)} </span>`);
   $(".mostrar_documento_pdf").show();
   $(".tbl_lista_documento_hmolog").hide();
   $(".show_view_btn_notificacion").hide();
@@ -960,7 +984,7 @@ function eliminar_periodo_h(id, nombres) {
 
   Swal.fire({
     title: "¿Está Seguro de eliminar el registro?",
-    html: `<b class="text-danger"><del>${nombres}</del></b>`,
+    html: `<b class="text-danger"><del>${escapeHtml(nombres)}</del></b>`,
     icon: "warning",
     showCancelButton: true,
     confirmButtonColor: "#2850a7",

@@ -16,6 +16,15 @@ var idfechaperso_homol_edit = null;
 var descrp_homol_edit = null;
 var nombre_razonsocial_tipo = null;
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
  $('#fecha_inicio_proceso').val(new Date().toISOString().slice(0,10));
  $('#descripcion_homologacion').val(`Periodo - ${new Date().getFullYear()}` );
  
@@ -176,6 +185,10 @@ function renderFilas(rows, total = 0){
   rows.forEach(r => {
     var estadoHtml='';
     let estado_completo = '';
+    const tipoEstandar = escapeHtml(r.tipo_estandar);
+    const proveedor = escapeHtml(r.proveedor);
+    const comprador = escapeHtml(r.comprador);
+    const descripcion = escapeHtml(r.descripcion);
 
     switch (r.estado_documentos) {
       case 0: estado_completo = `<span class="badge bg-danger text-white">  Pendiente Registro</span>`; break;
@@ -197,20 +210,20 @@ function renderFilas(rows, total = 0){
       <tr class="fila-proyecto" data-id="${r.idpersona_facha_homologacion}">          
         <td class="py-1 text-center"> 
           <div class="btn-group btn-group-sm">
-            <button class="btn btn-xs text-nowrap bn-ver-proyecto" onclick="ver_documentos_x_homologacion(${r.idpersona_facha_homologacion},'${r.tipo_estandar}','${r.proveedor ?? ''}','${r.idpersona}')" ><i class="fas fa-folder fa-0 color_icon_opt"></i></button>
-            <button class="btn btn-xs text-nowrap show_view_homol_eliminar" onclick="eliminar_periodo_h(${r.idpersona_facha_homologacion}, '${r.tipo_estandar ?? ''}')" ><i class="fas fa-trash color_icon_opt"></i></button>
+            <button class="btn btn-xs text-nowrap bn-ver-proyecto js-ver-documentos-homologacion" data-id="${r.idpersona_facha_homologacion}" data-descripcion="${tipoEstandar}" data-proveedor="${proveedor}" data-persona="${r.idpersona}"><i class="fas fa-folder fa-0 color_icon_opt"></i></button>
+            <button class="btn btn-xs text-nowrap show_view_homol_eliminar js-eliminar-periodo-h" data-id="${r.idpersona_facha_homologacion}" data-tipo="${tipoEstandar}"><i class="fas fa-trash color_icon_opt"></i></button>
           </div>
         </td>
-        <td class="py-1 text-nowrap">${r.proveedor ?? ''}</td>
-        <td class="py-1" >${r.tipo_estandar ?? ''}</td>
+        <td class="py-1 text-nowrap">${proveedor}</td>
+        <td class="py-1" >${tipoEstandar}</td>
         <td class="py-1" >${format_d_m_a(r.fecha_inicio_proceso ?? '')}</td>
         <td class="py-1 text-nowrap">${format_d_m_a(r.fecha_inicio_periodo_h ?? '')}</td>
         <td class="py-1 text-nowrap">${format_d_m_a(r.fecha_fin_periodo_h ?? '')}</td>
-        <td class="py-1 text-nowrap">${r.descripcion ?? ''}</td>
-        <td class="py-1 text-nowrap">${r.comprador ?? ''}</td>
+        <td class="py-1 text-nowrap">${descripcion}</td>
+        <td class="py-1 text-nowrap">${comprador}</td>
         <td class="py-1" style="max-width: 220px; white-space: normal; overflow-wrap: anywhere; word-break: break-word;">${ estadoHtml } </td>
         <td class="py-1" style="max-width: 220px; white-space: normal; overflow-wrap: anywhere; word-break: break-word;">${estado_completo} </td>
-        <td class="py-1 text-center"><i class="fas fa-cloud-download-alt descargar_funcion_${r.idpersona_facha_homologacion} color_icon_opt " onclick="descargar_docs_x_homologacion(${r.idpersona_facha_homologacion},'${r.tipo_estandar}','${r.proveedor ?? ''}')"></i> <i class="fas fa-redo-alt fa-spin reload_funcion_${r.idpersona_facha_homologacion} text-danger hidden"></i> </td>
+        <td class="py-1 text-center"><i class="fas fa-cloud-download-alt descargar_funcion_${r.idpersona_facha_homologacion} color_icon_opt js-descargar-docs-homologacion" data-id="${r.idpersona_facha_homologacion}" data-tipo="${tipoEstandar}" data-proveedor="${proveedor}"></i> <i class="fas fa-redo-alt fa-spin reload_funcion_${r.idpersona_facha_homologacion} text-danger hidden"></i> </td>
         
       </tr>
     `);
@@ -218,6 +231,23 @@ function renderFilas(rows, total = 0){
   });
   if (idTipoPersonauser=='2') { $(".show_view_homol_eliminar").show(); }else{ $(".show_view_homol_eliminar").hide(); };
 }
+
+$(document).on("click", ".js-ver-documentos-homologacion", function () {
+  ver_documentos_x_homologacion(
+    $(this).data("id"),
+    $(this).data("descripcion") || "",
+    $(this).data("proveedor") || "",
+    $(this).data("persona")
+  );
+});
+
+$(document).on("click", ".js-eliminar-periodo-h", function () {
+  eliminar_periodo_h($(this).data("id"), $(this).data("tipo") || "");
+});
+
+$(document).on("click", ".js-descargar-docs-homologacion", function () {
+  descargar_docs_x_homologacion($(this).data("id"), $(this).data("tipo") || "", $(this).data("proveedor") || "");
+});
 
 // Render paginación Bootstrap (ventana de 5 páginas)
 function renderPaginacion(actual, total){
@@ -568,7 +598,7 @@ function ver_documentos_x_homologacion(id, descripcion,proveedor,idpersona) {
   nombre_razonsocial_tipo = proveedor;
   idpersona_tipo = idpersona;
 
-  $(".Nombre_inicial").html(`Homologación de <span class="text-principal hove-negrita"> : ${proveedor} </span>`);
+  $(".Nombre_inicial").html(`Homologación de <span class="text-principal hove-negrita"> : ${escapeHtml(proveedor)} </span>`);
 
   $(".text_nombre_periodo_homol").text(`${descripcion}`);
   $(".tbl_lista_documentos").html('<tr><td colspan="10" class="text-center text-muted"><i class="fas fa-sync-alt fa-spin"></i> Cargando ...</td></tr>');
@@ -708,7 +738,7 @@ function eliminar_periodo_h(id, nombres) {
 
   Swal.fire({
     title: "¿Está Seguro de eliminar el registro?",
-    html: `<b class="text-danger"><del>${nombres}</del></b>`,
+    html: `<b class="text-danger"><del>${escapeHtml(nombres)}</del></b>`,
     icon: "warning",
     showCancelButton: true,
     confirmButtonColor: "#2850a7",
@@ -1235,6 +1265,3 @@ $(function () {
   $('#estado_documentos_update').rules('add', { required: true, messages: {  required: "Campo requerido" } });
 
 });
-
-
-
